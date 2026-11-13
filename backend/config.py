@@ -2,12 +2,12 @@ import os
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "FALCONZ - Indigenous Propulsion Digital Twin"
-    VERSION: str = "1.0.0"
+    PROJECT_NAME: str = "FALCONZ - Indigenous Propulsion Digital Twin & SaaS Platform"
+    VERSION: str = "2.0.0"
     API_V1_STR: str = "/api"
     
     # Telemetry Streaming — 20 Hz high-speed zero-latency broadcast
-    TELEMETRY_HZ: float = 20.0  # 20 Hz base update rate
+    TELEMETRY_HZ: float = 20.0
     TELEMETRY_BUFFER_SIZE: int = 5000
     
     # Safety Limits (Hard Hardware Interlocks)
@@ -30,5 +30,25 @@ class Settings(BaseSettings):
     
     # Model Directory
     MODEL_DIR: str = os.path.join(os.path.dirname(__file__), "models")
+    
+    # Database Configuration
+    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'falconz_saas.db')}")
+    
+    # JWT Authentication & Security
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "falconz_aerospace_super_secure_jwt_secret_key_2026_xai")
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+    
+    # OpenAI API Configuration
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o")
+    
+    # Razorpay Payment Gateway Configuration
+    RAZORPAY_KEY_ID: str = os.getenv("RAZORPAY_KEY_ID", "rzp_test_falconz_2026")
+    RAZORPAY_KEY_SECRET: str = os.getenv("RAZORPAY_KEY_SECRET", "falconz_secret_mock_test_key_123")
+    RAZORPAY_WEBHOOK_SECRET: str = os.getenv("RAZORPAY_WEBHOOK_SECRET", "falconz_webhook_secret_key_456")
+    
+    # PDF Reports Directory
+    REPORTS_DIR: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "reports")
 
 settings = Settings()

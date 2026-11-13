@@ -3,9 +3,11 @@ import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { AlertDrawer } from './components/AlertDrawer';
 import { ParameterHelpModal } from './components/ParameterHelpModal';
+import { UpgradeModal } from './components/UpgradeModal';
+import { Toast } from './components/Toast';
 import { useAppStore } from './state/store';
 
-// Pages
+// Existing 15 Modules (Preserved)
 import { OverviewPage } from './pages/1_Overview';
 import { LiveDigitalTwinPage } from './pages/2_LiveDigitalTwin';
 import { HealthIntelligencePage } from './pages/3_HealthIntelligence';
@@ -22,11 +24,26 @@ import { SafetyCenterPage } from './pages/13_SafetyCenter';
 import { ModelEvaluationPage } from './pages/14_ModelEvaluation';
 import { SettingsPage } from './pages/15_Settings';
 
+// New FALCONZ AI Intelligence & SaaS Modules
+import { AIIntelligenceCenterPage } from './pages/16_AIIntelligenceCenter';
+import { AICopilotPage } from './pages/17_AICopilot';
+import { FleetManagementPage } from './pages/18_FleetManagement';
+import { CloudFlightHistoryPage } from './pages/19_CloudFlightHistory';
+import { AIReportsPage } from './pages/20_AIReports';
+import { AIUsageCenterPage } from './pages/21_AIUsageCenter';
+import { PricingPlansPage } from './pages/22_PricingPlans';
+import { SubscriptionBillingPage } from './pages/23_SubscriptionBilling';
+import { PaymentHistoryPage } from './pages/24_PaymentHistory';
+import { OrganizationManagementPage } from './pages/25_OrganizationManagement';
+import { UserProfilePage } from './pages/26_UserProfile';
+import { SuperAdminCenterPage } from './pages/27_SuperAdminCenter';
+
 export const App: React.FC = () => {
   const { activePage } = useAppStore();
 
   const renderActivePage = () => {
     switch (activePage) {
+      // 15 Existing Modules
       case 'overview':
         return <OverviewPage />;
       case 'live-twin':
@@ -57,6 +74,33 @@ export const App: React.FC = () => {
         return <ModelEvaluationPage />;
       case 'settings':
         return <SettingsPage />;
+
+      // New AI Intelligence & SaaS Modules
+      case 'ai-intelligence':
+        return <AIIntelligenceCenterPage />;
+      case 'ai-copilot':
+        return <AICopilotPage />;
+      case 'fleet-management':
+        return <FleetManagementPage />;
+      case 'flight-history':
+        return <CloudFlightHistoryPage />;
+      case 'ai-reports':
+        return <AIReportsPage />;
+      case 'ai-usage':
+        return <AIUsageCenterPage />;
+      case 'pricing':
+        return <PricingPlansPage />;
+      case 'billing':
+        return <SubscriptionBillingPage />;
+      case 'payment-history':
+        return <PaymentHistoryPage />;
+      case 'organization':
+        return <OrganizationManagementPage />;
+      case 'profile':
+        return <UserProfilePage />;
+      case 'admin':
+        return <SuperAdminCenterPage />;
+
       default:
         return <OverviewPage />;
     }
@@ -68,7 +112,7 @@ export const App: React.FC = () => {
       <div className="flex-1 flex">
         <Sidebar />
         <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto w-full">
-          <div className="max-w-[1280px] mx-auto w-full animate-fadeInUp" key={activePage}>
+          <div className="max-w-[1340px] mx-auto w-full animate-fadeInUp" key={activePage}>
             {renderActivePage()}
           </div>
         </main>
@@ -76,6 +120,8 @@ export const App: React.FC = () => {
 
       <AlertDrawer />
       <ParameterHelpModal />
+      <UpgradeModal />
+      <Toast />
     </div>
   );
 };

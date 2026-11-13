@@ -11,6 +11,31 @@ import { wsService } from '../services/websocket';
 import { api } from '../services/api';
 import { createMockSystemState } from '../services/mockTelemetry';
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string;
+  role: 'SUPER_ADMIN' | 'ORG_ADMIN' | 'ENGINEER' | 'TECHNICIAN' | 'VIEWER';
+  organization?: {
+    id: string;
+    name: string;
+    slug: string;
+    plan_code: 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
+  };
+}
+
+export interface UpgradeModalData {
+  featureName: string;
+  requiredPlan: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
+  message?: string;
+}
+
+export interface ToastNotification {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
 interface AppContextType {
   systemState: FullSystemState | null;
   wsConnected: boolean;
@@ -49,6 +74,24 @@ interface AppContextType {
   triggerEmergencyStop: () => Promise<void>;
   resetEmergencyStop: () => Promise<void>;
   refreshDemoState: () => Promise<void>;
+
+  // SaaS, User & Entitlements State
+  currentUser: UserProfile | null;
+  currentPlan: 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
+  token: string | null;
+  setToken: (token: string | null) => void;
+  logout: () => void;
+  refreshUser: () => Promise<void>;
+  
+  // Upgrade Modal
+  upgradeModalOpen: boolean;
+  upgradeModalData: UpgradeModalData | null;
+  openUpgradeModal: (featureName: string, requiredPlan?: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE', message?: string) => void;
+  closeUpgradeModal: () => void;
+
+  // Toasts
+  toast: ToastNotification | null;
+  showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -65,6 +108,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   });
   const [demoState, setDemoState] = useState<DemoState | null>(null);
   const [activePage, setActivePage] = useState<string>('overview');
+
+  // SaaS User & Subscription state
+  const [token, setTokenState] = useState<string | null>(() => localStorage.getItem('falconz_token'));
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    return {
+      id: 'usr_admin_001',
+      email: 'admin@falconz.aero',
+      full_name: 'Lead Propulsion Engineer',
+      role: 'SUPER_ADMIN',
+      organization: {
+        id: 'org_aero_001',
+        name: 'AeroPropulsion Labs',
+        slug: 'aeropropulsion-labs',
+        plan_code: 'PROFESSIONAL'
+      }
+    };
+  });
+  const [currentPlan, setCurrentPlan] = useState<'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE'>('PROFESSIONAL');
+
+  // Upgrade Modal & Toast State
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState<boolean>(false);
+  const [upgradeModalData, setUpgradeModalData] = useState<UpgradeModalData | null>(null);
+  const [toast, setToast] = useState<ToastNotification | null>(null);
 
   // Client-side simulation state when backend is disconnected
   const simStepRef = useRef(0);
@@ -108,6 +174,59 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSidebarOpen((prev) => !prev);
   };
 
+  const setToken = (t: string | null) => {
+    if (t) {
+      localStorage.setItem('falconz_token', t);
+    } else {
+      localStorage.removeItem('falconz_token');
+    }
+    setTokenState(t);
+  };
+
+  const logout = () => {
+    setToken(null);
+    setCurrentUser(null);
+    setCurrentPlan('FREE');
+    showToast('Logged out successfully', 'info');
+  };
+
+  const refreshUser = async () => {
+    try {
+      const me = await api.getMe();
+      if (me && me.id) {
+        setCurrentUser(me);
+        if (me.organization?.plan_code) {
+          setCurrentPlan(me.organization.plan_code);
+        }
+      }
+    } catch {}
+  };
+
+  const openUpgradeModal = (
+    featureName: string,
+    requiredPlan: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE' = 'PROFESSIONAL',
+    message?: string
+  ) => {
+    setUpgradeModalData({ featureName, requiredPlan, message });
+    setUpgradeModalOpen(true);
+  };
+
+  const closeUpgradeModal = () => {
+    setUpgradeModalOpen(false);
+    setUpgradeModalData(null);
+  };
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ id: `${Date.now()}`, message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 4000);
+  };
+
+  useEffect(() => {
+    refreshUser();
+  }, [token]);
+
   useEffect(() => {
     wsService.connect();
 
@@ -121,16 +240,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     let lastHistoryPush = 0;
     const unsubMsg = wsService.subscribe((state) => {
       isBackendLiveRef.current = true;
-      // Instant zero-latency telemetry update for 3D twin, live gauges, and HUD
       setSystemState(state);
 
-      // Throttle heavy historical chart re-renders to 2 Hz (every 500ms)
       const now = performance.now();
       if (now - lastHistoryPush >= 500) {
         lastHistoryPush = now;
         setHistory((prev) => {
           const next = [...prev, state];
-          // Keep up to 3000 points ≈ 25m at 2Hz to support 5m/10m/20m windows
           return next.length > 3000 ? next.slice(-3000) : next;
         });
       }
@@ -198,140 +314,73 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         target: 'GLOBAL PROPULSION',
         event: 'Emergency Stop Interlock Active',
         evidence: 'Propulsion output commands cut off due to operator or safety guard trigger.',
-        action: 'Inspect hardware, ensure area is clear, and reset software/physical E-Stop.'
+        action: 'Inspect hardware, clear physical hazards, and reset latch via Safety Center.'
       });
     }
 
-    // 2. Critical Safety Threshold Violations
-    const tempC = tel.temperature_c ?? 25.0;
-    if (tempC > 75) {
+    // 2. Hardware Over-Temperature Breach
+    if (tel.temperature_c > 80.0) {
       alerts.push({
-        id: 'alert_temp_crit',
+        id: 'alert_temp_high',
         timestamp: now,
         level: 'CRITICAL',
-        target: 'MOTOR / STATOR',
-        parameter: 'Temperature',
-        measured: `${tempC.toFixed(1)} °C`,
-        limit: '75.0 °C',
-        event: 'Motor Stator Temperature Exceeded Critical Safety Limit',
-        evidence: `Measured ${tempC.toFixed(1)} °C vs 75.0 °C safety threshold.`,
-        action: 'STOP MOTOR OPERATION / FOLLOW SAFE SHUTDOWN PROCEDURE.'
+        target: 'Stator Winding',
+        event: `Temperature Limit Exceeded (${tel.temperature_c.toFixed(1)}°C > 80.0°C)`,
+        evidence: `Direct ESC/sensor measurement exceeds hard interlock bounds.`,
+        action: 'Throttle back immediately to prevent permanent winding insulation breakdown.'
       });
-    } else if (tempC > 60) {
+    } else if (tel.temperature_c > 65.0) {
       alerts.push({
         id: 'alert_temp_warn',
         timestamp: now,
         level: 'WARNING',
-        target: 'MOTOR / STATOR',
-        parameter: 'Temperature',
-        measured: `${tempC.toFixed(1)} °C`,
-        limit: '60.0 °C',
-        event: 'Motor Temperature Elevation Detected',
-        evidence: `Measured temperature elevated at ${tempC.toFixed(1)} °C.`,
-        action: 'Reduce throttle load and verify air cooling flow.'
+        target: 'Stator Winding',
+        event: `Elevated Motor Temperature (${tel.temperature_c.toFixed(1)}°C)`,
+        evidence: 'Thermal model shows rapid heat accumulation rate.',
+        action: 'Reduce continuous throttle load and check cooling airflow duct.'
       });
     }
 
-    const vibG = tel.vibration_rms_g ?? 0.05;
-    if (vibG > 0.45) {
+    // 3. Current Over-Draw Breach
+    if (tel.current_a > 35.0) {
+      alerts.push({
+        id: 'alert_curr_high',
+        timestamp: now,
+        level: 'CRITICAL',
+        target: 'ESC Inverter',
+        event: `Current Limit Exceeded (${tel.current_a.toFixed(1)}A > 35.0A)`,
+        evidence: 'Phase current approaching MOSFET thermal desoldering limit.',
+        action: 'Reduce commanded power or engage automatic Assisted Derate mode.'
+      });
+    }
+
+    // 4. Vibration Spike
+    if (tel.vibration_rms_g > 2.0) {
       alerts.push({
         id: 'alert_vib_crit',
         timestamp: now,
         level: 'CRITICAL',
-        target: 'PROPULSION IMU',
-        parameter: 'Vibration',
-        measured: `${vibG.toFixed(3)} g`,
-        limit: '0.450 g',
-        event: 'Excessive Structural / Motor Vibration Magnitude',
-        evidence: `IMU vibration level is ${vibG.toFixed(3)} g exceeding 0.450 g limit.`,
-        action: 'STOP OPERATION. Inspect propeller balance, motor bearings and arm mounting.'
+        target: 'Bearing & Propeller Hub',
+        event: `Severe Vibration Level (${tel.vibration_rms_g.toFixed(2)}g > 2.00g)`,
+        evidence: 'Exceeds structural airframe safe oscillation threshold.',
+        action: 'Inspect propeller tracking and check motor mount screw torque.'
       });
-    } else if (vibG > 0.25) {
+    }
+
+    // 5. ML Confirmed Anomaly & Fault
+    if (intel && intel.is_anomaly && intel.anomaly_severity !== 'NOMINAL') {
       alerts.push({
-        id: 'alert_vib_warn',
+        id: 'alert_ml_fault',
         timestamp: now,
-        level: 'WARNING',
-        target: 'PROPULSION IMU',
-        parameter: 'Vibration',
-        measured: `${vibG.toFixed(3)} g`,
-        limit: '0.250 g',
-        event: 'Elevated Vibration Baseline',
-        evidence: `Vibration reading ${vibG.toFixed(3)} g above nominal baseline.`,
-        action: 'Check propeller track and mechanical fasteners at next maintenance.'
+        level: intel.anomaly_severity === 'CRITICAL' ? 'CRITICAL' : 'WARNING',
+        target: intel.predicted_fault || 'Propulsion System',
+        event: `AI Diagnostic: ${intel.predicted_fault} (${intel.fault_confidence_pct.toFixed(0)}% conf)`,
+        evidence: intel.xai_what || 'Multi-channel residual deviation verified across feature pipeline.',
+        action: intel.xai_recommendation || 'Initiate scheduled maintenance review.'
       });
     }
 
-    const currA = tel.current_a ?? 0.0;
-    if (currA > 18.0) {
-      alerts.push({
-        id: 'alert_curr_crit',
-        timestamp: now,
-        level: 'CRITICAL',
-        target: 'ESC ELECTRICAL',
-        parameter: 'Current',
-        measured: `${currA.toFixed(2)} A`,
-        limit: '18.00 A',
-        event: 'ESC Overcurrent Safety Exceeded',
-        evidence: `Current draw ${currA.toFixed(2)} A exceeds 18.0 A continuous safe threshold.`,
-        action: 'Reduce throttle immediately. Inspect for aerodynamic stall or motor short.'
-      });
-    }
-
-    // 3. Multi-Motor Imbalance Alert (Channel Deviation)
-    if (tel.rpm_imbalance_pct !== null && tel.rpm_imbalance_pct !== undefined && tel.rpm_imbalance_pct > 15) {
-      alerts.push({
-        id: 'alert_rpm_imbalance',
-        timestamp: now,
-        level: 'WARNING',
-        target: '4-MOTOR CLUSTER',
-        event: 'Motor Performance Deviation Detected',
-        evidence: `Cross-motor RPM deviation of ${(tel.rpm_imbalance_pct || 0).toFixed(0)} RPM between propulsion channels.`,
-        action: 'Inspect ESC calibration, propeller condition, and telemetry wiring.'
-      });
-    }
-
-    // 4. Anomaly & ML Fault Prediction Alert
-    if (intel.is_anomaly && intel.predicted_fault && intel.predicted_fault !== 'NORMAL') {
-      const isHighRisk = intel.anomaly_severity === 'CRITICAL' || intel.fault_severity === 'CRITICAL';
-      const faultName = intel.predicted_fault.replace(/_/g, ' ');
-      const faultConf = (intel.fault_confidence_pct ?? 90).toFixed(0);
-      alerts.push({
-        id: 'alert_ml_pred',
-        timestamp: now,
-        level: isHighRisk ? 'CRITICAL' : 'WARNING',
-        target: intel.affected_subsystem || 'BLDC PROPULSION',
-        event: `${faultName} (${faultConf}% Confidence)`,
-        evidence: intel.xai_why || 'Telemetry residuals deviate significantly from learned operating baseline.',
-        action: intel.xai_recommendation || 'Inspect propulsion subsystem before continued flight.'
-      });
-    }
-
-    // 5. MAVLink / Telemetry Link State Alert
-    if (tel.source_type === 'APM_MAVLINK') {
-      if (tel.connection_status === 'CONNECTED' && tel.heartbeat_received) {
-        alerts.push({
-          id: 'alert_link_ok',
-          timestamp: now,
-          level: 'INFO',
-          target: 'APM MAVLINK',
-          event: 'APM MAVLink Connection Active',
-          evidence: `Heartbeat verified at ${tel.packet_rate_hz || 10} Hz.`,
-          action: 'Telemetry streaming live from hardware.'
-        });
-      } else if (tel.connection_status === 'STALE') {
-        alerts.push({
-          id: 'alert_link_stale',
-          timestamp: now,
-          level: 'WARNING',
-          target: 'APM MAVLINK',
-          event: 'MAVLink Telemetry Stream Stale',
-          evidence: `No valid packet received in the last ${(tel.telemetry_age_ms || 3000) / 1000}s.`,
-          action: 'Check USB serial / radio link and flight controller power.'
-        });
-      }
-    }
-
-    return alerts.filter(a => !dismissedAlertIds.has(a.id));
+    return alerts.filter((a) => !dismissedAlertIds.has(a.id));
   }, [systemState, dismissedAlertIds]);
 
   const dismissAlert = (id: string) => {
@@ -416,7 +465,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setControlMode,
         triggerEmergencyStop,
         resetEmergencyStop,
-        refreshDemoState
+        refreshDemoState,
+        currentUser,
+        currentPlan,
+        token,
+        setToken,
+        logout,
+        refreshUser,
+        upgradeModalOpen,
+        upgradeModalData,
+        openUpgradeModal,
+        closeUpgradeModal,
+        toast,
+        showToast
       }
     },
     children
@@ -428,4 +489,3 @@ export const useAppStore = () => {
   if (!context) throw new Error('useAppStore must be used within an AppProvider');
   return context;
 };
-

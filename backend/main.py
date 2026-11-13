@@ -33,6 +33,14 @@ from backend.api.routes_mission import router as mission_router
 from backend.api.routes_hardware import router as hardware_router
 from backend.api.routes_safety import router as safety_router
 from backend.api.routes_demo import router as demo_router
+from backend.api.routes_auth import router as auth_router
+from backend.api.routes_subscriptions import router as subscription_router
+from backend.api.routes_payments import router as payment_router
+from backend.api.routes_ai import router as ai_router
+from backend.api.routes_reports import router as reports_router
+from backend.api.routes_fleet import router as fleet_router
+from backend.api.routes_org import router as org_router
+from backend.api.routes_admin import router as admin_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("falconz_backend")
@@ -365,6 +373,12 @@ streaming_worker = TelemetryStreamingWorker()
 async def lifespan(app: FastAPI):
     global _async_loop
     _async_loop = asyncio.get_running_loop()
+    # Initialize & seed SQLite database
+    from backend.database.session import init_db
+    try:
+        init_db()
+    except Exception as e:
+        logger.error(f"Database initialization error: {e}")
     # Reload models if created
     anomaly_detector.load_model()
     fault_classifier.load_model()
@@ -397,6 +411,14 @@ app.include_router(mission_router, prefix=settings.API_V1_STR)
 app.include_router(hardware_router, prefix=settings.API_V1_STR)
 app.include_router(safety_router, prefix=settings.API_V1_STR)
 app.include_router(demo_router, prefix=settings.API_V1_STR)
+app.include_router(auth_router, prefix=settings.API_V1_STR)
+app.include_router(subscription_router, prefix=settings.API_V1_STR)
+app.include_router(payment_router, prefix=settings.API_V1_STR)
+app.include_router(ai_router, prefix=settings.API_V1_STR)
+app.include_router(reports_router, prefix=settings.API_V1_STR)
+app.include_router(fleet_router, prefix=settings.API_V1_STR)
+app.include_router(org_router, prefix=settings.API_V1_STR)
+app.include_router(admin_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def root():

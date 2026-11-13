@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Bell, Sun, Moon, Radio, Power, RefreshCw } from 'lucide-react';
+import { 
+  Menu, Bell, Sun, Moon, Radio, Power, RefreshCw, 
+  Sparkles, Bot, User as UserIcon, Shield 
+} from 'lucide-react';
 import { useAppStore } from '../state/store';
 import { api } from '../services/api';
 
 export const Navbar: React.FC = () => {
-  const { theme, toggleTheme, toggleSidebar, activeAlerts, setAlertDrawerOpen, systemState } = useAppStore();
+  const { 
+    theme, toggleTheme, toggleSidebar, activeAlerts, setAlertDrawerOpen, 
+    systemState, currentUser, currentPlan, setActivePage 
+  } = useAppStore();
   const [diag, setDiag] = useState<any>(null);
   const [isConnectedLocally, setIsConnectedLocally] = useState<boolean>(false);
   const [ports, setPorts] = useState<any[]>([]);
@@ -92,16 +98,19 @@ export const Navbar: React.FC = () => {
           <button onClick={toggleSidebar} className="w-8 h-8 rounded-md flex items-center justify-center border hover:bg-neutral-50 dark:hover:bg-neutral-900" style={{ borderColor: 'var(--border)', color: 'var(--text)' }} aria-label="Toggle menu">
             <Menu className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-2.5 pl-3 ml-1 border-l" style={{ borderColor: 'var(--border)' }}>
-            <div className="w-7 h-7 rounded-md bg-black dark:bg-white flex items-center justify-center">
-              <span className="text-[11px] font-bold text-white dark:text-black tracking-widest">F</span>
+          <div className="flex items-center gap-2.5 pl-3 ml-1 border-l cursor-pointer" onClick={() => setActivePage('overview')} style={{ borderColor: 'var(--border)' }}>
+            <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-purple-700 to-indigo-600 flex items-center justify-center shadow-sm">
+              <span className="text-[11px] font-bold text-white tracking-widest">F</span>
             </div>
-            <span className="text-[13px] font-semibold tracking-[0.16em]" style={{ color: 'var(--text)' }}>FALCONZ</span>
-            <span className="hidden sm:inline text-[11px] font-medium" style={{ color: 'var(--text-muted)' }}>GCS</span>
+            <span className="text-[13px] font-semibold tracking-[0.16em] text-white">FALCONZ</span>
+            <span className="hidden sm:inline text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              AERO-TWIN
+            </span>
           </div>
-          <div className="hidden md:flex items-center gap-1.5 ml-4 pl-4 border-l text-xs" style={{ borderColor: 'var(--border)' }}>
+
+          <div className="hidden md:flex items-center gap-1.5 ml-3 pl-3 border-l text-xs" style={{ borderColor: 'var(--border)' }}>
             <span className={`w-2 h-2 rounded-full ${isStreaming ? 'animate-pulse' : ''}`} style={{ background: isHardwareLive ? '#10b981' : isSimLive ? '#0284c7' : '#d4d4d4' }} />
-            <span className="font-semibold tracking-wide text-xs" style={{ color: isStreaming ? 'var(--text)' : 'var(--text-faint)' }}>
+            <span className="font-semibold tracking-wide text-[11px]" style={{ color: isStreaming ? 'var(--text)' : 'var(--text-faint)' }}>
               {isHardwareLive ? 'LIVE HARDWARE' : isSimLive ? 'SIMULATION (20 Hz)' : 'OFFLINE'}
             </span>
           </div>
@@ -145,14 +154,39 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* RIGHT */}
+        {/* RIGHT — AI Copilot Shortcut + Plan Tier Badge + User + Alerts + Theme */}
         <div className="flex items-center gap-2 shrink-0">
-          <a href="#hardware" onClick={e=>{e.preventDefault(); document.dispatchEvent(new CustomEvent('falconz:navigate',{detail:'hardware-center'}));}} className="lg:hidden text-[11px] px-2.5 py-1 rounded-full border lg:hidden" style={{ borderColor:'var(--border)', color:'var(--text-muted)'}}>
-            Connect
-          </a>
+          {/* Quick AI Copilot Button */}
+          <button
+            onClick={() => setActivePage('ai-copilot')}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-600/15 text-purple-300 border border-purple-500/30 hover:bg-purple-600/25 transition-colors"
+          >
+            <Bot className="w-3.5 h-3.5 text-purple-400" />
+            <span>Copilot</span>
+          </button>
+
+          {/* Plan Pill with Upgrade Action */}
+          <button
+            onClick={() => setActivePage('pricing')}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-colors"
+            title="Click to manage subscription"
+          >
+            <Sparkles className="w-3 h-3 text-purple-400" />
+            <span>{currentPlan}</span>
+          </button>
+
+          {/* User Profile Avatar */}
+          <button
+            onClick={() => setActivePage('profile')}
+            className="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-xs font-bold text-white hover:border-purple-400 transition-colors"
+            title={currentUser?.email || 'User Profile'}
+          >
+            {currentUser?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
+          </button>
+
           <button onClick={() => setAlertDrawerOpen(true)} className="relative w-8 h-8 rounded-md flex items-center justify-center border hover:bg-neutral-50 dark:hover:bg-neutral-900" style={{ borderColor:'var(--border)', color:'var(--text-muted)'}} aria-label="Alerts">
             <Bell className="w-4 h-4" />
-            {unread>0 && <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-black dark:bg-white text-white dark:text-black text-[11px] font-medium flex items-center justify-center">{unread}</span>}
+            {unread>0 && <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center">{unread}</span>}
           </button>
           <button onClick={toggleTheme} className="w-8 h-8 rounded-md flex items-center justify-center border hover:bg-neutral-50 dark:hover:bg-neutral-900" style={{ borderColor:'var(--border)', color:'var(--text-muted)'}} aria-label="Toggle theme">
             {theme==='dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
