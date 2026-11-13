@@ -15,9 +15,16 @@ class TelemetryWebSocketService {
       return;
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws/telemetry`;
+    const customWs = (import.meta.env.VITE_WS_BASE_URL as string | undefined)?.trim();
+    let wsUrl: string;
+    if (customWs) {
+      const clean = customWs.replace(/\/$/, '');
+      wsUrl = clean.endsWith('/ws/telemetry') ? clean : `${clean}/ws/telemetry`;
+    } else {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.host;
+      wsUrl = `${protocol}//${host}/ws/telemetry`;
+    }
 
     try {
       this.socket = new WebSocket(wsUrl);

@@ -39,7 +39,7 @@ class TelemetryGenerator:
                 "motor_1": True,
                 "motor_2": True,
                 "motor_3": True,
-                "motor_4": False
+                "motor_4": True
             }
         
         # Individual motor variations (simulating real-world arm differences)

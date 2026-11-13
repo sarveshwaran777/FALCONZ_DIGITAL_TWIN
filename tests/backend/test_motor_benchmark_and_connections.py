@@ -116,6 +116,6 @@ def test_dedicated_motors_telemetry_endpoint():
     assert restored_data["live_rpm"] > 0.0
     assert restored_data["thrust_g"] > 0.0
     
-    # Restore physical bench rig default (3 motors active, motor 4 disconnected)
-    client.post("/api/hardware/motor-connection", json={"motor_id": "motor_4", "is_connected": False})
+    # Ensure all motors remain connected
+    client.post("/api/hardware/motor-connection-all", json={"is_connected": True})
 

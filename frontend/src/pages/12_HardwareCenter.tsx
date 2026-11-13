@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Radio, Cpu, Power, CheckCircle, AlertCircle, XCircle, RefreshCw, Layers, ShieldCheck, Database, FileText, HardDrive, Download, Disc, Sliders, Activity, HelpCircle, Save, Zap, Gauge, Flame, Wind, ArrowUpDown, ChevronRight, BarChart2 } from 'lucide-react';
-import { api } from '../services/api';
+import { api, API_BASE } from '../services/api';
 import { useAppStore } from '../state/store';
 import { APMConnectionCard } from '../components/APMConnectionCard';
 import { StatusBadge } from '../components/StatusBadge';
@@ -576,14 +576,14 @@ export const HardwareCenterPage: React.FC = () => {
               {/* Download Buttons */}
               <div className="flex items-center gap-2">
                 <a
-                  href="/api/hardware/motor-benchmark/csv"
+                  href={`${API_BASE}/hardware/motor-benchmark/csv`}
                   download="a2212_15t_930kv_efficiency_data.csv"
                   className="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 py-1.5 px-3 rounded-lg border border-slate-300 flex items-center gap-1.5 transition-colors shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5 text-sky-600" /> Export CSV
                 </a>
                 <a
-                  href="/api/hardware/motor-benchmark"
+                  href={`${API_BASE}/hardware/motor-benchmark`}
                   download="a2212_15t_930kv_benchmark.json"
                   className="text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-800 py-1.5 px-3 rounded-lg border border-sky-300 flex items-center gap-1.5 transition-colors shadow-2xs"
                 >
@@ -1045,7 +1045,7 @@ export const HardwareCenterPage: React.FC = () => {
                         <td className="py-2 text-slate-600">{r.data_source}</td>
                         <td className="py-2 flex items-center gap-2">
                           <a
-                            href={`/api/telemetry/record/export/${r.session_id}.csv`}
+                            href={`${API_BASE}/telemetry/record/export/${r.session_id}.csv`}
                             target="_blank"
                             rel="noreferrer"
                             className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-800 px-2 py-1 rounded flex items-center gap-1"
@@ -1053,7 +1053,7 @@ export const HardwareCenterPage: React.FC = () => {
                             <Download className="w-3 h-3" /> CSV
                           </a>
                           <a
-                            href={`/api/telemetry/record/export/${r.session_id}.json`}
+                            href={`${API_BASE}/telemetry/record/export/${r.session_id}.json`}
                             target="_blank"
                             rel="noreferrer"
                             className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-800 px-2 py-1 rounded flex items-center gap-1"

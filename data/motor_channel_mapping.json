@@ -25,6 +25,6 @@
     "label": "Motor 4 - Rear Right (CCW)",
     "esc_instance": 3,
     "servo_channel": 4,
-    "is_connected": false
+    "is_connected": true
   }
 }

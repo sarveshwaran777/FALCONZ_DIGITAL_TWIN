@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useRef } from 'react';
 import { 
   FullSystemState, 
   ScenarioType, 
@@ -9,6 +9,7 @@ import {
 } from '../types/telemetry';
 import { wsService } from '../services/websocket';
 import { api } from '../services/api';
+import { createMockSystemState } from '../services/mockTelemetry';
 
 interface AppContextType {
   systemState: FullSystemState | null;
@@ -53,11 +54,25 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | null>(null);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [systemState, setSystemState] = useState<FullSystemState | null>(null);
+  const [systemState, setSystemState] = useState<FullSystemState | null>(() => createMockSystemState(0));
   const [wsConnected, setWsConnected] = useState<boolean>(false);
-  const [history, setHistory] = useState<FullSystemState[]>([]);
+  const [history, setHistory] = useState<FullSystemState[]>(() => {
+    const init: FullSystemState[] = [];
+    for (let i = 20; i >= 0; i--) {
+      init.push(createMockSystemState(-i, 'NORMAL', 0, 55, false));
+    }
+    return init;
+  });
   const [demoState, setDemoState] = useState<DemoState | null>(null);
   const [activePage, setActivePage] = useState<string>('overview');
+
+  // Client-side simulation state when backend is disconnected
+  const simStepRef = useRef(0);
+  const simThrottleRef = useRef(55);
+  const simEStopRef = useRef(false);
+  const simScenarioRef = useRef<ScenarioType>('NORMAL');
+  const simSeverityRef = useRef(0.0);
+  const isBackendLiveRef = useRef(false);
 
   // Theme setup (default dark for aerospace GCS)
   const [theme, setThemeState] = useState<'light' | 'dark'>(() => {
@@ -98,10 +113,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const unsubStatus = wsService.subscribeStatus((connected) => {
       setWsConnected(connected);
+      if (connected) {
+        isBackendLiveRef.current = true;
+      }
     });
 
     let lastHistoryPush = 0;
     const unsubMsg = wsService.subscribe((state) => {
+      isBackendLiveRef.current = true;
       // Instant zero-latency telemetry update for 3D twin, live gauges, and HUD
       setSystemState(state);
 
@@ -118,17 +137,47 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
 
     // Initial fallback REST poll
-    api.getFullSystemState().then(setSystemState).catch(() => {});
+    api.getFullSystemState().then((state) => {
+      if (state && state.telemetry) {
+        isBackendLiveRef.current = true;
+        setSystemState(state);
+      }
+    }).catch(() => {});
     api.getDemoState().then(setDemoState).catch(() => {});
 
     const demoPollInterval = setInterval(() => {
       api.getDemoState().then(setDemoState).catch(() => {});
     }, 2000);
 
+    // Client-side simulation ticker at 5 Hz when backend is offline
+    const simInterval = setInterval(() => {
+      if (!isBackendLiveRef.current) {
+        simStepRef.current += 1;
+        const mock = createMockSystemState(
+          simStepRef.current,
+          simScenarioRef.current,
+          simSeverityRef.current,
+          simThrottleRef.current,
+          simEStopRef.current
+        );
+        setSystemState(mock);
+
+        const now = performance.now();
+        if (now - lastHistoryPush >= 500) {
+          lastHistoryPush = now;
+          setHistory((prev) => {
+            const next = [...prev, mock];
+            return next.length > 3000 ? next.slice(-3000) : next;
+          });
+        }
+      }
+    }, 200);
+
     return () => {
       unsubStatus();
       unsubMsg();
       clearInterval(demoPollInterval);
+      clearInterval(simInterval);
     };
   }, []);
 
@@ -290,32 +339,51 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const setThrottle = async (throttle: number, load?: number) => {
-    await api.setThrottle(throttle, load);
+    simThrottleRef.current = throttle;
+    try {
+      await api.setThrottle(throttle, load);
+    } catch {}
   };
 
   const setScenario = async (scenario: ScenarioType, severity = 0.5) => {
-    await api.setScenario(scenario, severity);
+    simScenarioRef.current = scenario;
+    simSeverityRef.current = severity;
+    try {
+      await api.setScenario(scenario, severity);
+    } catch {}
   };
 
   const setSource = async (source: TelemetrySource) => {
-    await api.setTelemetrySource(source);
+    try {
+      await api.setTelemetrySource(source);
+    } catch {}
   };
 
   const setControlMode = async (mode: ControlMode) => {
-    await api.setControlMode(mode);
+    try {
+      await api.setControlMode(mode);
+    } catch {}
   };
 
   const triggerEmergencyStop = async () => {
-    await api.triggerEmergencyStop();
+    simEStopRef.current = true;
+    try {
+      await api.triggerEmergencyStop();
+    } catch {}
   };
 
   const resetEmergencyStop = async () => {
-    await api.resetEmergencyStop();
+    simEStopRef.current = false;
+    try {
+      await api.resetEmergencyStop();
+    } catch {}
   };
 
   const refreshDemoState = async () => {
-    const d = await api.getDemoState();
-    setDemoState(d);
+    try {
+      const d = await api.getDemoState();
+      setDemoState(d);
+    } catch {}
   };
 
   return React.createElement(

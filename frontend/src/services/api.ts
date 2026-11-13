@@ -1,6 +1,7 @@
 import { ScenarioType, TelemetrySource, ControlMode, MotorBenchmarkData } from '../types/telemetry';
 
-const API_BASE = '/api';
+const customApiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+export const API_BASE = customApiBase ? customApiBase.replace(/\/$/, '') : '/api';
 
 export const api = {
   async getMotorBenchmark(): Promise<MotorBenchmarkData> {

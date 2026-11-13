@@ -18,7 +18,7 @@ import {
   Radio
 } from 'lucide-react';
 import { useAppStore } from '../state/store';
-import { api } from '../services/api';
+import { api, API_BASE } from '../services/api';
 
 const MOTOR_KEYS = ['motor_1', 'motor_2', 'motor_3', 'motor_4'] as const;
 
@@ -45,7 +45,7 @@ export const DataTelemetryPage: React.FC = () => {
   }, []);
 
   const handleExportCSV = () => {
-    window.open('/api/telemetry/export-csv', '_blank');
+    window.open(`${API_BASE}/telemetry/export-csv`, '_blank');
   };
 
   const filteredHistory = filterSource === 'ALL'
