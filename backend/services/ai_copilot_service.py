@@ -228,8 +228,9 @@ LIVE TELEMETRY & TWIN SNAPSHOT:
         rul = ctx.get("rul_hours")
         composite_z = ctx.get("composite_residual_score", 0.0)
 
-        # 1. Greetings and conversational introductions
-        if any(greet in q for greet in ["hi", "hello", "hey", "good morning", "good evening", "who are you", "what can you do"]):
+        # 1. Greetings and conversational introductions (with word boundaries)
+        import re
+        if re.search(r'\b(hi|hello|hey|good\s+morning|good\s+evening|who\s+are\s+you|what\s+can\s+you\s+do)\b', q):
             text = (
                 f"### 👋 Greetings, Commander. FALCONZ Copilot Online\n\n"
                 f"I am actively monitoring your **UAV Propulsion System** in real-time at **20 Hz**.\n\n"
