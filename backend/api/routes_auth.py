@@ -184,3 +184,4 @@ def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
         "status": "SUCCESS",
         "message": f"If an account exists for {req.email}, a secure password reset link has been dispatched."
     }
+

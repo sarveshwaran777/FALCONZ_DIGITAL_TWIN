@@ -299,3 +299,4 @@ def seed_initial_data(db: Session):
             ))
 
         db.commit()
+

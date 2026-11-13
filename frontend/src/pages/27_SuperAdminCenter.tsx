@@ -67,11 +67,11 @@ export const SuperAdminCenterPage: React.FC = () => {
               RESTRICTED // ROOT ACCESS ONLY
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <ShieldAlert className="w-6 h-6 text-red-400" />
+          <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
+            <ShieldAlert className="w-6 h-6 text-red-500" />
             Super Admin Control Center
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
             Real-time SaaS recurring revenue metrics, subscription plan pricing overrides, user permissions and security audit trail.
           </p>
         </div>
@@ -79,38 +79,38 @@ export const SuperAdminCenterPage: React.FC = () => {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl border bg-white/5 space-y-1">
-          <span className="text-slate-400 text-[10px] uppercase font-mono">Monthly Recurring Revenue</span>
-          <span className="text-2xl font-extrabold text-emerald-400 font-mono block">
+        <div className="p-5 rounded-2xl border space-y-1" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+          <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-mono font-semibold">Monthly Recurring Revenue</span>
+          <span className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono block">
             ₹{metrics?.monthly_recurring_revenue_inr?.toLocaleString('en-IN') || '0'}
           </span>
-          <span className="text-[10px] text-slate-500">Active Paid Subscriptions</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">Active Paid Subscriptions</span>
         </div>
 
-        <div className="p-5 rounded-2xl border bg-white/5 space-y-1">
-          <span className="text-slate-400 text-[10px] uppercase font-mono">Annual Run Rate (ARR)</span>
-          <span className="text-2xl font-extrabold text-cyan-400 font-mono block">
+        <div className="p-5 rounded-2xl border space-y-1" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+          <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-mono font-semibold">Annual Run Rate (ARR)</span>
+          <span className="text-2xl font-extrabold text-cyan-600 dark:text-cyan-400 font-mono block">
             ₹{metrics?.annual_recurring_revenue_inr?.toLocaleString('en-IN') || '0'}
           </span>
-          <span className="text-[10px] text-slate-500">Projected Run Rate</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">Projected Run Rate</span>
         </div>
 
-        <div className="p-5 rounded-2xl border bg-white/5 space-y-1">
-          <span className="text-slate-400 text-[10px] uppercase font-mono">Total Operators</span>
-          <span className="text-2xl font-extrabold text-white font-mono block">
+        <div className="p-5 rounded-2xl border space-y-1" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+          <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-mono font-semibold">Total Operators</span>
+          <span className="text-2xl font-extrabold font-mono block" style={{ color: 'var(--text)' }}>
             {metrics?.total_users || 0}
           </span>
-          <span className="text-[10px] text-purple-400 font-mono font-bold">
+          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-mono font-bold">
             {metrics?.paid_subscribers || 0} Paid | {metrics?.free_users || 0} Free
           </span>
         </div>
 
-        <div className="p-5 rounded-2xl border bg-white/5 space-y-1">
-          <span className="text-slate-400 text-[10px] uppercase font-mono">Registered Drones</span>
-          <span className="text-2xl font-extrabold text-white font-mono block">
+        <div className="p-5 rounded-2xl border space-y-1" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+          <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-mono font-semibold">Registered Drones</span>
+          <span className="text-2xl font-extrabold font-mono block" style={{ color: 'var(--text)' }}>
             {metrics?.total_registered_drones || 0}
           </span>
-          <span className="text-[10px] text-slate-500">Across {metrics?.active_organizations || 0} Organizations</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400">Across {metrics?.active_organizations || 0} Organizations</span>
         </div>
       </div>
 
@@ -218,3 +218,4 @@ export const SuperAdminCenterPage: React.FC = () => {
     </div>
   );
 };
+

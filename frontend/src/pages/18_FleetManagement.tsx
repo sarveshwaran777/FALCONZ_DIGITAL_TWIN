@@ -62,11 +62,11 @@ export const FleetManagementPage: React.FC = () => {
             </span>
             <span className="text-xs text-slate-400">Total: {drones.length} Aircraft</span>
           </div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <Users className="w-6 h-6 text-cyan-400" />
+          <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
+            <Users className="w-6 h-6 text-cyan-500" />
             Drone Fleet Management
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
             Monitor, calibrate and manage multi-aircraft propulsion systems across your organization.
           </p>
         </div>
@@ -103,8 +103,8 @@ export const FleetManagementPage: React.FC = () => {
               </div>
 
               {/* Drone Name & Frame */}
-              <h3 className="text-base font-bold text-white tracking-tight">{d.name}</h3>
-              <p className="text-xs text-slate-400 mb-4">{d.frame_type}</p>
+              <h3 className="text-base font-bold tracking-tight" style={{ color: 'var(--text)' }}>{d.name}</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{d.frame_type}</p>
 
               {/* Health & Metrics Bar */}
               <div className="space-y-3 pt-3 border-t border-white/5 text-xs font-mono">
@@ -154,42 +154,45 @@ export const FleetManagementPage: React.FC = () => {
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-bold text-white mb-1">Register Aircraft to Fleet</h3>
-            <p className="text-xs text-slate-400 mb-5">
+            <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--text)' }}>Register Aircraft to Fleet</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">
               Connect a physical or simulated UAV airframe to your organization's digital twin telemetry bus.
             </p>
 
             <form onSubmit={handleRegister} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Aircraft Name</label>
+                <label className="block font-semibold mb-1" style={{ color: 'var(--text)' }}>Aircraft Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Falcon-Surveyor-04"
                   value={droneName}
                   onChange={(e) => setDroneName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-cyan-500"
+                  style={{ background: 'var(--input-bg)', color: 'var(--text)', borderColor: 'var(--border)' }}
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Hardware Serial Number</label>
+                <label className="block font-semibold mb-1" style={{ color: 'var(--text)' }}>Hardware Serial Number</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. FLC-F450-SN-004"
                   value={serialNumber}
                   onChange={(e) => setSerialNumber(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-cyan-500"
+                  style={{ background: 'var(--input-bg)', color: 'var(--text)', borderColor: 'var(--border)' }}
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Frame Architecture</label>
+                <label className="block font-semibold mb-1" style={{ color: 'var(--text)' }}>Frame Architecture</label>
                 <select
                   value={frameType}
                   onChange={(e) => setFrameType(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-cyan-500"
+                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-cyan-500"
+                  style={{ background: 'var(--input-bg)', color: 'var(--text)', borderColor: 'var(--border)' }}
                 >
                   <option value="Quadcopter F450">Quadcopter F450 (4× BLDC)</option>
                   <option value="Hexacopter F550">Hexacopter F550 (6× BLDC)</option>
@@ -220,3 +223,4 @@ export const FleetManagementPage: React.FC = () => {
     </div>
   );
 };
+

@@ -58,3 +58,4 @@
    - Physics residuals ($\Delta \text{RPM}, \Delta I, \Delta T, \Delta V$) are referenced with exact numerical precision.
 4. **Report Generation**:
    - Publication-grade PDF reports generate dynamically in under `0.5s` using ReportLab flowables.
+

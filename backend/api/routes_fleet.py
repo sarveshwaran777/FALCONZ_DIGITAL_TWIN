@@ -161,3 +161,4 @@ def get_cloud_flight_history(
         }
         for s in sessions
     ]
+

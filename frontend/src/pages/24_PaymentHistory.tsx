@@ -23,11 +23,11 @@ export const PaymentHistoryPage: React.FC = () => {
           </span>
           <span className="text-xs text-slate-400">Total: {history.length} Transactions</span>
         </div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-          <History className="w-6 h-6 text-purple-400" />
+        <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
+          <History className="w-6 h-6 text-purple-500" />
           Razorpay Payment History
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
           Cryptographically signed payment transaction records, order IDs, and payment verification timestamps.
         </p>
       </div>
@@ -36,7 +36,7 @@ export const PaymentHistoryPage: React.FC = () => {
       <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-white/5 border-b border-white/5 text-slate-400 text-[11px] uppercase tracking-wider">
+            <thead className="border-b text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-bold" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
               <tr>
                 <th className="px-5 py-3.5">Razorpay Order ID</th>
                 <th className="px-4 py-3.5">Payment ID</th>
@@ -79,3 +79,4 @@ export const PaymentHistoryPage: React.FC = () => {
     </div>
   );
 };
+

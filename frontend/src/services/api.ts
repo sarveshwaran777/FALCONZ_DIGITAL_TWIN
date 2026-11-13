@@ -424,11 +424,11 @@ export const api = {
   },
 
   // ================= FALCONZ AI INTELLIGENCE CENTER APIS =================
-  async chatAICopilot(prompt: string, conversation_id?: string, drone_id?: string) {
+  async chatAICopilot(prompt: string, conversation_id?: string, drone_id?: string, role?: string) {
     const res = await fetch(`${API_BASE}/ai/copilot/chat`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ prompt, conversation_id, drone_id })
+      body: JSON.stringify({ prompt, conversation_id, drone_id, role: role || 'ENGINEERING' })
     });
     return res.json();
   },

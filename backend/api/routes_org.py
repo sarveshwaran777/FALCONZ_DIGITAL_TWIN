@@ -115,3 +115,4 @@ def remove_member(
     db.delete(member)
     db.commit()
     return {"status": "SUCCESS", "message": "Member removed."}
+

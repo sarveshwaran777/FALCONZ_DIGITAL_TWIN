@@ -51,11 +51,11 @@ export const SubscriptionBillingPage: React.FC = () => {
             </span>
             <span className="text-xs text-slate-400">Org: {subData?.organization?.name || 'AeroPropulsion Labs'}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <CreditCard className="w-6 h-6 text-purple-400" />
+          <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
+            <CreditCard className="w-6 h-6 text-purple-500" />
             Subscription & Invoices
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
             Manage your commercial SaaS subscription, billing cycles, payment methods, and GST tax invoices.
           </p>
         </div>
@@ -71,17 +71,17 @@ export const SubscriptionBillingPage: React.FC = () => {
 
       {/* Current Subscription Card */}
       <div className="p-6 rounded-2xl border space-y-5" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-white/5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b" style={{ borderColor: 'var(--border)' }}>
           <div>
-            <span className="text-xs text-slate-400 block mb-1">Active Membership</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Active Membership</span>
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-extrabold text-white">{plan?.name || 'FalconZ Free'}</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              <h2 className="text-2xl font-extrabold" style={{ color: 'var(--text)' }}>{plan?.name || 'FalconZ Free'}</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                 {sub?.status || 'ACTIVE'}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
-              Billing Cadence: <b className="text-slate-200">{sub?.billing_cycle || 'MONTHLY'}</b>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Billing Cadence: <b style={{ color: 'var(--text)' }}>{sub?.billing_cycle || 'MONTHLY'}</b>
             </p>
           </div>
 
@@ -163,3 +163,4 @@ export const SubscriptionBillingPage: React.FC = () => {
     </div>
   );
 };
+

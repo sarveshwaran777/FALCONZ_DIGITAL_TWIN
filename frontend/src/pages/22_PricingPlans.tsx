@@ -52,21 +52,22 @@ export const PricingPlansPage: React.FC = () => {
           <Sparkles className="w-3.5 h-3.5" />
           COMMERCIAL AEROSPACE SAAS TIERS
         </div>
-        <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
+        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight" style={{ color: 'var(--text)' }}>
           Enterprise Propulsion Intelligence
         </h1>
-        <p className="text-sm md:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
           Predict mechanical failures, eliminate in-flight motor burnout, and access AI engineering copilot with certified physics digital twins.
         </p>
 
         {/* Monthly / Yearly Toggle */}
         <div className="flex items-center justify-center gap-3 pt-4 select-none">
-          <span className={`text-xs font-semibold ${billingCycle === 'MONTHLY' ? 'text-white' : 'text-slate-400'}`}>
+          <span className={`text-xs ${billingCycle === 'MONTHLY' ? 'font-bold text-slate-900 dark:text-white' : 'font-semibold text-slate-500 dark:text-slate-400'}`}>
             Monthly Billing
           </span>
           <button
             onClick={() => setBillingCycle(prev => prev === 'MONTHLY' ? 'YEARLY' : 'MONTHLY')}
-            className="w-14 h-7 rounded-full bg-white/10 p-1 transition-colors relative border border-white/15"
+            className="w-14 h-7 rounded-full p-1 transition-colors relative border"
+            style={{ background: 'var(--card-subtle)', borderColor: 'var(--border)' }}
           >
             <div 
               className={`w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-transform ${
@@ -74,9 +75,9 @@ export const PricingPlansPage: React.FC = () => {
               }`}
             />
           </button>
-          <span className={`text-xs font-semibold flex items-center gap-1.5 ${billingCycle === 'YEARLY' ? 'text-white' : 'text-slate-400'}`}>
+          <span className={`text-xs flex items-center gap-1.5 ${billingCycle === 'YEARLY' ? 'font-bold text-slate-900 dark:text-white' : 'font-semibold text-slate-500 dark:text-slate-400'}`}>
             <span>Annual Billing</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
               SAVE ~17%
             </span>
           </span>
@@ -94,12 +95,12 @@ export const PricingPlansPage: React.FC = () => {
           return (
             <div
               key={p.id}
-              className={`rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 relative ${
+              className={`rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 relative border ${
                 isPro 
-                  ? 'border-2 border-purple-500/70 bg-gradient-to-b from-purple-950/40 via-slate-900/60 to-slate-900 shadow-2xl shadow-purple-600/20 md:-translate-y-2' 
-                  : 'border border-white/10 bg-slate-900/40 hover:border-white/20'
+                  ? 'border-2 border-purple-500 bg-gradient-to-b from-purple-900/25 via-slate-900/40 to-slate-900 shadow-2xl shadow-purple-600/25 md:-translate-y-2' 
+                  : 'hover:shadow-md'
               }`}
-              style={{ backdropFilter: 'blur(16px)' }}
+              style={!isPro ? { background: 'var(--card)', borderColor: 'var(--border)' } : { backdropFilter: 'blur(16px)' }}
             >
               {/* Pro Badge */}
               {isPro && (
@@ -112,88 +113,88 @@ export const PricingPlansPage: React.FC = () => {
               <div>
                 {/* Plan Title & Desc */}
                 <div className="mb-4">
-                  <h3 className="text-lg font-bold text-white">{p.name}</h3>
-                  <p className="text-xs text-slate-400 mt-1 min-h-[36px]">{p.description}</p>
+                  <h3 className="text-lg font-bold" style={{ color: 'var(--text)' }}>{p.name}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 min-h-[36px]">{p.description}</p>
                 </div>
 
                 {/* Price Display */}
                 <div className="mb-6 font-mono">
                   {p.code === 'FREE' ? (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-extrabold text-white">₹0</span>
-                      <span className="text-xs text-slate-400">/ forever</span>
+                      <span className="text-3xl font-extrabold" style={{ color: 'var(--text)' }}>₹0</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">/ forever</span>
                     </div>
                   ) : p.code === 'ENTERPRISE' ? (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-extrabold text-white">Custom</span>
-                      <span className="text-xs text-slate-400">/ tailored</span>
+                      <span className="text-2xl font-extrabold" style={{ color: 'var(--text)' }}>Custom</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">/ tailored</span>
                     </div>
                   ) : (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-extrabold text-white">
+                      <span className="text-3xl font-extrabold" style={{ color: 'var(--text)' }}>
                         ₹{price.toLocaleString('en-IN')}
                       </span>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
                         {billingCycle === 'YEARLY' ? '/ yr' : '/ mo'}
                       </span>
                     </div>
                   )}
                   {billingCycle === 'YEARLY' && p.price_monthly_inr > 0 && (
-                    <span className="text-[11px] text-purple-400 block mt-1">
+                    <span className="text-[11px] text-purple-600 dark:text-purple-400 block mt-1 font-bold">
                       (Approx. ₹{Math.round(p.price_yearly_inr / 12)}/mo)
                     </span>
                   )}
                 </div>
 
                 {/* Features List */}
-                <div className="space-y-3 pt-4 border-t border-white/10 text-xs">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Check className="w-4 h-4 text-purple-400 shrink-0" />
+                <div className="space-y-3 pt-4 border-t text-xs" style={{ borderColor: 'var(--border)' }}>
+                  <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                    <Check className="w-4 h-4 text-purple-500 shrink-0 font-bold" />
                     <span>Up to <b>{p.max_drones}</b> drone aircraft</span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Check className="w-4 h-4 text-purple-400 shrink-0" />
+                  <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                    <Check className="w-4 h-4 text-purple-500 shrink-0 font-bold" />
                     <span><b>{p.ai_queries_limit}</b> AI Copilot queries/mo</span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Check className="w-4 h-4 text-purple-400 shrink-0" />
+                  <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                    <Check className="w-4 h-4 text-purple-500 shrink-0 font-bold" />
                     <span><b>{p.reports_limit}</b> Certified PDF reports/mo</span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Check className="w-4 h-4 text-purple-400 shrink-0" />
+                  <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                    <Check className="w-4 h-4 text-purple-500 shrink-0 font-bold" />
                     <span><b>{p.history_retention_days}</b> days flight history</span>
                   </div>
 
                   {p.code !== 'FREE' && (
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                      <Check className="w-4 h-4 text-emerald-500 shrink-0 font-bold" />
                       <span>Data export (CSV / JSON)</span>
                     </div>
                   )}
 
                   {(p.code === 'PROFESSIONAL' || p.code === 'ENTERPRISE') && (
                     <>
-                      <div className="flex items-center gap-2 text-slate-300 font-semibold">
-                        <Check className="w-4 h-4 text-purple-400 shrink-0" />
+                      <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-semibold">
+                        <Check className="w-4 h-4 text-purple-500 shrink-0 font-bold" />
                         <span>Quantile RUL Prognostics</span>
                       </div>
-                      <div className="flex items-center gap-2 text-slate-300 font-semibold">
-                        <Check className="w-4 h-4 text-purple-400 shrink-0" />
+                      <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-semibold">
+                        <Check className="w-4 h-4 text-purple-500 shrink-0 font-bold" />
                         <span>Mission Simulator & Feasibility</span>
                       </div>
-                      <div className="flex items-center gap-2 text-slate-300 font-semibold">
-                        <Check className="w-4 h-4 text-purple-400 shrink-0" />
+                      <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-semibold">
+                        <Check className="w-4 h-4 text-purple-500 shrink-0 font-bold" />
                         <span>REST API Developer Access</span>
                       </div>
                     </>
                   )}
 
                   {p.code === 'ENTERPRISE' && (
-                    <div className="flex items-center gap-2 text-slate-300 font-semibold">
-                      <Check className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-semibold">
+                      <Check className="w-4 h-4 text-cyan-500 shrink-0 font-bold" />
                       <span>Dedicated Solutions Engineer</span>
                     </div>
                   )}
@@ -253,3 +254,4 @@ export const PricingPlansPage: React.FC = () => {
     </div>
   );
 };
+

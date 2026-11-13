@@ -35,3 +35,4 @@ def init_db():
         seed_initial_data(db)
     finally:
         db.close()
+

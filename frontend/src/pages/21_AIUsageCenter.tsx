@@ -22,11 +22,11 @@ export const AIUsageCenterPage: React.FC = () => {
             </span>
             <span className="text-xs text-slate-400">Current Plan: {usage?.plan_name || currentPlan}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <Zap className="w-6 h-6 text-amber-400" />
+          <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
+            <Zap className="w-6 h-6 text-amber-500" />
             AI Quota & Usage Center
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
             Track monthly AI Copilot queries, automated engineering reports, and telemetry storage consumption.
           </p>
         </div>
@@ -45,18 +45,18 @@ export const AIUsageCenterPage: React.FC = () => {
         {/* AI Copilot Queries Card */}
         <div className="p-6 rounded-2xl border space-y-4" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
           <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
               <Bot className="w-5 h-5" />
             </div>
-            <span className="text-[10px] font-mono text-purple-400 font-bold px-2 py-0.5 rounded-full bg-purple-500/10">
+            <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 font-bold px-2 py-0.5 rounded-full bg-purple-500/10">
               {usage?.ai_queries?.percentage || 0}% CONSUMED
             </span>
           </div>
 
           <div>
-            <span className="text-xs text-slate-400 block">Monthly AI Copilot Queries</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 block font-semibold">Monthly AI Copilot Queries</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-extrabold text-white font-mono">
+              <span className="text-2xl font-extrabold font-mono" style={{ color: 'var(--text)' }}>
                 {usage?.ai_queries?.used || 0}
               </span>
               <span className="text-xs text-slate-500 font-mono">
@@ -65,7 +65,7 @@ export const AIUsageCenterPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="w-full h-2 rounded-full bg-white/5 overflow-hidden">
+          <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
             <div 
               className="h-full rounded-full bg-purple-500 transition-all"
               style={{ width: `${usage?.ai_queries?.percentage || 0}%` }}
@@ -138,3 +138,4 @@ export const AIUsageCenterPage: React.FC = () => {
     </div>
   );
 };
+

@@ -71,3 +71,4 @@ sequenceDiagram
   - `payment.captured` $\to$ Marks transaction as `SUCCESS`.
   - `payment.failed` $\to$ Logs error code and failure description.
   - `subscription.cancelled` $\to$ Marks active subscription as `CANCELLED`.
+

@@ -39,11 +39,11 @@ export const UserProfilePage: React.FC = () => {
           </span>
           <span className="text-xs text-slate-400 font-mono">ID: {currentUser?.id || 'N/A'}</span>
         </div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-          <UserIcon className="w-6 h-6 text-purple-400" />
+        <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
+          <UserIcon className="w-6 h-6 text-purple-500" />
           User Profile & Security Settings
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
           Manage your aerospace engineer profile, security keys, authentication credentials, and session state.
         </p>
       </div>
@@ -52,27 +52,27 @@ export const UserProfilePage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left: Identity Summary */}
         <div className="p-6 rounded-2xl border space-y-4" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-          <div className="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-400 flex items-center justify-center font-bold text-2xl mx-auto">
+          <div className="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-2xl mx-auto">
             {currentUser?.full_name?.charAt(0) || 'A'}
           </div>
 
           <div className="text-center">
-            <h3 className="font-bold text-white text-base">{currentUser?.full_name || 'Aerospace Engineer'}</h3>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">{currentUser?.email}</p>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[10px] font-mono font-bold mt-2">
+            <h3 className="font-bold text-base" style={{ color: 'var(--text)' }}>{currentUser?.full_name || 'Aerospace Engineer'}</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{currentUser?.email}</p>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/30 text-[10px] font-mono font-bold mt-2">
               <Shield className="w-3 h-3" />
               {currentUser?.role || 'ENGINEER'}
             </div>
           </div>
 
-          <div className="pt-4 border-t border-white/5 space-y-2 text-xs">
-            <div className="flex justify-between text-slate-400">
+          <div className="pt-4 border-t space-y-2 text-xs" style={{ borderColor: 'var(--border)' }}>
+            <div className="flex justify-between text-slate-600 dark:text-slate-400">
               <span>Organization:</span>
-              <span className="text-white font-semibold">{currentUser?.organization?.name || 'AeroPropulsion Labs'}</span>
+              <span className="font-semibold" style={{ color: 'var(--text)' }}>{currentUser?.organization?.name || 'AeroPropulsion Labs'}</span>
             </div>
-            <div className="flex justify-between text-slate-400">
+            <div className="flex justify-between text-slate-600 dark:text-slate-400">
               <span>Email Verified:</span>
-              <span className="text-emerald-400 font-mono flex items-center gap-1">
+              <span className="text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1 font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5" /> YES
               </span>
             </div>
@@ -80,7 +80,7 @@ export const UserProfilePage: React.FC = () => {
 
           <button
             onClick={logout}
-            className="w-full py-2.5 px-4 rounded-xl font-bold text-xs border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2 mt-4"
+            className="w-full py-2.5 px-4 rounded-xl font-bold text-xs border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2 mt-4"
           >
             <LogOut className="w-4 h-4" />
             Terminate Session (Log Out)
@@ -89,8 +89,8 @@ export const UserProfilePage: React.FC = () => {
 
         {/* Right: Profile Edit Form */}
         <div className="md:col-span-2 p-6 rounded-2xl border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-          <h3 className="font-bold text-sm text-white mb-4 flex items-center gap-2">
-            <Save className="w-4 h-4 text-purple-400" />
+          <h3 className="font-bold text-sm mb-4 flex items-center gap-2" style={{ color: 'var(--text)' }}>
+            <Save className="w-4 h-4 text-purple-500" />
             Update Account Details
           </h3>
 
@@ -146,3 +146,4 @@ export const UserProfilePage: React.FC = () => {
     </div>
   );
 };
+

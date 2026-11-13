@@ -89,3 +89,4 @@ def require_role(allowed_roles: list):
             )
         return current_user
     return role_checker
+

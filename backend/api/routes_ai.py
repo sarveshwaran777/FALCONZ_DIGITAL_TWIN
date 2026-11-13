@@ -15,6 +15,7 @@ class ChatRequest(BaseModel):
     prompt: str
     conversation_id: Optional[str] = None
     drone_id: Optional[str] = None
+    role: Optional[str] = "ENGINEERING"
 
 class MissionAdvisorRequest(BaseModel):
     duration_minutes: float = 30.0
@@ -68,7 +69,7 @@ def copilot_chat(
     ]
 
     # Generate Copilot response using real telemetry
-    result = ai_copilot_service.generate_copilot_response(req.prompt, history)
+    result = ai_copilot_service.generate_copilot_response(req.prompt, history, role=req.role or "ENGINEERING")
 
     # Save Copilot message
     ai_msg = AIMessage(
@@ -93,6 +94,7 @@ def copilot_chat(
         "severity": result.get("severity"),
         "confidence_pct": result.get("confidence_pct"),
         "recommended_actions": result.get("recommended_actions", []),
+        "suggested_followups": result.get("suggested_followups", []),
         "created_at": ai_msg.created_at
     }
 
@@ -230,3 +232,4 @@ def get_ai_usage_stats(
         },
         "telemetry_storage_mb": usage.telemetry_storage_mb if usage else 0.0
     }
+

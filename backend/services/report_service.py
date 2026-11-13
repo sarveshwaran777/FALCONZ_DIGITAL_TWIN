@@ -271,3 +271,4 @@ class ReportService:
         return report_record
 
 report_service = ReportService()
+

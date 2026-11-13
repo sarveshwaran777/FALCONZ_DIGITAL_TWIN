@@ -66,11 +66,11 @@ export const AIReportsPage: React.FC = () => {
             </span>
             <span className="text-xs text-slate-400">Total: {reports.length} Generated</span>
           </div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <FileText className="w-6 h-6 text-emerald-400" />
+          <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
+            <FileText className="w-6 h-6 text-emerald-500" />
             AI Automated Engineering Reports
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
             Generate and export certified publication-grade aerospace PDF reports with telemetry, residuals & technician SOP checklists.
           </p>
         </div>
@@ -78,18 +78,19 @@ export const AIReportsPage: React.FC = () => {
 
       {/* Generator Form */}
       <div className="p-6 rounded-2xl border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-        <h2 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-emerald-400" />
+        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text)' }}>
+          <Sparkles className="w-4 h-4 text-emerald-500" />
           Generate New Aerospace Diagnostic Report
         </h2>
 
         <form onSubmit={handleGenerate} className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Report Architecture</label>
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Report Architecture</label>
             <select
               value={reportType}
               onChange={(e) => setReportType(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-emerald-500 font-medium"
+              style={{ background: 'var(--input-bg)', color: 'var(--text)', borderColor: 'var(--border)' }}
             >
               {reportTypes.map((t) => (
                 <option key={t.value} value={t.value}>{t.label}</option>
@@ -98,13 +99,14 @@ export const AIReportsPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Custom Title (Optional)</label>
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Custom Title (Optional)</label>
             <input
               type="text"
               placeholder="e.g. Flight 104 - Thermal Benchmark"
               value={reportTitle}
               onChange={(e) => setReportTitle(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:border-emerald-500 font-medium"
+              style={{ background: 'var(--input-bg)', color: 'var(--text)', borderColor: 'var(--border)' }}
             />
           </div>
 
@@ -190,3 +192,4 @@ export const AIReportsPage: React.FC = () => {
     </div>
   );
 };
+

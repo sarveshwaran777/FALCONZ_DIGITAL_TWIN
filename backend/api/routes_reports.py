@@ -92,3 +92,4 @@ def download_report(
         media_type="application/pdf",
         filename=f"FALCONZ_{report.report_type}_{report.id}.pdf"
     )
+

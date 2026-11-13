@@ -13,3 +13,4 @@ __all__ = [
     "Invoice", "Drone", "FlightSession", "AIConversation", "AIMessage", "AIReport",
     "MaintenanceRecord", "AuditLog"
 ]
+

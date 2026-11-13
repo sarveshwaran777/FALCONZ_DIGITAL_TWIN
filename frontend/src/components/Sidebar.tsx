@@ -108,7 +108,7 @@ export const Sidebar: React.FC = () => {
         {sections.map((sec, idx) => (
           <div key={idx} className="space-y-1">
             {sidebarOpen && (
-              <span className="px-2.5 text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold block pt-1">
+              <span className="px-2.5 text-[10.5px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold block pt-1">
                 {sec.title}
               </span>
             )}
@@ -123,8 +123,8 @@ export const Sidebar: React.FC = () => {
                     sidebarOpen ? 'justify-start' : 'justify-center'
                   } ${
                     isActive
-                      ? 'bg-purple-600/15 text-purple-300 font-semibold border border-purple-500/30'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-purple-600/15 text-purple-700 dark:text-purple-300 font-bold border border-purple-500/30'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 font-medium'
                   }`}
                 >
                   <span className="shrink-0">{item.icon}</span>
@@ -132,7 +132,7 @@ export const Sidebar: React.FC = () => {
                     <span className="truncate flex-1 text-left flex items-center justify-between">
                       <span className="truncate">{item.label}</span>
                       {item.badge && (
-                        <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full border ${item.badgeColor || 'text-purple-400 bg-purple-500/10 border-purple-500/20'}`}>
+                        <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border ${item.badgeColor || 'text-purple-700 dark:text-purple-300 bg-purple-500/10 border-purple-500/20'}`}>
                           {item.badge}
                         </span>
                       )}
@@ -141,7 +141,7 @@ export const Sidebar: React.FC = () => {
 
                   {!sidebarOpen && (
                     <span
-                      className="absolute left-full ml-2 px-2.5 py-1 text-xs rounded-md shadow-sm whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border bg-slate-900 text-white border-white/10"
+                      className="absolute left-full ml-2 px-2.5 py-1 text-xs rounded-md shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border bg-slate-900 text-white border-slate-700"
                     >
                       {item.label}
                     </span>

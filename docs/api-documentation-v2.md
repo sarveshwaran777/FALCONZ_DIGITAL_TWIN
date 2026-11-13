@@ -99,3 +99,4 @@ The **FALCONZ Digital Twin & SaaS Platform** exposes a high-frequency, low-laten
 | `GET` | `/api/admin/plans` | Inspect plan parameters | `SUPER_ADMIN` |
 | `PUT` | `/api/admin/plans/{id}` | Modify plan pricing and quotas | `SUPER_ADMIN` |
 | `GET` | `/api/admin/audit-logs` | Comprehensive security audit log | `SUPER_ADMIN` |
+

@@ -122,3 +122,4 @@ export const UpgradeModal: React.FC = () => {
     </div>
   );
 };
+

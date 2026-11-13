@@ -67,11 +67,11 @@ export const OrganizationManagementPage: React.FC = () => {
             </span>
             <span className="text-xs text-slate-400">Organization: {org?.name || 'AeroPropulsion Labs'}</span>
           </div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <Building2 className="w-6 h-6 text-purple-400" />
+          <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
+            <Building2 className="w-6 h-6 text-purple-500" />
             Organization & Team Members
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
             Manage multi-tenant engineering seats, technician credentials, and role-based permissions.
           </p>
         </div>
@@ -87,14 +87,14 @@ export const OrganizationManagementPage: React.FC = () => {
 
       {/* Members Table */}
       <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-        <div className="px-6 py-4 border-b border-white/5 font-bold text-sm text-white flex items-center justify-between">
+        <div className="px-6 py-4 border-b font-bold text-sm flex items-center justify-between" style={{ color: 'var(--text)', borderColor: 'var(--border)' }}>
           <span>Active Team Seats ({members.length})</span>
-          <span className="text-xs font-mono text-purple-400">{org?.plan_code || currentPlan} TIER</span>
+          <span className="text-xs font-mono font-bold text-purple-600 dark:text-purple-400">{org?.plan_code || currentPlan} TIER</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-white/5 border-b border-white/5 text-slate-400 font-mono text-[11px] uppercase tracking-wider">
+            <thead className="border-b text-slate-500 dark:text-slate-400 font-mono text-[11px] uppercase tracking-wider font-bold" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
               <tr>
                 <th className="px-5 py-3.5">Name</th>
                 <th className="px-4 py-3.5">Email</th>
@@ -212,3 +212,4 @@ export const OrganizationManagementPage: React.FC = () => {
     </div>
   );
 };
+

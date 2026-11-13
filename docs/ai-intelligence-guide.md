@@ -51,3 +51,4 @@ The platform uses `ReportLab 5.0` to compile publication-grade aerospace PDF rep
 5. **Quantile RUL Prognostic Certificate**: Certified median remaining hours with $90\%$ confidence intervals.
 6. **Isolation Forest Anomaly Dossier**: Historical trigger timeline and feature attribution graphs.
 7. **Complete Propulsion Engineering Diagnostic**: Comprehensive multi-subsystem engineering dossier.
+
