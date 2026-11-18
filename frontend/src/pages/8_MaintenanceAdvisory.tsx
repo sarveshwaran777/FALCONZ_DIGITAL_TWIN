@@ -39,7 +39,7 @@ export const MaintenanceAdvisoryPage: React.FC = () => {
       </div>
 
       {/* Primary Work Order Banner */}
-      <div className="aerospace-card p-5 border-l-4 border-l-sky-600 bg-gradient-to-r from-sky-50/50 via-white to-white">
+      <div className="aerospace-card p-5 border-l-4 border-l-sky-600" style={{ background: 'var(--card)' }}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-3">
           <div>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">

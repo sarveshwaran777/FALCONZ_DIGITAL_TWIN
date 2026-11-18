@@ -67,11 +67,11 @@ export const Sidebar: React.FC = () => {
     {
       title: 'SaaS, Billing & Org',
       items: [
-        { id: 'pricing', label: 'Plans & Pricing', icon: <Sparkles className="w-4 h-4 text-purple-400" /> },
-        { id: 'billing', label: 'Billing & Invoices', icon: <CreditCard className="w-4 h-4 text-slate-300" /> },
-        { id: 'payment-history', label: 'Payment Ledger', icon: <History className="w-4 h-4 text-slate-300" /> },
-        { id: 'organization', label: 'Team & RBAC', icon: <Building2 className="w-4 h-4 text-slate-300" /> },
-        { id: 'profile', label: 'Account Security', icon: <User className="w-4 h-4 text-slate-300" /> }
+        { id: 'pricing', label: 'Plans & Pricing', icon: <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" /> },
+        { id: 'billing', label: 'Billing & Invoices', icon: <CreditCard className="w-4 h-4 text-slate-600 dark:text-slate-300" /> },
+        { id: 'payment-history', label: 'Payment Ledger', icon: <History className="w-4 h-4 text-slate-600 dark:text-slate-300" /> },
+        { id: 'organization', label: 'Team & RBAC', icon: <Building2 className="w-4 h-4 text-slate-600 dark:text-slate-300" /> },
+        { id: 'profile', label: 'Account Security', icon: <User className="w-4 h-4 text-slate-600 dark:text-slate-300" /> }
       ]
     }
   ];
@@ -163,7 +163,7 @@ export const Sidebar: React.FC = () => {
           {sidebarOpen && (
             <button
               onClick={() => setActivePage('pricing')}
-              className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30 transition-colors"
+              className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-700 dark:text-purple-300 hover:bg-purple-500/30 border border-purple-500/30 transition-colors"
             >
               {currentPlan}
             </button>

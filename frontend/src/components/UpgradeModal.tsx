@@ -52,30 +52,30 @@ export const UpgradeModal: React.FC = () => {
         </div>
 
         {/* Subtitle */}
-        <p className="text-sm text-slate-400 mb-5 leading-relaxed">
+        <p className="text-sm text-slate-600 dark:text-slate-300 mb-5 leading-relaxed font-medium">
           {upgradeModalData.message || `Access to ${upgradeModalData.featureName} requires a FalconZ ${targetPlan.charAt(0) + targetPlan.slice(1).toLowerCase()} subscription.`}
         </p>
 
         {/* Plan Comparison Pill */}
-        <div className="grid grid-cols-2 gap-3 mb-5 p-3 rounded-xl bg-black/30 border border-white/5 text-xs font-mono">
+        <div className="grid grid-cols-2 gap-3 mb-5 p-3 rounded-xl border text-xs font-mono" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
           <div>
-            <span className="text-slate-500 uppercase tracking-wider block text-[10px]">Your Current Tier</span>
-            <span className="font-semibold text-slate-300 flex items-center gap-1.5 mt-0.5">
+            <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider block text-[10px]">Your Current Tier</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mt-0.5">
               <span className="w-2 h-2 rounded-full bg-slate-500" />
               {currentPlan}
             </span>
           </div>
           <div>
-            <span className="text-purple-400 uppercase tracking-wider block text-[10px]">Required Tier</span>
-            <span className="font-semibold text-purple-300 flex items-center gap-1.5 mt-0.5">
-              <Zap className="w-3.5 h-3.5 text-purple-400" />
+            <span className="text-purple-600 dark:text-purple-400 uppercase tracking-wider block text-[10px]">Required Tier</span>
+            <span className="font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1.5 mt-0.5">
+              <Zap className="w-3.5 h-3.5 text-purple-500" />
               {targetPlan}
             </span>
           </div>
         </div>
 
         {/* Feature Highlights */}
-        <div className="space-y-2 mb-6 text-xs text-slate-300">
+        <div className="space-y-2 mb-6 text-xs text-slate-700 dark:text-slate-200">
           <div className="flex items-center gap-2.5">
             <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
               <Check className="w-3 h-3" />

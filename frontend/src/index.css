@@ -10,10 +10,10 @@
     --card: #ffffff;
     --card-subtle: #f1f5f9;
     --border: #e2e8f0;
-    --border-strong: #94a3b8;
+    --border-strong: #cbd5e1;
     --text: #0f172a;
     --text-muted: #334155;
-    --text-faint: #64748b;
+    --text-faint: #475569;
     --input-bg: #ffffff;
     --accent: #7c3aed;
     --accent-soft: #f3e8ff;
@@ -31,9 +31,9 @@
   .dark {
     --bg: #0b0f19;
     --card: #111827;
-    --card-subtle: #1e293b;
-    --border: #1e293b;
-    --border-strong: #334155;
+    --card-subtle: #1f2937;
+    --border: #1f2937;
+    --border-strong: #374151;
     --text: #f8fafc;
     --text-muted: #cbd5e1;
     --text-faint: #94a3b8;
@@ -142,34 +142,95 @@
 .glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 
 /* High-contrast dark mode font visibility fixes */
-.dark .text-slate-400 {
-  color: #94a3b8 !important;
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700 {
+  color: #f8fafc !important;
 }
-.dark .text-slate-300 {
+.dark .text-slate-600 {
   color: #cbd5e1 !important;
-}
-.dark .text-slate-200 {
-  color: #e2e8f0 !important;
-}
-.dark .text-slate-100 {
-  color: #f1f5f9 !important;
 }
 .dark .text-slate-500 {
   color: #94a3b8 !important;
 }
-.dark .text-white {
-  color: #ffffff !important;
+.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+.dark .text-purple-700,
+.dark .text-purple-800,
+.dark .text-purple-900 {
+  color: #c084fc !important;
+}
+.dark .text-amber-700,
+.dark .text-amber-800,
+.dark .text-amber-900 {
+  color: #fcd34d !important;
+}
+.dark .text-rose-700,
+.dark .text-rose-800,
+.dark .text-rose-900 {
+  color: #fca5a5 !important;
+}
+.dark .text-emerald-700,
+.dark .text-emerald-800,
+.dark .text-emerald-900 {
+  color: #6ee7b7 !important;
+}
+.dark .text-sky-700,
+.dark .text-sky-800,
+.dark .text-sky-900 {
+  color: #7dd3fc !important;
 }
 
-/* Light mode high-contrast font visibility fixes */
+/* Dark mode background and border overrides for legacy components */
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+.dark .bg-amber-50,
+.dark .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+}
+.dark .bg-rose-50,
+.dark .bg-rose-100 {
+  background-color: rgba(244, 63, 94, 0.15) !important;
+}
+.dark .bg-emerald-50,
+.dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+}
+.dark .bg-sky-50,
+.dark .bg-sky-100 {
+  background-color: rgba(14, 165, 233, 0.15) !important;
+}
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-300 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+.dark [class*="via-white"],
+.dark [class*="to-white"] {
+  background-image: none !important;
+  background-color: var(--card) !important;
+}
+.dark input.bg-slate-50,
+.dark input.bg-white,
+.dark select.bg-white,
+.dark textarea.bg-white {
+  background-color: var(--input-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+/* Light mode high-contrast text improvements */
 html:not(.dark) .text-slate-400 {
-  color: #475569 !important;
+  color: #475569;
 }
 html:not(.dark) .text-slate-500 {
-  color: #334155 !important;
+  color: #334155;
 }
-html:not(.dark) .text-slate-300 {
-  color: #1e293b !important;
+html:not(.dark) .text-slate-600 {
+  color: #1e293b;
 }
 
 /* Recharts styling for maximum readability */
