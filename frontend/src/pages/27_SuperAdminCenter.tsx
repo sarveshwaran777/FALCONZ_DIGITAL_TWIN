@@ -137,20 +137,21 @@ export const SuperAdminCenterPage: React.FC = () => {
                 <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-[11px]">
+            <tbody className="divide-y text-[11px]" style={{ borderColor: 'var(--border)' }}>
               {plans.map((p) => (
-                <tr key={p.id} className="hover:bg-white/5 transition-colors">
-                  <td className="px-5 py-4 font-semibold text-white font-sans">{p.name}</td>
-                  <td className="px-4 py-4 text-purple-400 font-bold">{p.code}</td>
-                  <td className="px-4 py-4 text-white">₹{p.price_monthly_inr}</td>
-                  <td className="px-4 py-4 text-white">₹{p.price_yearly_inr}</td>
-                  <td className="px-4 py-4 text-slate-300">{p.max_drones}</td>
-                  <td className="px-4 py-4 text-slate-300">{p.ai_queries_limit}</td>
-                  <td className="px-4 py-4 text-slate-300">{p.reports_limit}</td>
+                <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  <td className="px-5 py-4 font-semibold font-sans" style={{ color: 'var(--text)' }}>{p.name}</td>
+                  <td className="px-4 py-4 text-purple-700 dark:text-purple-400 font-bold">{p.code}</td>
+                  <td className="px-4 py-4 font-bold" style={{ color: 'var(--text)' }}>₹{p.price_monthly_inr}</td>
+                  <td className="px-4 py-4 font-bold" style={{ color: 'var(--text)' }}>₹{p.price_yearly_inr}</td>
+                  <td className="px-4 py-4 text-slate-700 dark:text-slate-300">{p.max_drones}</td>
+                  <td className="px-4 py-4 text-slate-700 dark:text-slate-300">{p.ai_queries_limit}</td>
+                  <td className="px-4 py-4 text-slate-700 dark:text-slate-300">{p.reports_limit}</td>
                   <td className="px-5 py-4 text-right">
                     <button
                       onClick={() => handlePlanPriceSave(p.id, p.price_monthly_inr, p.price_yearly_inr)}
-                      className="px-3 py-1 rounded bg-white/10 hover:bg-white/15 text-white font-sans font-semibold text-xs"
+                      className="px-3 py-1 rounded border text-xs font-sans font-semibold transition-colors hover:border-purple-500"
+                      style={{ background: 'var(--card-subtle)', borderColor: 'var(--border)', color: 'var(--text)' }}
                     >
                       Save
                     </button>
@@ -164,17 +165,17 @@ export const SuperAdminCenterPage: React.FC = () => {
 
       {/* User Governance Table */}
       <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-        <div className="px-6 py-4 border-b border-white/5 font-bold text-sm text-white flex items-center justify-between">
+        <div className="px-6 py-4 border-b font-bold text-sm flex items-center justify-between" style={{ borderColor: 'var(--border)', color: 'var(--text)' }}>
           <span className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-cyan-400" />
+            <Users className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
             User Identity & Role Permissions
           </span>
-          <span className="text-xs font-mono text-slate-500 font-normal">{users.length} Users</span>
+          <span className="text-xs font-mono text-slate-500 dark:text-slate-400 font-normal">{users.length} Users</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-white/5 border-b border-white/5 text-slate-400 font-mono text-[11px] uppercase tracking-wider">
+            <thead className="border-b text-slate-500 dark:text-slate-400 font-mono text-[11px] uppercase tracking-wider" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
               <tr>
                 <th className="px-5 py-3.5">Full Name</th>
                 <th className="px-4 py-3.5">Email</th>
@@ -183,24 +184,25 @@ export const SuperAdminCenterPage: React.FC = () => {
                 <th className="px-5 py-3.5 text-right">Update Role</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 font-mono text-[11px]">
+            <tbody className="divide-y font-mono text-[11px]" style={{ borderColor: 'var(--border)' }}>
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-white/5 transition-colors">
-                  <td className="px-5 py-4 font-semibold text-white font-sans">{u.full_name}</td>
-                  <td className="px-4 py-4 text-slate-300">{u.email}</td>
+                <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  <td className="px-5 py-4 font-semibold font-sans" style={{ color: 'var(--text)' }}>{u.full_name}</td>
+                  <td className="px-4 py-4 text-slate-700 dark:text-slate-300">{u.email}</td>
                   <td className="px-4 py-4">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
                       {u.role}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-emerald-400">
+                  <td className="px-4 py-4 text-emerald-600 dark:text-emerald-400 font-bold">
                     {u.is_active ? 'ACTIVE' : 'DISABLED'}
                   </td>
                   <td className="px-5 py-4 text-right">
                     <select
                       value={u.role}
                       onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-white/10 text-xs text-white focus:outline-none"
+                      className="px-2.5 py-1 rounded-lg border text-xs focus:outline-none"
+                      style={{ background: 'var(--input-bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
                     >
                       <option value="SUPER_ADMIN">SUPER_ADMIN</option>
                       <option value="ORG_ADMIN">ORG_ADMIN</option>

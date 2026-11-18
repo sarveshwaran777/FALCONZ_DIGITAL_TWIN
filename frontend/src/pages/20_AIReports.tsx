@@ -151,16 +151,16 @@ export const AIReportsPage: React.FC = () => {
                 <th className="px-5 py-3.5 text-right">Download</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y" style={{ borderColor: 'var(--border)' }}>
               {reports.map((r) => (
-                <tr key={r.id} className="hover:bg-white/5 transition-colors">
-                  <td className="px-5 py-4 font-semibold text-white">
+                <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  <td className="px-5 py-4 font-semibold" style={{ color: 'var(--text)' }}>
                     <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       <span>{r.title}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-slate-300 font-mono text-[11px]">{r.report_type}</td>
+                  <td className="px-4 py-4 text-slate-700 dark:text-slate-300 font-mono text-[11px]">{r.report_type}</td>
                   <td className="px-4 py-4 text-slate-400 font-mono text-[11px]">
                     {(r.file_size_bytes / 1024).toFixed(1)} KB
                   </td>

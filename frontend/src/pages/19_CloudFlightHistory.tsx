@@ -58,23 +58,23 @@ export const CloudFlightHistoryPage: React.FC = () => {
                 const isWarning = s.min_health_idx >= 70 && s.min_health_idx < 85;
 
                 return (
-                  <tr key={s.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-5 py-4 font-semibold text-white">
+                  <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <td className="px-5 py-4 font-semibold" style={{ color: 'var(--text)' }}>
                       <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-purple-400 shrink-0" />
+                        <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                         <span className="truncate max-w-[200px]">{s.session_name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-slate-300 font-sans">{s.drone_name || 'Falcon-X1'}</td>
-                    <td className="px-4 py-4 text-slate-300">{durationMin} min</td>
-                    <td className="px-4 py-4 text-slate-300">{s.max_rpm.toFixed(0)}</td>
-                    <td className="px-4 py-4 text-slate-300">{s.max_temp_c.toFixed(1)} °C</td>
-                    <td className="px-4 py-4 text-slate-300">{s.max_vib_g.toFixed(2)} g</td>
-                    <td className={`px-4 py-4 font-bold ${isHealthy ? 'text-emerald-400' : isWarning ? 'text-amber-400' : 'text-red-400'}`}>
+                    <td className="px-4 py-4 text-slate-700 dark:text-slate-300 font-sans">{s.drone_name || 'Falcon-X1'}</td>
+                    <td className="px-4 py-4 text-slate-700 dark:text-slate-300">{durationMin} min</td>
+                    <td className="px-4 py-4 text-slate-700 dark:text-slate-300 font-mono">{s.max_rpm.toFixed(0)}</td>
+                    <td className="px-4 py-4 text-slate-700 dark:text-slate-300 font-mono">{s.max_temp_c.toFixed(1)} °C</td>
+                    <td className="px-4 py-4 text-slate-700 dark:text-slate-300 font-mono">{s.max_vib_g.toFixed(2)} g</td>
+                    <td className={`px-4 py-4 font-bold ${isHealthy ? 'text-emerald-600 dark:text-emerald-400' : isWarning ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
                       {s.min_health_idx.toFixed(1)}%
                     </td>
                     <td className="px-4 py-4">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                         {s.status}
                       </span>
                     </td>
@@ -83,9 +83,10 @@ export const CloudFlightHistoryPage: React.FC = () => {
                         href={`/api/telemetry/record/export/${s.id}.csv`}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 text-xs font-sans transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-sans transition-colors hover:border-purple-500"
+                        style={{ background: 'var(--card-subtle)', borderColor: 'var(--border)', color: 'var(--text)' }}
                       >
-                        <Download className="w-3.5 h-3.5 text-purple-400" />
+                        <Download className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                         <span>CSV</span>
                       </a>
                     </td>

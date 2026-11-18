@@ -95,7 +95,7 @@ export const FleetManagementPage: React.FC = () => {
             >
               {/* Status Header */}
               <div className="flex items-center justify-between mb-3">
-                <span className="flex items-center gap-2 text-xs font-mono font-bold text-slate-300">
+                <span className="flex items-center gap-2 text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
                   <span className={`w-2 h-2 rounded-full ${statusColor}`} />
                   {d.status}
                 </span>
@@ -124,7 +124,7 @@ export const FleetManagementPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-300">
+                <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-700 dark:text-slate-300">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-slate-500" />
                     <span>{d.total_flight_hours.toFixed(1)} hrs logged</span>

@@ -103,23 +103,23 @@ export const OrganizationManagementPage: React.FC = () => {
                 <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y" style={{ borderColor: 'var(--border)' }}>
               {members.map((m) => (
-                <tr key={m.id} className="hover:bg-white/5 transition-colors">
-                  <td className="px-5 py-4 font-semibold text-white">{m.full_name}</td>
-                  <td className="px-4 py-4 text-slate-300 font-mono text-[11px]">{m.email}</td>
+                <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                  <td className="px-5 py-4 font-semibold" style={{ color: 'var(--text)' }}>{m.full_name}</td>
+                  <td className="px-4 py-4 font-mono text-[11px] text-slate-700 dark:text-slate-300">{m.email}</td>
                   <td className="px-4 py-4">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
                       {m.role}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-slate-400 font-mono text-[11px]">
+                  <td className="px-4 py-4 text-slate-500 dark:text-slate-400 font-mono text-[11px]">
                     {new Date(m.joined_at).toLocaleDateString()}
                   </td>
                   <td className="px-5 py-4 text-right">
                     <button
                       onClick={() => handleRemove(m.id)}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-colors"
                       title="Remove member"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -141,47 +141,50 @@ export const OrganizationManagementPage: React.FC = () => {
           >
             <button 
               onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-white"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-bold text-white mb-1">Invite Team Member</h3>
-            <p className="text-xs text-slate-400 mb-5">
+            <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--text)' }}>Invite Team Member</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">
               Dispatches an automated credential link to access the GCS telemetry and AI copilot workspace.
             </p>
 
             <form onSubmit={handleInvite} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Full Name</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Full Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Flight Line Specialist"
                   value={inviteName}
                   onChange={(e) => setInviteName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/40 text-xs font-medium"
+                  style={{ background: 'var(--input-bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Work Email</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Work Email</label>
                 <input
                   type="email"
                   required
                   placeholder="e.g. specialist@company.aero"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/40 text-xs font-medium"
+                  style={{ background: 'var(--input-bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Role / Permissions</label>
+                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Role / Permissions</label>
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-purple-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/40 text-xs font-medium"
+                  style={{ background: 'var(--input-bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
                 >
                   <option value="ORG_ADMIN">Organization Admin (Full Control & Billing)</option>
                   <option value="ENGINEER">Propulsion Engineer (Analysis & Flight Ingress)</option>
@@ -194,7 +197,7 @@ export const OrganizationManagementPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-white"
                 >
                   Cancel
                 </button>

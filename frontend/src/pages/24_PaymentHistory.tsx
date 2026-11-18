@@ -48,17 +48,17 @@ export const PaymentHistoryPage: React.FC = () => {
                 <th className="px-5 py-3.5 text-right">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-[11px]">
+            <tbody className="divide-y text-[11px]" style={{ borderColor: 'var(--border)' }}>
               {history.map((t) => {
                 const isSuccess = t.status === 'SUCCESS';
                 return (
-                  <tr key={t.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-5 py-4 font-semibold text-white">{t.order_id || 'N/A'}</td>
-                    <td className="px-4 py-4 text-purple-300">{t.payment_id || 'PENDING'}</td>
-                    <td className="px-4 py-4 text-slate-300 font-sans font-semibold">{t.plan_code}</td>
-                    <td className="px-4 py-4 text-slate-400">{t.billing_cycle}</td>
-                    <td className="px-4 py-4 text-white font-bold">₹{t.amount_inr?.toLocaleString('en-IN')}</td>
-                    <td className="px-4 py-4 uppercase text-slate-400 text-[10px]">{t.payment_method || 'UPI'}</td>
+                  <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <td className="px-5 py-4 font-semibold" style={{ color: 'var(--text)' }}>{t.order_id || 'N/A'}</td>
+                    <td className="px-4 py-4 text-purple-700 dark:text-purple-300 font-mono">{t.payment_id || 'PENDING'}</td>
+                    <td className="px-4 py-4 text-slate-700 dark:text-slate-300 font-sans font-semibold">{t.plan_code}</td>
+                    <td className="px-4 py-4 text-slate-500 dark:text-slate-400">{t.billing_cycle}</td>
+                    <td className="px-4 py-4 font-bold" style={{ color: 'var(--text)' }}>₹{t.amount_inr?.toLocaleString('en-IN')}</td>
+                    <td className="px-4 py-4 uppercase text-slate-500 dark:text-slate-400 text-[10px]">{t.payment_method || 'UPI'}</td>
                     <td className="px-4 py-4">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                         isSuccess ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'

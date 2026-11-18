@@ -4,6 +4,7 @@ import { Sidebar } from './components/Sidebar';
 import { AlertDrawer } from './components/AlertDrawer';
 import { ParameterHelpModal } from './components/ParameterHelpModal';
 import { UpgradeModal } from './components/UpgradeModal';
+import { AuthModal } from './components/AuthModal';
 import { Toast } from './components/Toast';
 import { useAppStore } from './state/store';
 
@@ -121,6 +122,7 @@ export const App: React.FC = () => {
       <AlertDrawer />
       <ParameterHelpModal />
       <UpgradeModal />
+      <AuthModal />
       <Toast />
     </div>
   );

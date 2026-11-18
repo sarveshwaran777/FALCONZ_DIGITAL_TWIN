@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Menu, Bell, Sun, Moon, Radio, Power, RefreshCw, 
-  Sparkles, Bot, User as UserIcon, Shield 
+  Sparkles, Bot, User as UserIcon, Shield, LogOut, KeyRound, ChevronDown, Check 
 } from 'lucide-react';
 import { useAppStore } from '../state/store';
 import { api } from '../services/api';
@@ -9,8 +9,9 @@ import { api } from '../services/api';
 export const Navbar: React.FC = () => {
   const { 
     theme, toggleTheme, toggleSidebar, activeAlerts, setAlertDrawerOpen, 
-    systemState, currentUser, currentPlan, setActivePage 
+    systemState, currentUser, currentPlan, setActivePage, openAuthModal, logout 
   } = useAppStore();
+  const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
   const [diag, setDiag] = useState<any>(null);
   const [isConnectedLocally, setIsConnectedLocally] = useState<boolean>(false);
   const [ports, setPorts] = useState<any[]>([]);
@@ -176,15 +177,94 @@ export const Navbar: React.FC = () => {
             <span>{currentPlan}</span>
           </button>
 
-          {/* User Profile Avatar */}
-          <button
-            onClick={() => setActivePage('profile')}
-            className="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:border-purple-500 transition-colors"
-            style={{ background: 'var(--card-subtle)', borderColor: 'var(--border)', color: 'var(--text)' }}
-            title={currentUser?.email || 'User Profile'}
-          >
-            {currentUser?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
-          </button>
+          {/* User Profile Avatar / Sign In Trigger */}
+          {currentUser ? (
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:border-purple-500 transition-colors focus:outline-none"
+                style={{ background: 'var(--card-subtle)', borderColor: 'var(--border)', color: 'var(--text)' }}
+                title={currentUser?.email || 'User Profile'}
+              >
+                {currentUser?.full_name?.charAt(0) || <UserIcon className="w-4 h-4" />}
+              </button>
+
+              {/* Dropdown Menu */}
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
+                  <div 
+                    className="absolute right-0 mt-2 w-64 rounded-2xl border shadow-2xl p-3 z-50 animate-fadeInUp text-xs space-y-2.5"
+                    style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+                  >
+                    {/* User Header */}
+                    <div className="pb-2.5 border-b" style={{ borderColor: 'var(--border)' }}>
+                      <div className="font-bold text-slate-900 dark:text-white truncate">
+                        {currentUser.full_name}
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate">
+                        {currentUser.email}
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <span className="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                          {currentUser.role}
+                        </span>
+                        <span className="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                          {currentPlan}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Navigation Links */}
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => { setActivePage('profile'); setUserMenuOpen(false); }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                      >
+                        <UserIcon className="w-3.5 h-3.5 text-purple-500" />
+                        <span>Account & Security</span>
+                      </button>
+
+                      <button
+                        onClick={() => { setActivePage('billing'); setUserMenuOpen(false); }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                        <span>Subscription & Invoices</span>
+                      </button>
+
+                      <button
+                        onClick={() => { openAuthModal('LOGIN'); setUserMenuOpen(false); }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                      >
+                        <KeyRound className="w-3.5 h-3.5 text-purple-500" />
+                        <span>Switch Operator Session</span>
+                      </button>
+                    </div>
+
+                    {/* Sign Out */}
+                    <div className="pt-1.5 border-t" style={{ borderColor: 'var(--border)' }}>
+                      <button
+                        onClick={() => { logout(); setUserMenuOpen(false); openAuthModal('LOGIN'); }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold flex items-center gap-2"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => openAuthModal('LOGIN')}
+              className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white shadow-sm flex items-center gap-1.5 transition-all"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </button>
+          )}
 
           <button onClick={() => setAlertDrawerOpen(true)} className="relative w-8 h-8 rounded-md flex items-center justify-center border hover:bg-neutral-50 dark:hover:bg-neutral-900" style={{ borderColor:'var(--border)', color:'var(--text-muted)'}} aria-label="Alerts">
             <Bell className="w-4 h-4" />

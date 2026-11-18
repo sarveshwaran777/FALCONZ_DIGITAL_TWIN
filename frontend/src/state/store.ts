@@ -80,9 +80,19 @@ interface AppContextType {
   currentPlan: 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
   token: string | null;
   setToken: (token: string | null) => void;
+  setCurrentUser: (user: UserProfile | null) => void;
+  setCurrentPlan: (plan: 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE') => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
   
+  // Auth Modal (Login / Register / Password Reset)
+  authModalOpen: boolean;
+  setAuthModalOpen: (open: boolean) => void;
+  authModalMode: 'LOGIN' | 'REGISTER' | 'FORGOT';
+  setAuthModalMode: (mode: 'LOGIN' | 'REGISTER' | 'FORGOT') => void;
+  openAuthModal: (mode?: 'LOGIN' | 'REGISTER' | 'FORGOT') => void;
+  closeAuthModal: () => void;
+
   // Upgrade Modal
   upgradeModalOpen: boolean;
   upgradeModalData: UpgradeModalData | null;
@@ -126,6 +136,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   });
   const [currentPlan, setCurrentPlan] = useState<'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE'>('PROFESSIONAL');
+
+  // Auth Modal State
+  const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'LOGIN' | 'REGISTER' | 'FORGOT'>('LOGIN');
 
   // Upgrade Modal & Toast State
   const [upgradeModalOpen, setUpgradeModalOpen] = useState<boolean>(false);
@@ -200,6 +214,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }
       }
     } catch {}
+  };
+
+  const openAuthModal = (mode: 'LOGIN' | 'REGISTER' | 'FORGOT' = 'LOGIN') => {
+    setAuthModalMode(mode);
+    setAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setAuthModalOpen(false);
   };
 
   const openUpgradeModal = (
@@ -468,10 +491,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         refreshDemoState,
         currentUser,
         currentPlan,
+        setCurrentUser,
+        setCurrentPlan,
         token,
         setToken,
         logout,
         refreshUser,
+        authModalOpen,
+        setAuthModalOpen,
+        authModalMode,
+        setAuthModalMode,
+        openAuthModal,
+        closeAuthModal,
         upgradeModalOpen,
         upgradeModalData,
         openUpgradeModal,

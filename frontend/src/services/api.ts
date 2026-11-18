@@ -370,6 +370,15 @@ export const api = {
     return res.json();
   },
 
+  async forgotPassword(email: string) {
+    const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    return res.json();
+  },
+
   // ================= SUBSCRIPTION & BILLING APIS =================
   async getSubscriptionPlans() {
     const res = await fetch(`${API_BASE}/subscriptions/plans`, { headers: getAuthHeaders() });

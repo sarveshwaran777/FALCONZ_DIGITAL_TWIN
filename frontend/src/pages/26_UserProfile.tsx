@@ -96,29 +96,31 @@ export const UserProfilePage: React.FC = () => {
 
           <form onSubmit={handleUpdate} className="space-y-4 text-xs">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Full Legal Name</label>
+              <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Full Legal Name</label>
               <input
                 type="text"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/40 text-xs font-medium"
+                style={{ background: 'var(--input-bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Registered Work Email</label>
+              <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Registered Work Email</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/40 text-xs font-medium"
+                style={{ background: 'var(--input-bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">
+              <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
                 New Password (Leave blank to keep unchanged)
               </label>
               <input
@@ -126,7 +128,8 @@ export const UserProfilePage: React.FC = () => {
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/40 text-xs font-medium"
+                style={{ background: 'var(--input-bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>
 
