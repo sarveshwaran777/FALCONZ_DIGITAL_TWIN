@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Bot, Send, Sparkles, MessageSquare, Plus, ArrowRight, 
-  CheckCircle, AlertTriangle, AlertOctagon, HelpCircle, Activity,
-  RefreshCw, Wrench, Shield, Volume2, VolumeX, Mic, MicOff,
+  Activity, RefreshCw, Wrench, Volume2, VolumeX, Mic, MicOff,
   Copy, Check, ThumbsUp, ThumbsDown, Download, Trash2, Gauge,
-  Sliders, User, ArrowUpRight
+  Sliders, User, ArrowUpRight, ChevronDown, ChevronUp, History,
+  ShieldCheck, AlertTriangle, Zap, CheckCircle2, X
 } from 'lucide-react';
 import { useAppStore } from '../state/store';
 import { api } from '../services/api';
@@ -22,6 +22,149 @@ interface ChatMessage {
   created_at?: string;
 }
 
+// Custom Rich Markdown Formatter for High-Contrast Clean Typography
+const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let inList = false;
+  let listItems: string[] = [];
+
+  const flushList = (key: string) => {
+    if (listItems.length > 0) {
+      elements.push(
+        <ul key={key} className="space-y-1.5 my-2.5 pl-1">
+          {listItems.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2.5 text-xs leading-relaxed text-slate-700 dark:text-slate-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0 mt-2" />
+              <div className="flex-1">{renderInline(item)}</div>
+            </li>
+          ))}
+        </ul>
+      );
+      listItems = [];
+      inList = false;
+    }
+  };
+
+  const cleanMath = (str: string): string => {
+    return str
+      .replace(/\\\$/g, '$')
+      .replace(/\$\\frac\{([^}]+)\}\{([^}]+)\}\$/g, '$1 / $2')
+      .replace(/\$f_0\$/g, 'f₀')
+      .replace(/\$f_\{BPFO\}\$/g, 'f_BPFO')
+      .replace(/\$1X\$/g, '1X')
+      .replace(/\$2X\$/g, '2X')
+      .replace(/\$3\.2X - 5\.8X\$/g, '3.2X - 5.8X')
+      .replace(/\$q_\{10\}\$/g, 'q₁₀ (Conservative)')
+      .replace(/\$q_\{50\}\$/g, 'q₅₀ (Median)')
+      .replace(/\$q_\{90\}\$/g, 'q₉₀ (Optimistic)')
+      .replace(/\$P = I\^2 R\$/g, 'P = I²R')
+      .replace(/\$P_\{loss\} = I\^2 R_m\$/g, 'P_loss = I²Rm')
+      .replace(/\$\\ge 75\\%\$/g, '≥ 75%')
+      .replace(/\$\\sigma\$/g, 'σ')
+      .replace(/\$Z\$/g, 'Z')
+      .replace(/\$R\^2\$/g, 'R²')
+      .replace(/\\Delta/g, 'Δ')
+      .replace(/\\tau_\{motor\}/g, 'τ_motor')
+      .replace(/\\tau_\{aero\}/g, 'τ_aero')
+      .replace(/\\cdot/g, '·')
+      .replace(/\\text\{([^}]+)\}/g, '$1')
+      .replace(/\$/g, '');
+  };
+
+  const renderInline = (text: string): React.ReactNode => {
+    const cleaned = cleanMath(text);
+    // Split by inline code (`...`) and bold (`**...**`)
+    const parts = cleaned.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('`') && part.endsWith('`')) {
+        const codeText = part.slice(1, -1);
+        return (
+          <code
+            key={i}
+            className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded border mx-0.5"
+            style={{
+              background: 'var(--card-subtle)',
+              borderColor: 'var(--border)',
+              color: 'var(--text)'
+            }}
+          >
+            {codeText}
+          </code>
+        );
+      }
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <strong key={i} className="font-bold text-slate-900 dark:text-white">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return part;
+    });
+  };
+
+  lines.forEach((line, lineIdx) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushList(`list_flush_${lineIdx}`);
+      return;
+    }
+
+    // Headings: ### Header or ## Header
+    if (trimmed.startsWith('### ') || trimmed.startsWith('## ')) {
+      flushList(`list_before_h_${lineIdx}`);
+      const headingText = trimmed.replace(/^#{2,3}\s+/, '');
+      elements.push(
+        <div 
+          key={`h_${lineIdx}`} 
+          className="text-[13px] font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-2 pt-2.5 pb-1 mb-1.5 border-b border-slate-200/80 dark:border-slate-800"
+        >
+          {renderInline(headingText)}
+        </div>
+      );
+      return;
+    }
+
+    // Unordered list items: - Item or * Item
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      inList = true;
+      listItems.push(trimmed.slice(2));
+      return;
+    }
+
+    // Numbered list items: 1. Item
+    if (/^\d+\.\s+/.test(trimmed)) {
+      flushList(`list_before_num_${lineIdx}`);
+      const match = trimmed.match(/^(\d+)\.\s+(.*)$/);
+      if (match) {
+        elements.push(
+          <div key={`num_${lineIdx}`} className="flex items-start gap-2.5 text-xs my-1.5 text-slate-700 dark:text-slate-200 leading-relaxed">
+            <span className="w-4 h-4 rounded-full bg-purple-600/15 border border-purple-500/30 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+              {match[1]}
+            </span>
+            <div className="flex-1">{renderInline(match[2])}</div>
+          </div>
+        );
+        return;
+      }
+    }
+
+    // Regular paragraph
+    flushList(`list_before_p_${lineIdx}`);
+    elements.push(
+      <p key={`p_${lineIdx}`} className="text-xs leading-relaxed my-1.5 text-slate-700 dark:text-slate-200">
+        {renderInline(trimmed)}
+      </p>
+    );
+  });
+
+  flushList('final_list_flush');
+
+  return <div className="space-y-0.5">{elements}</div>;
+};
+
 export const AICopilotPage: React.FC = () => {
   const { systemState, showToast } = useAppStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -34,19 +177,20 @@ export const AICopilotPage: React.FC = () => {
   const [feedbackGiven, setFeedbackGiven] = useState<{ [id: string]: 'up' | 'down' }>({});
   const [isListening, setIsListening] = useState<boolean>(false);
   const [roleMode, setRoleMode] = useState<'ENGINEERING' | 'TECHNICIAN' | 'COMMANDER'>('ENGINEERING');
-  const [cockpitOpen, setCockpitOpen] = useState<boolean>(true);
+  const [historyDrawerOpen, setHistoryDrawerOpen] = useState<boolean>(false);
+  const [hudDrawerOpen, setHudDrawerOpen] = useState<boolean>(false);
+  const [expandedEvidence, setExpandedEvidence] = useState<{ [msgId: string]: boolean }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
-  // Quick Diagnostic Action Chips
-  const presetActions = [
+  // Curated Quick Prompts
+  const quickPrompts = [
     { label: '🛡️ Pre-Flight Clearance', prompt: 'Perform complete pre-flight health clearance and evaluate launch safety.' },
-    { label: '⚙️ Bearing Harmonic Scan', prompt: 'Perform 1X and high-frequency harmonic vibration scan for bearing raceway degradation.' },
+    { label: '⚙️ Bearing Harmonic Scan', prompt: 'Which motor channel has the highest vibration and bearing defect indicators?' },
     { label: '🌡️ Stator Thermal Check', prompt: 'Analyze current stator temperature, convection resistance, and thermal slope margin.' },
-    { label: '🔄 RPM Twin Comparison', prompt: 'Compare actual measured RPM against first-principles digital twin physics expectation.' },
     { label: '⏱️ Quantile RUL Prognosis', prompt: 'What is the multi-quantile Remaining Useful Life (RUL) with 90% confidence bounds?' },
+    { label: '🛫 Flight Mission Debrief', prompt: 'Analyze my latest flight session and debrief cruise performance.' },
     { label: '📋 Line Maintenance SOP', prompt: 'Generate step-by-step line technician maintenance checklist for current propulsion state.' },
-    { label: '📄 Automated PDF Report', prompt: 'Explain the available automated engineering PDF reports and how to generate them.' },
   ];
 
   // Speech Recognition (Voice Dictation)
@@ -70,7 +214,7 @@ export const AICopilotPage: React.FC = () => {
 
   const toggleVoiceInput = () => {
     if (!recognitionRef.current) {
-      showToast('Voice input is not supported in this browser.', 'info');
+      showToast('Voice dictation is not supported in this browser.', 'info');
       return;
     }
     if (isListening) {
@@ -80,7 +224,7 @@ export const AICopilotPage: React.FC = () => {
       try {
         recognitionRef.current.start();
         setIsListening(true);
-        showToast('Listening... Speak your flight engineering question.', 'info');
+        showToast('Listening... Speak your aerospace query.', 'info');
       } catch (e) {
         setIsListening(false);
       }
@@ -123,13 +267,17 @@ export const AICopilotPage: React.FC = () => {
 
   const handleFeedback = (id: string, type: 'up' | 'down') => {
     setFeedbackGiven((prev) => ({ ...prev, [id]: type }));
-    showToast(type === 'up' ? 'Feedback recorded: Highly helpful!' : 'Feedback recorded: Calibration adjusted.', 'success');
+    showToast(type === 'up' ? 'Feedback recorded: Highly helpful!' : 'Feedback recorded: Model calibration updated.', 'success');
+  };
+
+  const toggleEvidence = (msgId: string) => {
+    setExpandedEvidence((prev) => ({ ...prev, [msgId]: !prev[msgId] }));
   };
 
   const exportConversation = () => {
     if (messages.length === 0) return;
     const transcript = messages.map(m => {
-      const sender = m.sender === 'USER' ? 'ENGINEER' : 'FALCONZ COPILOT';
+      const sender = m.sender === 'USER' ? 'FLIGHT ENGINEER' : 'FALCONZ COPILOT';
       return `[${sender}]\n${m.content}\n`;
     }).join('\n----------------------------------------\n\n');
 
@@ -137,16 +285,16 @@ export const AICopilotPage: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `FalconZ_Copilot_Transcript_${Date.now()}.txt`;
+    a.download = `FalconZ_Copilot_Debrief_${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('Diagnostic transcript downloaded.', 'success');
   };
 
   const clearChat = () => {
-    if (window.confirm('Clear current diagnostic session?')) {
+    if (window.confirm('Clear active diagnostic session?')) {
       setMessages([]);
-      showToast('Chat cleared.', 'info');
+      showToast('Diagnostic conversation reset.', 'info');
     }
   };
 
@@ -170,6 +318,7 @@ export const AICopilotPage: React.FC = () => {
         setMessages(data.messages);
       }
     } catch {}
+    setHistoryDrawerOpen(false);
   };
 
   const handleNewConversation = async () => {
@@ -178,6 +327,8 @@ export const AICopilotPage: React.FC = () => {
       setActiveConvId(newConv.id);
       setMessages([]);
       fetchConversations();
+      setHistoryDrawerOpen(false);
+      showToast('New diagnostic flight session started.', 'info');
     } catch {}
   };
 
@@ -228,7 +379,7 @@ export const AICopilotPage: React.FC = () => {
         setMessages((prev) => [...prev, aiMsg]);
       }
     } catch (err: any) {
-      showToast(err.message || 'AI Copilot error', 'error');
+      showToast(err.message || 'AI Copilot communication error', 'error');
     }
     setLoading(false);
   };
@@ -248,420 +399,429 @@ export const AICopilotPage: React.FC = () => {
   const liveZScore = (res?.composite_residual_score ?? 0.0).toFixed(2);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-84px)] gap-3 select-none">
-      {/* Top Engineering Mode Bar & Diagnostic Quick-Pills */}
-      <div 
-        className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl border"
+    <div className="relative flex flex-col h-[calc(100vh-84px)] max-w-5xl mx-auto w-full select-none">
+      
+      {/* 1. TOP HEADER: Clean Navigation, Persona Segments & Telemetry Pill */}
+      <header 
+        className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl border shrink-0 mb-3"
         style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
       >
-        {/* Left: Role Switcher */}
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Copilot Persona:
-          </span>
-          <div className="flex items-center gap-1 p-0.5 rounded-xl border" style={{ borderColor: 'var(--border)', background: 'var(--bg)' }}>
-            <button
-              onClick={() => setRoleMode('ENGINEERING')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                roleMode === 'ENGINEERING' 
-                  ? 'bg-purple-600 text-white shadow-sm' 
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              Propulsion Engineer
-            </button>
-            <button
-              onClick={() => setRoleMode('TECHNICIAN')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                roleMode === 'TECHNICIAN' 
-                  ? 'bg-purple-600 text-white shadow-sm' 
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              Line Technician
-            </button>
-            <button
-              onClick={() => setRoleMode('COMMANDER')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                roleMode === 'COMMANDER' 
-                  ? 'bg-purple-600 text-white shadow-sm' 
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              Flight Commander
-            </button>
+        {/* Left: Branding & Grounding Pulse */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-purple-600/15 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <div>
+            <h1 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 leading-none">
+              FALCONZ Copilot
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            </h1>
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+              20 Hz Telemetry Grounded
+            </span>
           </div>
         </div>
 
-        {/* Right: Telemetry Cockpit Drawer Toggle & Controls */}
-        <div className="flex items-center gap-2">
+        {/* Center: Segmented Role Mode Pill */}
+        <div 
+          className="flex items-center p-0.5 rounded-xl border text-xs font-semibold"
+          style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+        >
           <button
-            onClick={() => setCockpitOpen(!cockpitOpen)}
-            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition-colors ${
-              cockpitOpen 
-                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30' 
-                : 'text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
+            onClick={() => setRoleMode('ENGINEERING')}
+            className={`px-3 py-1 rounded-lg text-xs transition-all ${
+              roleMode === 'ENGINEERING'
+                ? 'bg-purple-600 text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
-            title="Toggle live telemetry cockpit panel"
           >
-            <Gauge className="w-3.5 h-3.5" />
-            <span>Telemetry Gauges</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+            Engineer
+          </button>
+          <button
+            onClick={() => setRoleMode('TECHNICIAN')}
+            className={`px-3 py-1 rounded-lg text-xs transition-all ${
+              roleMode === 'TECHNICIAN'
+                ? 'bg-purple-600 text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            Technician
+          </button>
+          <button
+            onClick={() => setRoleMode('COMMANDER')}
+            className={`px-3 py-1 rounded-lg text-xs transition-all ${
+              roleMode === 'COMMANDER'
+                ? 'bg-purple-600 text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            Commander
+          </button>
+        </div>
+
+        {/* Right: Telemetry HUD Pill & Control Actions */}
+        <div className="flex items-center gap-1.5">
+          {/* Live Telemetry Pill */}
+          <button
+            onClick={() => setHudDrawerOpen(!hudDrawerOpen)}
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition-colors ${
+              hudDrawerOpen 
+                ? 'bg-purple-600/15 text-purple-700 dark:text-purple-300 border-purple-500/30' 
+                : 'hover:bg-slate-100 dark:hover:bg-white/5'
+            }`}
+            style={!hudDrawerOpen ? { borderColor: 'var(--border)', color: 'var(--text)' } : {}}
+            title="Toggle Live Telemetry HUD"
+          >
+            <Gauge className="w-3.5 h-3.5 text-purple-500" />
+            <span className="font-mono text-[11px] tabular-nums font-bold">
+              {liveRpm} RPM • {liveTemp}°C
+            </span>
           </button>
 
+          {/* Sessions Drawer Toggle */}
+          <button
+            onClick={() => setHistoryDrawerOpen(!historyDrawerOpen)}
+            className={`p-2 rounded-xl border transition-colors ${
+              historyDrawerOpen 
+                ? 'bg-purple-600/15 text-purple-700 dark:text-purple-300 border-purple-500/30' 
+                : 'hover:bg-slate-100 dark:hover:bg-white/5'
+            }`}
+            style={!historyDrawerOpen ? { borderColor: 'var(--border)', color: 'var(--text)' } : {}}
+            title="Flight Sessions History"
+          >
+            <History className="w-4 h-4" />
+          </button>
+
+          {/* Export Transcript */}
           <button
             onClick={exportConversation}
             disabled={messages.length === 0}
-            className="p-1.5 rounded-xl border text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors"
-            style={{ borderColor: 'var(--border)' }}
-            title="Download diagnostic conversation transcript"
+            className="p-2 rounded-xl border hover:bg-slate-100 dark:hover:bg-white/5 disabled:opacity-40 transition-colors"
+            style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+            title="Download Transcript"
           >
             <Download className="w-4 h-4" />
           </button>
 
+          {/* Clear Session */}
           <button
             onClick={clearChat}
             disabled={messages.length === 0}
-            className="p-1.5 rounded-xl border text-slate-600 dark:text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors"
-            style={{ borderColor: 'var(--border)' }}
-            title="Clear chat"
+            className="p-2 rounded-xl border hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/30 disabled:opacity-40 transition-colors"
+            style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+            title="Reset Chat"
           >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Main Workspace: Sidebar + Chat Stream + Telemetry Cockpit */}
-      <div className="flex flex-1 gap-3 min-h-0">
-        {/* Left Drawer: Saved Diagnostic Sessions */}
-        <div 
-          className="w-56 hidden lg:flex flex-col rounded-2xl border p-3 shrink-0"
-          style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
-        >
-          <button
-            onClick={handleNewConversation}
-            className="w-full py-2 px-3 rounded-xl font-bold text-xs bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center gap-1.5 mb-3 shadow-md shadow-purple-600/20 transition-all"
-          >
-            <Plus className="w-4 h-4" />
-            New Diagnostic Session
-          </button>
-
-          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 mb-1.5 font-bold">
-            Flight Sessions
-          </span>
-
-          <div className="flex-1 overflow-y-auto space-y-1 pr-1">
-            {conversations.map((c) => {
-              const isActive = activeConvId === c.id;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => loadConversation(c.id)}
-                  className={`w-full text-left p-2 rounded-xl text-xs transition-colors truncate flex items-center gap-2 ${
-                    isActive 
-                      ? 'bg-purple-600/15 text-purple-700 dark:text-purple-300 font-bold border border-purple-500/30' 
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-                  }`}
-                >
-                  <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                  <span className="truncate">{c.title || 'Propulsion Analysis'}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Active AI Telemetry Status Badge */}
-          <div className="p-2.5 rounded-xl border mt-auto text-[11px] space-y-1" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
-            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold text-[10.5px]">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>20 Hz Physical Causal Engine</span>
-            </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
-              Real-time residual Z-scores & random forest classification grounded.
-            </p>
-          </div>
-        </div>
-
-        {/* Center: Interactive Chat Interface */}
-        <div 
-          className="flex-1 flex flex-col rounded-2xl border min-h-0 overflow-hidden"
-          style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
-        >
-          {/* Preset Quick-Actions Carousel Bar */}
-          <div className="px-4 py-2 border-b overflow-x-auto flex items-center gap-1.5 scrollbar-none" style={{ borderColor: 'var(--border)' }}>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 shrink-0 mr-1">
-              Quick Scans:
-            </span>
-            {presetActions.map((act, i) => (
-              <button
-                key={i}
-                onClick={() => handleSend(act.prompt)}
-                disabled={loading}
-                className="px-2.5 py-1 rounded-full text-[11px] font-semibold border shrink-0 transition-all hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-300"
-                style={{ background: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
-              >
-                {act.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Messages Stream */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 min-h-0">
-            {messages.length === 0 && (
-              <div className="max-w-xl mx-auto py-8 text-center space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto shadow-inner">
-                  <Sparkles className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                    FALCONZ Aerospace Engineering Copilot
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1 leading-relaxed">
-                    Ask natural questions regarding live RPM, harmonic vibration, stator thermal gradients, physics residuals, or component remaining useful life.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 gap-2 pt-2 text-left">
-                  {presetActions.slice(0, 4).map((p, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSend(p.prompt)}
-                      className="p-3 rounded-xl border text-xs transition-all flex items-center justify-between group hover:border-purple-500 hover:shadow-sm"
-                      style={{ background: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
-                    >
-                      <span className="font-medium">{p.prompt}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
-                    </button>
-                  ))}
-                </div>
+      {/* 2. MAIN WORKSPACE: Clean Centered Conversation View + Floating Drawers */}
+      <div className="relative flex-1 flex flex-col min-h-0 rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+        
+        {/* Messages Stream Container */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6">
+          
+          {/* Welcome Screen when Empty */}
+          {messages.length === 0 && (
+            <div className="max-w-xl mx-auto py-10 text-center space-y-6 animate-fadeInUp">
+              <div className="w-16 h-16 rounded-3xl bg-purple-600/10 border border-purple-500/25 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto shadow-inner">
+                <Bot className="w-8 h-8" />
               </div>
-            )}
+              
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                  How can I assist your propulsion test today?
+                </h2>
+                <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1.5 leading-relaxed">
+                  Real-time physics residuals, 20 Hz multi-channel FFT vibration harmonics, stator temperature gradients, and quantile RUL forecasting.
+                </p>
+              </div>
 
-            {messages.map((m) => {
-              const isUser = m.sender === 'USER';
-              return (
-                <div key={m.id} className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
-                  {!isUser && (
-                    <div className="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
-                      <Bot className="w-4 h-4" />
+              {/* 4 Feature Action Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 text-left">
+                {quickPrompts.slice(0, 4).map((p, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSend(p.prompt)}
+                    className="p-3.5 rounded-xl border text-xs transition-all flex flex-col justify-between group hover:border-purple-500 hover:shadow-xs"
+                    style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-slate-900 dark:text-white text-[12px]">{p.label}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-purple-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </div>
-                  )}
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
+                      {p.prompt}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-                  <div className={`max-w-2xl space-y-2.5 ${isUser ? 'items-end' : 'items-start'}`}>
-                    {/* Message Bubble */}
-                    <div 
-                      className={`p-4 rounded-2xl text-[12.5px] leading-relaxed shadow-sm transition-all ${
-                        isUser
-                          ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white rounded-br-none'
-                          : 'border text-slate-900 dark:text-slate-100 rounded-bl-none'
-                      }`}
-                      style={!isUser ? { background: 'var(--card-subtle)', borderColor: 'var(--border)' } : {}}
-                    >
-                      <div className="whitespace-pre-line font-normal prose-sm">
-                        {m.content}
-                      </div>
+          {/* Message List */}
+          {messages.map((m) => {
+            const isUser = m.sender === 'USER';
+            const evidenceOpen = !!expandedEvidence[m.id];
 
-                      {/* Interactive Bottom Action Toolbar (Audio, Copy, Thumbs) for Copilot */}
-                      {!isUser && (
-                        <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 text-xs">
-                          <div className="flex items-center gap-1.5">
-                            {/* Speech Readout Button */}
-                            <button
-                              onClick={() => toggleSpeak(m.id, m.content)}
-                              className={`p-1.5 rounded-lg border flex items-center gap-1 text-[11px] font-medium transition-colors ${
-                                speakingMsgId === m.id 
-                                  ? 'bg-purple-600 text-white border-purple-500 animate-pulse' 
-                                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border-transparent hover:border-slate-300 dark:hover:border-slate-700'
-                              }`}
-                              title={speakingMsgId === m.id ? 'Stop audio' : 'Listen to Copilot response'}
-                            >
-                              {speakingMsgId === m.id ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                              <span>{speakingMsgId === m.id ? 'Mute' : 'Voice'}</span>
-                            </button>
+            return (
+              <div 
+                key={m.id} 
+                className={`flex gap-3 max-w-3xl mx-auto w-full ${isUser ? 'justify-end' : 'justify-start'} animate-fadeInUp`}
+              >
+                {!isUser && (
+                  <div className="w-8 h-8 rounded-xl bg-purple-600/15 border border-purple-500/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 mt-1">
+                    <Bot className="w-4 h-4" />
+                  </div>
+                )}
 
-                            {/* Copy Button */}
-                            <button
-                              onClick={() => handleCopy(m.id, m.content)}
-                              className="p-1.5 rounded-lg border border-transparent hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-[11px] font-medium flex items-center gap-1 transition-colors"
-                              title="Copy response"
-                            >
-                              {copiedId === m.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                              <span>{copiedId === m.id ? 'Copied' : 'Copy'}</span>
-                            </button>
-                          </div>
-
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleFeedback(m.id, 'up')}
-                              className={`p-1.5 rounded-lg transition-colors ${
-                                feedbackGiven[m.id] === 'up' 
-                                  ? 'text-emerald-500 bg-emerald-500/10' 
-                                  : 'text-slate-400 hover:text-emerald-500'
-                              }`}
-                              title="Helpful"
-                            >
-                              <ThumbsUp className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleFeedback(m.id, 'down')}
-                              className={`p-1.5 rounded-lg transition-colors ${
-                                feedbackGiven[m.id] === 'down' 
-                                  ? 'text-rose-500 bg-rose-500/10' 
-                                  : 'text-slate-400 hover:text-rose-500'
-                              }`}
-                              title="Not helpful"
-                            >
-                              <ThumbsDown className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Interactive Telemetry Snapshot Evidence Card */}
-                    {!isUser && m.evidence && (
-                      <div 
-                        className="p-3.5 rounded-xl border space-y-2 text-[11px]"
-                        style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
-                      >
-                        <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 font-mono text-[10.5px]">
-                          <span className="font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
-                            GROUNDED TELEMETRY EVIDENCE
-                          </span>
-                          <span>Confidence: {m.confidence_pct ? `${m.confidence_pct.toFixed(1)}%` : '98.0%'}</span>
-                        </div>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[10.5px]">
-                          <div className="p-1.5 rounded border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                            <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Measured RPM</span>
-                            <span className="font-bold" style={{ color: 'var(--text)' }}>{m.evidence.rpm_actual || 0}</span>
-                          </div>
-                          <div className="p-1.5 rounded border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                            <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Twin Target</span>
-                            <span className="font-bold" style={{ color: 'var(--text)' }}>{m.evidence.rpm_expected || 0}</span>
-                          </div>
-                          <div className="p-1.5 rounded border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                            <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Stator Temp</span>
-                            <span className="font-bold" style={{ color: 'var(--text)' }}>{m.evidence.temperature_c || 0} °C</span>
-                          </div>
-                          <div className="p-1.5 rounded border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                            <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Vibration RMS</span>
-                            <span className="font-bold" style={{ color: 'var(--text)' }}>{m.evidence.vibration_rms_g || 0} g</span>
-                          </div>
-                          <div className="p-1.5 rounded border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                            <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Composite Z</span>
-                            <span className="font-bold text-purple-600 dark:text-purple-400">{m.evidence.composite_z_score || 0} σ</span>
-                          </div>
-                          <div className="p-1.5 rounded border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                            <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Health Index</span>
-                            <span className="font-bold text-emerald-600 dark:text-emerald-400">{m.evidence.health_index || 100}%</span>
-                          </div>
-                          <div className="p-1.5 rounded border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                            <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Phase Current</span>
-                            <span className="font-bold" style={{ color: 'var(--text)' }}>{m.evidence.current_a || 0} A</span>
-                          </div>
-                          <div className="p-1.5 rounded border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                            <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Severity</span>
-                            <span className="font-bold text-amber-600 dark:text-amber-400">{m.severity || 'Nominal'}</span>
-                          </div>
-                        </div>
-
-                        {/* Action Plan */}
-                        {m.recommended_actions && m.recommended_actions.length > 0 && (
-                          <div className="pt-2 border-t space-y-1" style={{ borderColor: 'var(--border)' }}>
-                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                              <Wrench className="w-3 h-3 text-purple-500" /> Maintenance Action SOP
-                            </span>
-                            {m.recommended_actions.map((act, i) => (
-                              <p key={i} className="text-slate-700 dark:text-slate-300 text-[11px] pl-4 relative before:content-['•'] before:absolute before:left-1 before:text-purple-500">
-                                {act}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                <div className={`space-y-2 max-w-[85%] sm:max-w-[78%] ${isUser ? 'items-end' : 'items-start'}`}>
+                  
+                  {/* Message Bubble */}
+                  <div
+                    className={`p-4 rounded-2xl text-xs leading-relaxed shadow-xs transition-all ${
+                      isUser
+                        ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white rounded-br-sm'
+                        : 'border rounded-bl-sm'
+                    }`}
+                    style={!isUser ? { background: 'var(--card-subtle)', borderColor: 'var(--border)' } : {}}
+                  >
+                    {/* Rich Formatted Content */}
+                    {isUser ? (
+                      <p className="whitespace-pre-line text-xs font-medium text-white">{m.content}</p>
+                    ) : (
+                      <FormattedMessage content={m.content} />
                     )}
 
-                    {/* Interactive Suggested Follow-Up Chips */}
-                    {!isUser && m.suggested_followups && m.suggested_followups.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {m.suggested_followups.map((chip, idx) => (
+                    {/* Copilot Action Toolbar (Speech, Copy, Feedback) */}
+                    {!isUser && (
+                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-200/80 dark:border-slate-800 text-xs">
+                        <div className="flex items-center gap-1">
+                          {/* Audio Readout */}
                           <button
-                            key={idx}
-                            onClick={() => handleSend(chip)}
-                            disabled={loading}
-                            className="px-2.5 py-1 rounded-full text-[11px] font-semibold border flex items-center gap-1 group transition-all hover:border-purple-500 hover:shadow-xs"
-                            style={{ background: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
+                            onClick={() => toggleSpeak(m.id, m.content)}
+                            className={`px-2 py-1 rounded-lg border text-[11px] font-medium flex items-center gap-1 transition-colors ${
+                              speakingMsgId === m.id
+                                ? 'bg-purple-600 text-white border-purple-500 animate-pulse'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border-transparent hover:border-slate-300 dark:hover:border-slate-700'
+                            }`}
+                            title={speakingMsgId === m.id ? 'Mute speech' : 'Listen with voice readout'}
                           >
-                            <Sparkles className="w-3 h-3 text-purple-500" />
-                            <span>{chip}</span>
-                            <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-purple-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                            {speakingMsgId === m.id ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                            <span>{speakingMsgId === m.id ? 'Mute' : 'Voice'}</span>
                           </button>
-                        ))}
+
+                          {/* Copy */}
+                          <button
+                            onClick={() => handleCopy(m.id, m.content)}
+                            className="px-2 py-1 rounded-lg border border-transparent hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-[11px] font-medium flex items-center gap-1 transition-colors"
+                            title="Copy response"
+                          >
+                            {copiedId === m.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedId === m.id ? 'Copied' : 'Copy'}</span>
+                          </button>
+
+                          {/* Evidence Toggle Button if evidence is attached */}
+                          {m.evidence && (
+                            <button
+                              onClick={() => toggleEvidence(m.id)}
+                              className="px-2 py-1 rounded-lg border border-transparent hover:border-slate-300 dark:hover:border-slate-700 text-purple-600 dark:text-purple-400 text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                              title="Toggle Telemetry Snapshot Evidence"
+                            >
+                              <Activity className="w-3.5 h-3.5" />
+                              <span>{evidenceOpen ? 'Hide Evidence' : 'View Evidence'}</span>
+                              {evidenceOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Thumbs Feedback */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleFeedback(m.id, 'up')}
+                            className={`p-1 rounded-lg transition-colors ${
+                              feedbackGiven[m.id] === 'up'
+                                ? 'text-emerald-500 bg-emerald-500/10'
+                                : 'text-slate-400 hover:text-emerald-500'
+                            }`}
+                            title="Accurate & helpful"
+                          >
+                            <ThumbsUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleFeedback(m.id, 'down')}
+                            className={`p-1 rounded-lg transition-colors ${
+                              feedbackGiven[m.id] === 'down'
+                                ? 'text-rose-500 bg-rose-500/10'
+                                : 'text-slate-400 hover:text-rose-500'
+                            }`}
+                            title="Needs calibration"
+                          >
+                            <ThumbsDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
-                </div>
-              );
-            })}
 
-            {loading && (
-              <div className="flex gap-3 items-center text-xs text-purple-600 dark:text-purple-400 animate-pulse py-2">
-                <div className="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center">
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  {/* Collapsible Telemetry Snapshot Evidence Card */}
+                  {!isUser && m.evidence && evidenceOpen && (
+                    <div 
+                      className="p-3.5 rounded-xl border space-y-2.5 text-[11px] animate-slideDown"
+                      style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+                    >
+                      <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 font-mono text-[10.5px]">
+                        <span className="font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1">
+                          <ShieldCheck className="w-3.5 h-3.5" /> Grounded Telemetry Evidence
+                        </span>
+                        <span className="font-semibold">
+                          Confidence: {m.confidence_pct ? `${m.confidence_pct.toFixed(1)}%` : '98.0%'}
+                        </span>
+                      </div>
+
+                      {/* Clean 4-Grid Sensor Snapshot */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px]">
+                        <div className="p-2 rounded-lg border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+                          <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Speed</span>
+                          <span className="font-bold" style={{ color: 'var(--text)' }}>{m.evidence.rpm_actual || 0} RPM</span>
+                        </div>
+                        <div className="p-2 rounded-lg border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+                          <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Stator Heat</span>
+                          <span className="font-bold" style={{ color: 'var(--text)' }}>{m.evidence.temperature_c || 0} °C</span>
+                        </div>
+                        <div className="p-2 rounded-lg border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+                          <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Vibration RMS</span>
+                          <span className="font-bold" style={{ color: 'var(--text)' }}>{m.evidence.vibration_rms_g || 0} g</span>
+                        </div>
+                        <div className="p-2 rounded-lg border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+                          <span className="text-slate-500 dark:text-slate-400 block text-[9.5px]">Composite Z</span>
+                          <span className="font-bold text-purple-600 dark:text-purple-400">{m.evidence.composite_z_score || 0} σ</span>
+                        </div>
+                      </div>
+
+                      {/* Action Plan Checklist */}
+                      {m.recommended_actions && m.recommended_actions.length > 0 && (
+                        <div className="pt-2 border-t space-y-1.5" style={{ borderColor: 'var(--border)' }}>
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                            <Wrench className="w-3 h-3 text-purple-500" /> Maintenance Action SOP
+                          </span>
+                          {m.recommended_actions.map((act, i) => (
+                            <div key={i} className="flex items-start gap-1.5 text-[11px] text-slate-700 dark:text-slate-300">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-purple-500 shrink-0 mt-0.5" />
+                              <span>{act}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Suggested Follow-Up Prompt Chips */}
+                  {!isUser && m.suggested_followups && m.suggested_followups.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {m.suggested_followups.map((chip, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSend(chip)}
+                          disabled={loading}
+                          className="px-2.5 py-1 rounded-full text-[11px] font-semibold border flex items-center gap-1 group transition-all hover:border-purple-500 hover:shadow-xs"
+                          style={{ background: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
+                        >
+                          <Sparkles className="w-3 h-3 text-purple-500" />
+                          <span>{chip}</span>
+                          <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-purple-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-0.5">
-                  <p className="font-bold">FALCONZ Copilot is analyzing live telemetry residuals...</p>
-                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400">Computing 20 Hz Joule dissipation, 1X harmonics & quantile RUL bounds.</p>
-                </div>
+
+                {isUser && (
+                  <div className="w-8 h-8 rounded-xl bg-purple-700 text-white flex items-center justify-center shrink-0 mt-1 shadow-sm font-bold text-xs">
+                    U
+                  </div>
+                )}
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+            );
+          })}
 
-          {/* Interactive Chat Input Bar with Voice Dictation */}
-          <div className="p-3 sm:p-4 border-t" style={{ borderColor: 'var(--border)' }}>
+          {/* Thinking / Calculating Spinner */}
+          {loading && (
+            <div className="flex gap-3 items-center max-w-3xl mx-auto w-full text-xs text-purple-600 dark:text-purple-400 animate-pulse py-2">
+              <div className="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="font-bold text-xs">FALCONZ Copilot is analyzing live telemetry residuals...</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Computing 20 Hz multi-channel FFT, Joule losses, and quantile RUL bounds.</p>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* 3. BOTTOM FLOATING CONSOLE: Quick Action Carousel + Voice + Input Dock */}
+        <div className="p-3 sm:p-4 border-t shrink-0" style={{ borderColor: 'var(--border)', background: 'var(--card)' }}>
+          <div className="max-w-3xl mx-auto space-y-2.5">
+            
+            {/* Quick Diagnostic Carousel Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 shrink-0 mr-1">
+                Quick Prompts:
+              </span>
+              {quickPrompts.map((act, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSend(act.prompt)}
+                  disabled={loading}
+                  className="px-2.5 py-1 rounded-full text-[11px] font-medium border shrink-0 transition-all hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-300"
+                  style={{ background: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
+                >
+                  {act.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Input Form with Voice Dictation & Send */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSend();
               }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 p-1.5 rounded-2xl border shadow-xs"
+              style={{ background: 'var(--input-bg)', borderColor: 'var(--border)' }}
             >
-              {/* Voice Dictation Button */}
+              {/* Voice Microphone Dictation */}
               <button
                 type="button"
                 onClick={toggleVoiceInput}
-                className={`p-3 rounded-xl border transition-all ${
-                  isListening 
-                    ? 'bg-rose-500 text-white border-rose-600 animate-pulse shadow-md shadow-rose-500/25' 
-                    : 'text-slate-600 dark:text-slate-300 hover:text-purple-600 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
+                className={`p-2.5 rounded-xl border transition-all ${
+                  isListening
+                    ? 'bg-rose-500 text-white border-rose-600 animate-pulse shadow-md shadow-rose-500/25'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-purple-600 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
-                style={{ background: isListening ? undefined : 'var(--input-bg)' }}
                 title={isListening ? 'Stop listening' : 'Speak your question (Voice dictation)'}
               >
                 {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
               </button>
 
-              {/* Text Input with High Contrast */}
+              {/* Main Text Input */}
               <input
                 type="text"
                 value={inputPrompt}
                 onChange={(e) => setInputPrompt(e.target.value)}
-                placeholder={isListening ? "Listening... Speak your flight question..." : "Ask Copilot: 'Why is Motor 2 hot?', 'Check vibration', 'Is it safe to fly?'..."}
-                className="flex-1 rounded-xl px-4 py-3 text-xs font-medium border focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition-all"
-                style={{
-                  background: 'var(--input-bg)',
-                  borderColor: 'var(--border)',
-                  color: 'var(--text)'
-                }}
+                placeholder={isListening ? "Listening... Speak your flight question..." : "Ask Copilot: 'Which motor has highest vibration?', 'Why is M2 hot?', 'Can I fly?'..."}
+                className="flex-1 bg-transparent px-2 py-2 text-xs font-medium focus:outline-none"
+                style={{ color: 'var(--text)' }}
               />
 
               {/* Send Button */}
               <button
                 type="submit"
                 disabled={loading || !inputPrompt.trim()}
-                className="p-3 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white shadow-md shadow-purple-600/20 transition-all shrink-0 font-bold"
+                className="p-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white shadow-sm shadow-purple-600/20 transition-all shrink-0 font-bold"
                 title="Send message"
               >
                 <Send className="w-4 h-4" />
@@ -670,134 +830,208 @@ export const AICopilotPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Drawer: Live Telemetry Mini-Cockpit Panel */}
-        {cockpitOpen && (
+        {/* 4. SLIDE-OUT DRAWER: Diagnostic Flight Sessions History */}
+        {historyDrawerOpen && (
           <div 
-            className="w-64 hidden xl:flex flex-col rounded-2xl border p-4 shrink-0 space-y-3.5 overflow-y-auto"
+            className="absolute inset-y-0 left-0 w-72 border-r shadow-2xl p-4 flex flex-col z-30 animate-fadeInUp"
             style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
           >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-purple-500" />
-                Live Telemetry Cockpit
+            <div className="flex items-center justify-between pb-3 border-b" style={{ borderColor: 'var(--border)' }}>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
+                <History className="w-4 h-4 text-purple-500" />
+                Flight Sessions
               </span>
-              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                20 Hz
-              </span>
+              <button 
+                onClick={() => setHistoryDrawerOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400">
-              Click any metric dial below to instantly ask the Copilot to analyze that parameter.
+
+            <button
+              onClick={handleNewConversation}
+              className="w-full mt-3 py-2 px-3 rounded-xl font-bold text-xs bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center gap-1.5 shadow-sm shadow-purple-600/20 transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              New Flight Session
+            </button>
+
+            <div className="flex-1 overflow-y-auto space-y-1.5 mt-3 pr-1">
+              {conversations.map((c) => {
+                const isActive = activeConvId === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => loadConversation(c.id)}
+                    className={`w-full text-left p-2.5 rounded-xl text-xs transition-colors truncate flex items-center gap-2 ${
+                      isActive 
+                        ? 'bg-purple-600/15 text-purple-700 dark:text-purple-300 font-bold border border-purple-500/30' 
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                    <span className="truncate">{c.title || 'Propulsion Analysis'}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 5. SLIDE-OUT DRAWER: Live Telemetry Mini-Cockpit HUD */}
+        {hudDrawerOpen && (
+          <div 
+            className="absolute inset-y-0 right-0 w-72 border-l shadow-2xl p-4 flex flex-col z-30 space-y-3 animate-fadeInUp"
+            style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+          >
+            <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: 'var(--border)' }}>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Gauge className="w-4 h-4 text-purple-500" />
+                Live Telemetry HUD
+              </span>
+              <button 
+                onClick={() => setHudDrawerOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
+              Click any gauge to ask Copilot for instant diagnostic analysis:
             </p>
 
-            {/* Metric Dial 1: RPM */}
-            <div 
-              onClick={() => handleSend("Compare actual RPM against expected digital twin speed.")}
-              className="p-3 rounded-xl border cursor-pointer hover:border-purple-500 hover:shadow-xs transition-all group"
-              style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
-            >
-              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                <span className="font-semibold">Propulsion RPM</span>
-                <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 group-hover:underline">Ask ↗</span>
+            <div className="space-y-2 overflow-y-auto pr-1">
+              {/* Dial 1: RPM */}
+              <div
+                onClick={() => {
+                  handleSend("Compare actual RPM against expected digital twin speed.");
+                  setHudDrawerOpen(false);
+                }}
+                className="p-2.5 rounded-xl border cursor-pointer hover:border-purple-500 transition-all"
+                style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+              >
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
+                  <span className="font-semibold">Propulsion Speed</span>
+                  <span className="text-purple-600 dark:text-purple-400 font-mono text-[10px]">Ask ↗</span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-lg font-bold tabular-nums" style={{ color: 'var(--text)' }}>
+                    {liveRpm} <span className="text-xs font-normal text-slate-400">RPM</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500">Twin: {expectedRpm}</span>
+                </div>
               </div>
-              <div className="flex items-baseline justify-between">
-                <span className="text-xl font-extrabold tabular-nums" style={{ color: 'var(--text)' }}>
-                  {liveRpm} <span className="text-xs font-normal text-slate-400">RPM</span>
-                </span>
-                <span className="text-[11px] font-mono text-slate-500">Twin: {expectedRpm}</span>
-              </div>
-            </div>
 
-            {/* Metric Dial 2: Stator Temperature */}
-            <div 
-              onClick={() => handleSend("Analyze why stator core temperature is at current level and project thermal slope.")}
-              className="p-3 rounded-xl border cursor-pointer hover:border-purple-500 hover:shadow-xs transition-all group"
-              style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
-            >
-              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                <span className="font-semibold">Stator Temperature</span>
-                <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 group-hover:underline">Ask ↗</span>
+              {/* Dial 2: Temperature */}
+              <div
+                onClick={() => {
+                  handleSend("Analyze why stator core temperature is at current level and project thermal slope.");
+                  setHudDrawerOpen(false);
+                }}
+                className="p-2.5 rounded-xl border cursor-pointer hover:border-purple-500 transition-all"
+                style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+              >
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
+                  <span className="font-semibold">Stator Temperature</span>
+                  <span className="text-purple-600 dark:text-purple-400 font-mono text-[10px]">Ask ↗</span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-lg font-bold tabular-nums" style={{ color: 'var(--text)' }}>
+                    {liveTemp} <span className="text-xs font-normal text-slate-400">°C</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500">Ceiling: 105°C</span>
+                </div>
               </div>
-              <div className="flex items-baseline justify-between">
-                <span className={`text-xl font-extrabold tabular-nums ${Number(liveTemp) > 65 ? 'text-amber-500' : ''}`} style={{ color: Number(liveTemp) <= 65 ? 'var(--text)' : undefined }}>
-                  {liveTemp} <span className="text-xs font-normal text-slate-400">°C</span>
-                </span>
-                <span className="text-[11px] font-mono text-slate-500">Limit: 75°C</span>
-              </div>
-            </div>
 
-            {/* Metric Dial 3: Vibration RMS */}
-            <div 
-              onClick={() => handleSend("Analyze current vibration RMS and identify which motor has the highest harmonic peak.")}
-              className="p-3 rounded-xl border cursor-pointer hover:border-purple-500 hover:shadow-xs transition-all group"
-              style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
-            >
-              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                <span className="font-semibold">Radial Vibration</span>
-                <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 group-hover:underline">Ask ↗</span>
+              {/* Dial 3: Vibration */}
+              <div
+                onClick={() => {
+                  handleSend("Which motor has the highest vibration peak and harmonic spectrum?");
+                  setHudDrawerOpen(false);
+                }}
+                className="p-2.5 rounded-xl border cursor-pointer hover:border-purple-500 transition-all"
+                style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+              >
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
+                  <span className="font-semibold">Radial Vibration</span>
+                  <span className="text-purple-600 dark:text-purple-400 font-mono text-[10px]">Ask ↗</span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-lg font-bold tabular-nums" style={{ color: 'var(--text)' }}>
+                    {liveVib} <span className="text-xs font-normal text-slate-400">g</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500">Norm: &lt;0.35g</span>
+                </div>
               </div>
-              <div className="flex items-baseline justify-between">
-                <span className={`text-xl font-extrabold tabular-nums ${Number(liveVib) > 0.5 ? 'text-rose-500' : ''}`} style={{ color: Number(liveVib) <= 0.5 ? 'var(--text)' : undefined }}>
-                  {liveVib} <span className="text-xs font-normal text-slate-400">g</span>
-                </span>
-                <span className="text-[11px] font-mono text-slate-500">Norm: &lt;0.35g</span>
-              </div>
-            </div>
 
-            {/* Metric Dial 4: Phase Current */}
-            <div 
-              onClick={() => handleSend("Analyze phase current draw and calculate Joule dissipation losses.")}
-              className="p-3 rounded-xl border cursor-pointer hover:border-purple-500 hover:shadow-xs transition-all group"
-              style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
-            >
-              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                <span className="font-semibold">Current Draw</span>
-                <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 group-hover:underline">Ask ↗</span>
+              {/* Dial 4: Current */}
+              <div
+                onClick={() => {
+                  handleSend("Analyze phase current draw and calculate Joule dissipation losses.");
+                  setHudDrawerOpen(false);
+                }}
+                className="p-2.5 rounded-xl border cursor-pointer hover:border-purple-500 transition-all"
+                style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+              >
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
+                  <span className="font-semibold">Phase Current</span>
+                  <span className="text-purple-600 dark:text-purple-400 font-mono text-[10px]">Ask ↗</span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-lg font-bold tabular-nums" style={{ color: 'var(--text)' }}>
+                    {liveCurr} <span className="text-xs font-normal text-slate-400">A</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500">Total Pack</span>
+                </div>
               </div>
-              <div className="flex items-baseline justify-between">
-                <span className="text-xl font-extrabold tabular-nums" style={{ color: 'var(--text)' }}>
-                  {liveCurr} <span className="text-xs font-normal text-slate-400">A</span>
-                </span>
-                <span className="text-[11px] font-mono text-slate-500">Total Pack</span>
-              </div>
-            </div>
 
-            {/* Metric Dial 5: Composite Residual Z-Score */}
-            <div 
-              onClick={() => handleSend("Explain how the composite residual score and Z-score are calculated.")}
-              className="p-3 rounded-xl border cursor-pointer hover:border-purple-500 hover:shadow-xs transition-all group"
-              style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
-            >
-              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                <span className="font-semibold">Composite Residual</span>
-                <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 group-hover:underline">Ask ↗</span>
+              {/* Dial 5: Composite Z-Score */}
+              <div
+                onClick={() => {
+                  handleSend("Explain how the composite residual score and Z-score are calculated.");
+                  setHudDrawerOpen(false);
+                }}
+                className="p-2.5 rounded-xl border cursor-pointer hover:border-purple-500 transition-all"
+                style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+              >
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
+                  <span className="font-semibold">Residual Variance</span>
+                  <span className="text-purple-600 dark:text-purple-400 font-mono text-[10px]">Ask ↗</span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-lg font-bold text-purple-600 dark:text-purple-400 tabular-nums">
+                    {liveZScore} <span className="text-xs font-normal text-slate-400">σ</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500">Warn: &gt;2.0σ</span>
+                </div>
               </div>
-              <div className="flex items-baseline justify-between">
-                <span className="text-xl font-extrabold text-purple-600 dark:text-purple-400 tabular-nums">
-                  {liveZScore} <span className="text-xs font-normal text-slate-400">σ</span>
-                </span>
-                <span className="text-[11px] font-mono text-slate-500">Warn: &gt;2.0σ</span>
-              </div>
-            </div>
 
-            {/* Metric Dial 6: Propulsion Health Index */}
-            <div 
-              onClick={() => handleSend("Why is the propulsion health index at its current level?")}
-              className="p-3 rounded-xl border cursor-pointer hover:border-purple-500 hover:shadow-xs transition-all group"
-              style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
-            >
-              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                <span className="font-semibold">Health Integrity</span>
-                <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 group-hover:underline">Ask ↗</span>
-              </div>
-              <div className="flex items-baseline justify-between">
-                <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                  {liveHealth}%
-                </span>
-                <span className="text-[11px] font-mono text-slate-500">{intel?.health_band || 'HEALTHY'}</span>
+              {/* Dial 6: Health Index */}
+              <div
+                onClick={() => {
+                  handleSend("Why is the propulsion health index at its current level?");
+                  setHudDrawerOpen(false);
+                }}
+                className="p-2.5 rounded-xl border cursor-pointer hover:border-purple-500 transition-all"
+                style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+              >
+                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
+                  <span className="font-semibold">Health Integrity</span>
+                  <span className="text-purple-600 dark:text-purple-400 font-mono text-[10px]">Ask ↗</span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                    {liveHealth}%
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-500">{intel?.health_band || 'HEALTHY'}</span>
+                </div>
               </div>
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
