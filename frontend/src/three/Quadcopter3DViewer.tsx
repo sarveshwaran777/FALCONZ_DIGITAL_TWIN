@@ -104,8 +104,8 @@ export const Quadcopter3DViewer: React.FC = () => {
     const isDark = theme === 'dark';
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(isDark ? 0x0a0a0a : 0xf8fafc);
-    scene.fog = new THREE.Fog(isDark ? 0x0a0a0a : 0xf8fafc, 8, 18);
+    scene.background = new THREE.Color(0x050505);
+    scene.fog = new THREE.Fog(0x050505, 8, 18);
 
     const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
     camera.position.set(0, 3.1, 4.3);
@@ -147,10 +147,10 @@ export const Quadcopter3DViewer: React.FC = () => {
     keyLight.shadow.camera.top = 6; keyLight.shadow.camera.bottom = -6;
     keyLight.shadow.bias = -0.0005;
     scene.add(keyLight);
-    const fillLight = new THREE.DirectionalLight(isDark ? 0x8ab4f8 : 0xfff4e0, isDark ? 0.35 : 0.5);
+    const fillLight = new THREE.DirectionalLight(0xffffff, isDark ? 0.4 : 0.5);
     fillLight.position.set(-6, 4, -4);
     scene.add(fillLight);
-    const rimLight = new THREE.PointLight(isDark ? 0x8ab4f8 : 0xffffff, 0.6, 12);
+    const rimLight = new THREE.PointLight(0xffffff, 0.6, 12);
     rimLight.position.set(0, 2.5, 0);
     scene.add(rimLight);
     const topLight = new THREE.DirectionalLight(0xffffff, isDark ? 0.75 : 0.95);
@@ -875,31 +875,31 @@ export const Quadcopter3DViewer: React.FC = () => {
     const isWarning = isHot || (vib !== null && Number(vib) > 0.35);
 
     return (
-      <div key={k} className="p-2.5 rounded-lg border backdrop-blur-md transition-colors" style={{ background: 'color-mix(in srgb, var(--card) 92%, transparent)', borderColor: isWarning ? '#ef4444' : 'var(--border)' }}>
+      <div key={k} className="p-2.5 rounded-xl border backdrop-blur-md transition-colors bg-black/85" style={{ borderColor: isWarning ? '#ef4444' : '#27272a' }}>
         <div className="flex items-center justify-between gap-1 mb-1">
-          <span className="font-semibold text-[11px] tracking-wide" style={{ color: 'var(--text)' }}>{label}</span>
+          <span className="font-bold text-[11px] tracking-wide text-white">{label}</span>
           <span
-            className="px-1.5 py-0.5 rounded-full text-[9px] border font-medium uppercase tracking-wider"
+            className="px-2 py-0.5 rounded-full text-[9px] border font-bold uppercase tracking-wider"
             style={{
-              background: !conn ? 'var(--card)' : isHot ? '#ef4444' : rpm > 50 ? 'var(--text)' : 'var(--card)',
-              color: !conn ? 'var(--text-faint)' : isHot ? '#ffffff' : rpm > 50 ? 'var(--bg)' : 'var(--text-muted)',
-              borderColor: isHot ? '#ef4444' : 'var(--border)'
+              background: !conn ? '#18181b' : isHot ? '#dc2626' : rpm > 50 ? 'rgba(239, 68, 68, 0.2)' : '#18181b',
+              color: !conn ? '#71717a' : isHot ? '#ffffff' : rpm > 50 ? '#ef4444' : '#ffffff',
+              borderColor: isHot ? '#dc2626' : rpm > 50 ? '#ef4444' : '#27272a'
             }}
           >
             {!conn ? 'Offline' : isHot ? 'Hot' : rpm > 50 ? 'Spinning' : 'Ready'}
           </span>
         </div>
         <div className="flex items-baseline justify-between mb-1">
-          <span className="text-sm font-semibold tabular-nums tracking-tight" style={{ color: 'var(--text)' }}>
+          <span className="text-sm font-black tabular-nums tracking-tight text-white">
             {conn ? (rpm > 0 ? `${rpm.toLocaleString()} RPM` : '0 RPM') : '—'}
           </span>
           {conn && temp !== null && (
-            <span className="text-[10px] tabular-nums font-medium" style={{ color: isHot ? '#ef4444' : 'var(--text-muted)' }}>
+            <span className="text-[10px] tabular-nums font-bold" style={{ color: isHot ? '#ef4444' : '#d4d4d8' }}>
               {temp}°C
             </span>
           )}
         </div>
-        <div className="flex items-center justify-between text-[10px] tabular-nums pt-1 border-t" style={{ borderColor: 'color-mix(in srgb, var(--border) 60%, transparent)', color: 'var(--text-muted)' }}>
+        <div className="flex items-center justify-between text-[10px] tabular-nums pt-1 border-t border-zinc-800 text-zinc-300 font-bold">
           <span>{curr}A</span>
           {thrust > 0 && <span>{thrust}g thrust</span>}
           {vib !== null && <span>{vib}g vib</span>}
@@ -909,44 +909,44 @@ export const Quadcopter3DViewer: React.FC = () => {
   };
 
   return (
-    <div className="aerospace-card p-5 relative overflow-hidden flex flex-col h-[520px] min-h-[480px] select-none">
+    <div className="aerospace-card p-5 relative overflow-hidden flex flex-col h-[520px] min-h-[480px] select-none bg-[#09090b] border-zinc-800">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'var(--text)', color: 'var(--bg)' }}><Cpu className="w-3.5 h-3.5" /></div>
+          <div className="w-7 h-7 rounded-md flex items-center justify-center bg-white text-black font-black"><Cpu className="w-3.5 h-3.5" /></div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold" style={{ color: 'var(--text)' }}>3D Digital Twin</span>
-              <span className="hidden sm:inline text-[11px] px-2 py-0.5 rounded-full border font-medium" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>{flightMode}</span>
+              <span className="text-xs font-bold text-white">3D Digital Twin</span>
+              <span className="hidden sm:inline text-[11px] px-2 py-0.5 rounded-full border border-zinc-800 font-bold text-zinc-300 bg-zinc-900">{flightMode}</span>
               <span
-                className="text-[11px] px-2 py-0.5 rounded-full border font-medium flex items-center gap-1"
+                className="text-[11px] px-2.5 py-0.5 rounded-full border font-bold flex items-center gap-1.5"
                 style={{
-                  background: isArmed ? '#10b981' : 'transparent',
-                  color: isArmed ? '#ffffff' : 'var(--text-muted)',
-                  borderColor: isArmed ? '#10b981' : 'var(--border)'
+                  background: isArmed ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
+                  color: isArmed ? '#ef4444' : '#a1a1aa',
+                  borderColor: isArmed ? '#ef4444' : '#27272a'
                 }}
               >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: isArmed ? '#ffffff' : '#6b7280' }} />
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: isArmed ? '#ef4444' : '#71717a' }} />
                 {isArmed ? 'Armed' : 'Disarmed'}
               </span>
-              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[11px] font-mono font-medium" style={{ borderColor: 'var(--border)', color: 'var(--text)', background: 'var(--card)' }}>
-                <Compass className="w-3 h-3 text-sky-500" />
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-zinc-800 text-[11px] font-mono font-bold text-white bg-black">
+                <Compass className="w-3 h-3 text-red-500" />
                 <span>{headingDeg}° {cardinal}</span>
               </div>
               {tel?.battery_voltage_v != null && (
-                <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-mono" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
+                <div className="hidden md:flex items-center gap-1 px-2.5 py-0.5 rounded-full border border-zinc-800 text-[11px] font-mono font-bold text-zinc-300 bg-black">
                   <span>{tel.battery_voltage_v.toFixed(1)}V</span>
                   {tel?.battery_remaining_pct != null && <span>({Math.round(tel.battery_remaining_pct)}%)</span>}
                 </div>
               )}
             </div>
-            <div className="text-[11px] hidden sm:block mt-0.5" style={{ color: 'var(--text-faint)' }}>
+            <div className="text-[11px] hidden sm:block mt-0.5 text-zinc-400 font-medium">
               {tel?.source_type === 'APM_MAVLINK' ? 'Live APM MAVLink' : 'Physics Simulation'} • Roll: {Math.round(tel?.roll_deg ?? 0)}° • Pitch: {Math.round(tel?.pitch_deg ?? 0)}° • Vib: {(tel?.vibration_rms_g ?? 0.05).toFixed(2)}g
             </div>
           </div>
         </div>
-        <button onClick={handleResetView} className="text-xs px-3 py-1.5 rounded-full border transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)', background: 'var(--card)' }}>Reset view</button>
+        <button onClick={handleResetView} className="text-xs px-3 py-1.5 rounded-full border border-zinc-800 bg-black text-white font-bold transition-colors hover:border-red-500 cursor-pointer">Reset view</button>
       </div>
-      <div ref={containerRef} className="w-full flex-1 rounded-lg overflow-hidden border relative cursor-grab active:cursor-grabbing" style={{ background: theme==='dark' ? '#0a0a0a' : '#f8fafc', borderColor: 'var(--border)' }} />
+      <div ref={containerRef} className="w-full flex-1 rounded-xl overflow-hidden border border-zinc-800 relative cursor-grab active:cursor-grabbing bg-black" />
       <div className="absolute bottom-6 left-6 right-6 z-10 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] select-none pointer-events-none">
         {renderHud('motor_1', 'M1 Front-R (CW)')}
         {renderHud('motor_2', 'M2 Rear-L (CW)')}

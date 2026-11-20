@@ -54,26 +54,26 @@ export const FleetManagementPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl border bg-[#09090b] border-zinc-800">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400 font-bold px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-red-400 font-bold px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/30">
               FLEET TELEMETRY INGRESS
             </span>
-            <span className="text-xs text-slate-400">Total: {drones.length} Aircraft</span>
+            <span className="text-xs text-zinc-400">Total: {drones.length} Aircraft</span>
           </div>
-          <h1 className="text-2xl font-bold flex items-center gap-2.5" style={{ color: 'var(--text)' }}>
-            <Users className="w-6 h-6 text-cyan-500" />
+          <h1 className="text-2xl font-black flex items-center gap-2.5 text-white">
+            <Users className="w-6 h-6 text-red-500" />
             Drone Fleet Management
           </h1>
-          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
+          <p className="text-xs text-zinc-300 mt-1 font-medium">
             Monitor, calibrate and manage multi-aircraft propulsion systems across your organization.
           </p>
         </div>
 
         <button
           onClick={() => setModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl font-bold text-xs bg-cyan-600 hover:bg-cyan-500 text-white flex items-center gap-2 shadow-lg shadow-cyan-600/20 transition-all shrink-0"
+          className="px-4 py-2.5 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white flex items-center gap-2 shadow-lg shadow-red-950/40 transition-all shrink-0 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Register New Aircraft
@@ -85,52 +85,51 @@ export const FleetManagementPage: React.FC = () => {
         {drones.map((d) => {
           const isHealthy = d.health_index >= 85;
           const isWarning = d.health_index >= 70 && d.health_index < 85;
-          const statusColor = d.status === 'ONLINE' ? 'bg-emerald-400' : (d.status === 'IN_FLIGHT' ? 'bg-cyan-400 animate-pulse' : 'bg-amber-400');
+          const statusColor = d.status === 'ONLINE' ? 'bg-white' : (d.status === 'IN_FLIGHT' ? 'bg-red-500 animate-pulse' : 'bg-zinc-500');
 
           return (
             <div 
               key={d.id}
-              className="p-5 rounded-2xl border transition-all relative overflow-hidden"
-              style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+              className="p-5 rounded-2xl border transition-all relative overflow-hidden bg-[#09090b] border-zinc-800 hover:border-red-500/40"
             >
               {/* Status Header */}
               <div className="flex items-center justify-between mb-3">
-                <span className="flex items-center gap-2 text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
+                <span className="flex items-center gap-2 text-xs font-mono font-bold text-white">
                   <span className={`w-2 h-2 rounded-full ${statusColor}`} />
                   {d.status}
                 </span>
-                <span className="text-[10px] font-mono text-slate-500">{d.serial_number}</span>
+                <span className="text-[10px] font-mono text-zinc-400">{d.serial_number}</span>
               </div>
 
               {/* Drone Name & Frame */}
-              <h3 className="text-base font-bold tracking-tight" style={{ color: 'var(--text)' }}>{d.name}</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{d.frame_type}</p>
+              <h3 className="text-base font-black tracking-tight text-white">{d.name}</h3>
+              <p className="text-xs text-zinc-400 mb-4">{d.frame_type}</p>
 
               {/* Health & Metrics Bar */}
-              <div className="space-y-3 pt-3 border-t border-white/5 text-xs font-mono">
+              <div className="space-y-3 pt-3 border-t border-zinc-800 text-xs font-mono">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400 text-[11px] flex items-center gap-1.5">
-                    <Activity className="w-3.5 h-3.5 text-purple-400" /> Propulsion Health
+                  <span className="text-zinc-400 text-[11px] flex items-center gap-1.5 font-bold">
+                    <Activity className="w-3.5 h-3.5 text-red-500" /> Propulsion Health
                   </span>
-                  <span className={`font-bold ${isHealthy ? 'text-emerald-400' : isWarning ? 'text-amber-400' : 'text-red-400'}`}>
+                  <span className={`font-black ${isHealthy ? 'text-white' : isWarning ? 'text-red-400' : 'text-red-500'}`}>
                     {d.health_index.toFixed(1)}%
                   </span>
                 </div>
 
-                <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-zinc-800 overflow-hidden">
                   <div 
-                    className={`h-full rounded-full ${isHealthy ? 'bg-emerald-500' : isWarning ? 'bg-amber-500' : 'bg-red-500'}`}
+                    className={`h-full rounded-full ${isHealthy ? 'bg-white' : isWarning ? 'bg-red-400' : 'bg-red-600'}`}
                     style={{ width: `${Math.min(100, d.health_index)}%` }}
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-700 dark:text-slate-300">
+                <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-zinc-300 font-bold">
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-500" />
+                    <Clock className="w-3.5 h-3.5 text-zinc-400" />
                     <span>{d.total_flight_hours.toFixed(1)} hrs logged</span>
                   </div>
                   <div className="flex items-center gap-1.5 justify-end">
-                    <Battery className="w-3.5 h-3.5 text-slate-500" />
+                    <Battery className="w-3.5 h-3.5 text-zinc-400" />
                     <span>{d.battery_level_pct?.toFixed(0) || 90}% pack</span>
                   </div>
                 </div>

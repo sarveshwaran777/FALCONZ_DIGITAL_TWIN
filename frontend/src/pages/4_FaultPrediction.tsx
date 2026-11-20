@@ -9,55 +9,54 @@ export const FaultPredictionPage: React.FC = () => {
   if (!systemState) return null;
 
   const intel = systemState.intelligence;
-  const res = systemState.residuals;
 
   const faultClasses = [
     { name: 'Normal Propulsion Baseline', key: 'NORMAL', desc: 'All physical signals adhere to physics model within ±1.5σ' },
-    { name: 'Excessive Aeromechanical Load', key: 'HIGH_LOAD', desc: 'Heavy drag or headwind torque exceeding nominal cruise specification' },
-    { name: 'Stator / ESC Thermal Overheating', key: 'OVERHEATING', desc: 'Winding dissipation or cooling airflow breakdown' },
-    { name: 'Mechanical Bearing Raceway Defect', key: 'BEARING_DEGRADATION', desc: 'Spalling/pitting on ball bearings creating 1X vibration harmonics' },
-    { name: 'Phase Winding / FET Electrical Fault', key: 'ELECTRICAL_DEGRADATION', desc: 'Partial phase short or MOSFET gate resistance increase' },
-    { name: 'Optical/Hall Sensor Calibration Drift', key: 'SENSOR_DRIFT', desc: 'Telemetry sensor jitter without physical power loss' },
-    { name: 'Multi-Factor Compound Degradation', key: 'COMBINED_DEGRADATION', desc: 'Simultaneous mechanical wear, thermal stress, and electrical overload' }
+    { name: 'High Aeromechanical Load Inception', key: 'HIGH_LOAD', desc: 'Torque surge detected with RPM-current residual divergence' },
+    { name: 'Mechanical Bearing Degradation', key: 'BEARING_DEGRADATION', desc: '1X rotational vibration harmonics and elevated high-frequency RMS' },
+    { name: 'Electrical Overheating / Winding Resistance Shift', key: 'OVERHEATING', desc: 'Positive thermal slope anomaly (>+2.0σ) with Joule dissipation excess' },
+    { name: 'Propeller Structural Damage / Imbalance', key: 'PROPELLER_DAMAGE', desc: 'Severe aerodynamic asymmetry and dynamic thrust loss' },
+    { name: 'Sensor Link Telemetry Failure', key: 'SENSOR_FAILURE', desc: 'Frozen, out-of-range, or corrupted sensor telemetry stream' },
+    { name: 'Combined Multi-Component Failure', key: 'MULTI_FAULT', desc: 'Concurrent cascaded degradation across mechanical and thermal domains' }
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 max-w-[1200px] mx-auto">
       <div>
-        <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-          <AlertOctagon className="w-5 h-5 text-amber-600" />
-          Multi-Class Fault Prediction & Classification
+        <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2">
+          <Cpu className="w-5 h-5 text-red-500" />
+          ML Fault Classifier & Anomaly Diagnostics
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-zinc-400 font-medium mt-1">
           Supervised Random Forest / Gradient Boosting Classifier trained on physics-grounded flight degradation trajectories
         </p>
       </div>
 
       {/* Primary Predicted Fault Banner */}
-      <div className="aerospace-card p-4 border-l-4 border-l-amber-500" style={{ background: 'var(--card)' }}>
+      <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800 border-l-4 border-l-red-600">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
               PRIMARY CLASSIFIED FAULT MODE
             </span>
-            <h3 className="text-xl font-bold text-slate-900 font-mono">
+            <h3 className="text-xl font-black text-white font-mono">
               {intel.predicted_fault || 'NORMAL'}
             </h3>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-mono">
             <div className="text-right">
-              <span className="text-slate-400 block text-[10px]">CONFIDENCE</span>
-              <strong className="text-slate-800 text-sm">{(intel.fault_confidence_pct ?? 92.2).toFixed(1)}%</strong>
+              <span className="text-zinc-400 block text-[10px] font-bold">CONFIDENCE</span>
+              <strong className="text-white text-sm font-black">{(intel.fault_confidence_pct ?? 92.2).toFixed(1)}%</strong>
             </div>
             <div className="text-right">
-              <span className="text-slate-400 block text-[10px]">SEVERITY</span>
-              <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+              <span className="text-zinc-400 block text-[10px] font-bold">SEVERITY</span>
+              <span className={`px-2.5 py-0.5 rounded text-xs font-black border ${
                 intel.fault_severity === 'HIGH' || intel.fault_severity === 'CRITICAL'
-                  ? 'bg-rose-100 text-rose-800'
+                  ? 'bg-red-600 text-white border-red-700'
                   : intel.fault_severity === 'MEDIUM'
-                  ? 'bg-amber-100 text-amber-800'
-                  : 'bg-emerald-100 text-emerald-800'
+                  ? 'bg-red-500/20 text-red-400 border-red-500/40'
+                  : 'bg-white/10 text-white border-white/20'
               }`}>
                 {intel.fault_severity || 'LOW'}
               </span>
@@ -69,8 +68,8 @@ export const FaultPredictionPage: React.FC = () => {
       {/* Fault Mode Probability Distribution & Feature Attribution */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Fault Modes List */}
-        <div className="lg:col-span-7 aerospace-card p-4">
-          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">
+        <div className="lg:col-span-7 aerospace-card p-5 bg-[#09090b] border-zinc-800">
+          <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
             Fault Mode Classification Taxonomy
           </h3>
 
@@ -81,23 +80,23 @@ export const FaultPredictionPage: React.FC = () => {
               return (
                 <div
                   key={idx}
-                  className={`p-3 rounded-lg border transition-all text-xs ${
+                  className={`p-3.5 rounded-xl border transition-all text-xs ${
                     isMatch
-                      ? 'bg-amber-50/80 border-amber-300 shadow-xs'
-                      : 'bg-slate-50 border-slate-200/80'
+                      ? 'bg-red-950/25 border-red-500/40 shadow-xs'
+                      : 'bg-black border-zinc-800'
                   }`}
                 >
                   <div className="flex justify-between items-center mb-1">
-                    <span className={`font-bold ${isMatch ? 'text-amber-900' : 'text-slate-800'}`}>
+                    <span className={`font-bold ${isMatch ? 'text-red-400' : 'text-white'}`}>
                       {f.name}
                     </span>
                     {isMatch && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-200 text-amber-900">
+                      <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded bg-red-600 text-white border border-red-500/40">
                         ACTIVE MATCH
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-500">{f.desc}</p>
+                  <p className="text-[11px] text-zinc-400 font-medium">{f.desc}</p>
                 </div>
               );
             })}
@@ -105,25 +104,25 @@ export const FaultPredictionPage: React.FC = () => {
         </div>
 
         {/* Feature Contribution Attribution */}
-        <div className="lg:col-span-5 aerospace-card p-4 flex flex-col justify-between">
+        <div className="lg:col-span-5 aerospace-card p-5 bg-[#09090b] border-zinc-800 flex flex-col justify-between">
           <div>
-            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
               Root-Cause Feature Attributions
             </h3>
-            <p className="text-[11px] text-slate-400 mb-3">
+            <p className="text-[11px] text-zinc-400 mb-4 font-medium">
               Contribution percentage toward the predicted fault classification:
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-3 font-mono">
               {Object.entries(intel.contributing_features).map(([feat, score], idx) => (
                 <div key={idx} className="space-y-1">
-                  <div className="flex justify-between text-xs font-medium">
-                    <span className="text-slate-700">{feat}</span>
-                    <span className="font-mono font-bold text-slate-900">{score}%</span>
+                  <div className="flex justify-between text-xs font-bold">
+                    <span className="text-zinc-200">{feat}</span>
+                    <span className="text-white">{score}%</span>
                   </div>
-                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-sky-500 rounded-full"
+                      className="h-full bg-red-600 rounded-full"
                       style={{ width: `${Math.min(100, score)}%` }}
                     />
                   </div>
@@ -132,8 +131,8 @@ export const FaultPredictionPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-4 p-3 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-600">
-            <span className="font-bold text-slate-800 block mb-0.5">Scientific Evaluation:</span>
+          <div className="mt-5 p-3.5 rounded-xl bg-black border border-zinc-800 text-[11px] text-zinc-300">
+            <span className="font-bold text-white block mb-0.5">Scientific Evaluation:</span>
             Trained with 10-fold cross validation. Confusion matrix & test set metrics available on page 14.
           </div>
         </div>

@@ -214,14 +214,15 @@ export const OverviewPage: React.FC = () => {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
               <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="timeLabel" tick={{ fontSize: 10, fill: '#a1a1aa' }} tickLine={false} axisLine={{ stroke: '#27272a' }} interval="preserveStartEnd" minTickGap={40} />
-              <YAxis stroke="#a1a1aa" fontSize={11} width={44} tick={{ fontFamily: 'JetBrains Mono' }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="timeLabel" tick={{ fontSize: 11, fill: '#ffffff', fontWeight: 700 }} tickLine={false} axisLine={{ stroke: '#27272a' }} interval="preserveStartEnd" minTickGap={40} />
+              <YAxis stroke="#ffffff" fontSize={11} width={44} tick={{ fill: '#ffffff', fontWeight: 700, fontFamily: 'JetBrains Mono' }} tickLine={false} axisLine={false} />
               <Tooltip
                 contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, fontSize: 12, color: '#ffffff' }}
                 cursor={{ stroke: '#ef4444' }}
                 labelStyle={{ color: '#ffffff', fontSize: 11, fontWeight: 'bold' }}
+                itemStyle={{ color: '#ffffff', fontWeight: 'bold' }}
               />
-              <Area type="monotone" dataKey={activeTab} stroke="#ef4444" strokeWidth={2} fill="rgba(239, 68, 68, 0.2)" fillOpacity={1} dot={false} isAnimationActive={false} />
+              <Area type="monotone" dataKey={activeTab} stroke="#ef4444" strokeWidth={2.5} fill="rgba(239, 68, 68, 0.2)" fillOpacity={1} dot={false} isAnimationActive={false} />
             </AreaChart>
           </ResponsiveContainer>
           <div className="flex justify-between text-[10px] mt-1 px-1 font-mono text-zinc-400">

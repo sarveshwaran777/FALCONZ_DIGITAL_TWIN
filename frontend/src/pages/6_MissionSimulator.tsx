@@ -36,23 +36,23 @@ export const MissionSimulatorPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 max-w-[1200px] mx-auto">
       <div>
-        <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-          <Compass className="w-5 h-5 text-sky-600" />
+        <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2">
+          <Compass className="w-5 h-5 text-red-500" />
           MALE UAV Mission Profile & Life Consumption Simulator
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-zinc-400 font-medium mt-1">
           Project multi-hour degradation, equivalent operating hours consumed, and mission feasibility under diverse flight profiles
         </p>
       </div>
 
       {/* Control Configuration Card */}
-      <div className="aerospace-card p-4">
+      <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           {/* Mission Profile Selection */}
           <div>
-            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-2">
               SELECT UAV FLIGHT MISSION PROFILE
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -60,14 +60,14 @@ export const MissionSimulatorPage: React.FC = () => {
                 <button
                   key={key}
                   onClick={() => handleProfileChange(key)}
-                  className={`text-left p-3 rounded-lg border text-xs font-semibold transition-all ${
+                  className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all ${
                     selectedProfile === key
-                      ? 'bg-sky-50 text-sky-900 border-sky-300 ring-1 ring-sky-300 shadow-xs'
-                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      ? 'bg-red-950/30 text-white border-red-600 ring-1 ring-red-600 shadow-xs'
+                      : 'bg-black text-zinc-300 border-zinc-800 hover:border-zinc-700'
                   }`}
                 >
-                  <div className="font-bold mb-0.5">{prof.name}</div>
-                  <div className="text-[10px] text-slate-400 font-mono">
+                  <div className="font-bold mb-0.5 text-white">{prof.name}</div>
+                  <div className="text-[10px] text-zinc-400 font-mono">
                     ALT: {prof.altitude_m}m | TEMP: {prof.ambient_temp_c}°C
                   </div>
                 </button>
@@ -76,10 +76,10 @@ export const MissionSimulatorPage: React.FC = () => {
           </div>
 
           {/* Mission Duration Slider */}
-          <div className="space-y-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <div className="space-y-3 bg-black p-4 rounded-xl border border-zinc-800">
             <div className="flex justify-between items-center text-xs">
-              <span className="font-bold text-slate-700 uppercase">MISSION FLIGHT DURATION</span>
-              <span className="font-mono text-base font-bold text-sky-700">{durationHours} HOURS</span>
+              <span className="font-bold text-zinc-300 uppercase">MISSION FLIGHT DURATION</span>
+              <span className="font-mono text-base font-black text-red-400">{durationHours} HOURS</span>
             </div>
             <input
               type="range"
@@ -87,11 +87,11 @@ export const MissionSimulatorPage: React.FC = () => {
               max="48"
               value={durationHours}
               onChange={(e) => handleDurationChange(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+              className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-red-600"
             />
-            <div className="flex justify-between text-[10px] font-mono text-slate-400">
+            <div className="flex justify-between text-[10px] font-mono text-zinc-400">
               <span>1 hr (Short sortie)</span>
-              <span>24 hrs (Standard MALE loiter)</span>
+              <span>24 hrs (Standard loiter)</span>
               <span>48 hrs (Max endurance)</span>
             </div>
           </div>
@@ -101,74 +101,78 @@ export const MissionSimulatorPage: React.FC = () => {
       {/* Simulation Results Grid */}
       {simulationResult && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="aerospace-card p-4">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 font-mono">
+            <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
                 PROJECTED FINAL HEALTH
               </span>
-              <div className="text-3xl font-bold font-mono text-slate-900 my-1">
+              <div className="text-3xl font-black text-white my-1">
                 {simulationResult.final_health}%
               </div>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-zinc-400">
                 Initial: {simulationResult.initial_health}% (Δ -{(simulationResult.initial_health - simulationResult.final_health).toFixed(1)}%)
               </p>
             </div>
 
-            <div className="aerospace-card p-4">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
                 EQUIVALENT LIFE CONSUMED
               </span>
-              <div className="text-3xl font-bold font-mono text-purple-700 my-1">
-                {simulationResult.equivalent_operating_hours} <span className="text-xs text-slate-500 font-sans">HRS</span>
+              <div className="text-3xl font-black text-red-500 my-1">
+                {simulationResult.equivalent_operating_hours} <span className="text-xs text-zinc-400 font-sans">HRS</span>
               </div>
-              <p className="text-[11px] text-slate-500">
-                Acceleration ratio: <strong>{simulationResult.damage_acceleration_ratio}x</strong>
+              <p className="text-[11px] text-zinc-400">
+                Acceleration ratio: <strong className="text-white">{simulationResult.damage_acceleration_ratio}x</strong>
               </p>
             </div>
 
-            <div className="aerospace-card p-4">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
                 PEAK WINDING TEMPERATURE
               </span>
-              <div className="text-3xl font-bold font-mono text-amber-600 my-1">
+              <div className="text-3xl font-black text-white my-1">
                 {simulationResult.peak_winding_temp_c}°C
               </div>
-              <p className="text-[11px] text-slate-500">Altitude convective cooling factor</p>
+              <p className="text-[11px] text-zinc-400">Altitude convective cooling factor</p>
             </div>
 
-            <div className="aerospace-card p-4">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
                 MISSION FEASIBILITY
               </span>
-              <div className="text-xl font-bold font-mono text-emerald-600 my-1 flex items-center gap-1.5">
+              <div className="text-xl font-black my-1 flex items-center gap-1.5 text-white">
                 {simulationResult.is_mission_feasible ? (
                   <>
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" /> FEASIBLE
+                    <CheckCircle2 className="w-5 h-5 text-white" /> FEASIBLE
                   </>
                 ) : (
                   <>
-                    <AlertTriangle className="w-5 h-5 text-rose-600" /> HIGH RISK
+                    <AlertTriangle className="w-5 h-5 text-red-500" /> HIGH RISK
                   </>
                 )}
               </div>
-              <p className="text-[11px] text-slate-500">Risk rating: <strong>{simulationResult.mission_risk}</strong></p>
+              <p className="text-[11px] text-zinc-400">Risk rating: <strong className="text-red-400">{simulationResult.mission_risk}</strong></p>
             </div>
           </div>
 
           {/* Projected Health & Winding Temperature Trajectory */}
-          <div className="aerospace-card p-4">
-            <div className="flex justify-between items-center mb-2">
+          <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-3">
               <div>
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
                   Simulated Health Decay Trajectory Over Mission Duration
                 </h3>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-zinc-400 font-medium">
                   {simulationResult.profile_name} — {simulationResult.description}
                 </p>
               </div>
-              <div className="flex items-center gap-3 text-xs font-mono">
-                <span className="text-emerald-600 font-bold">HEALTH (%)</span>
-                <span className="text-purple-600 font-bold">RUL (HOURS)</span>
+              <div className="flex items-center gap-4 text-xs font-mono font-bold">
+                <span className="text-white flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-white" /> HEALTH (%)
+                </span>
+                <span className="text-red-500 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500" /> RUL (HOURS)
+                </span>
               </div>
             </div>
 
@@ -177,16 +181,20 @@ export const MissionSimulatorPage: React.FC = () => {
                 <AreaChart data={simulationResult.trajectory}>
                   <defs>
                     <linearGradient id="simHealth" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#ffffff" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#ffffff" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="time_hours" stroke="#94a3b8" fontSize={11} unit="h" fontStyle="monospace" />
-                  <YAxis stroke="#94a3b8" fontSize={11} fontStyle="monospace" />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="health_index" stroke="#10b981" strokeWidth={2.5} fill="url(#simHealth)" />
-                  <Area type="monotone" dataKey="rul_hours" stroke="#9333ea" strokeWidth={1.5} fill="none" />
+                  <CartesianGrid stroke="#27272a" strokeDasharray="3 3" />
+                  <XAxis dataKey="time_hours" stroke="#ffffff" fontSize={11} unit="h" tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
+                  <YAxis stroke="#ffffff" fontSize={11} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
+                  <Tooltip 
+                    contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
+                    itemStyle={{ color: '#ffffff', fontWeight: 'bold' }}
+                    labelStyle={{ color: '#ffffff', fontWeight: 'bold' }}
+                  />
+                  <Area type="monotone" dataKey="health_index" stroke="#ffffff" strokeWidth={2.5} fill="url(#simHealth)" isAnimationActive={false} name="Health Index" />
+                  <Area type="monotone" dataKey="rul_hours" stroke="#ef4444" strokeWidth={2.5} fill="none" isAnimationActive={false} name="RUL (Hours)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>

@@ -717,44 +717,44 @@ export const HardwareCenterPage: React.FC = () => {
               return (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {/* Chart 1: Throttle vs Efficiency (g/W) */}
-                  <div className="p-3 bg-slate-900 text-white rounded-xl border border-slate-800 space-y-2">
+                  <div className="p-4 bg-[#09090b] text-white rounded-xl border border-zinc-800 space-y-2">
                     <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="font-bold text-emerald-400 flex items-center gap-1.5">
-                        <BarChart2 className="w-3.5 h-3.5" /> Thrust Efficiency (g/W) vs Throttle (%)
+                      <span className="font-bold text-white flex items-center gap-1.5">
+                        <BarChart2 className="w-3.5 h-3.5 text-red-500" /> Thrust Efficiency (g/W) vs Throttle (%)
                       </span>
-                      <span className="text-[10px] text-slate-400">Peak: 8.85 g/W</span>
+                      <span className="text-[11px] font-bold text-red-400">Peak: 8.85 g/W</span>
                     </div>
 
                     <div className="relative h-44 w-full">
                       <svg className="w-full h-full" viewBox="0 0 460 160">
                         {/* Grid lines */}
-                        <line x1="30" y1="20" x2="430" y2="20" stroke="#334155" strokeDasharray="3 3" />
-                        <line x1="30" y1="60" x2="430" y2="60" stroke="#334155" strokeDasharray="3 3" />
-                        <line x1="30" y1="100" x2="430" y2="100" stroke="#334155" strokeDasharray="3 3" />
-                        <line x1="30" y1="140" x2="430" y2="140" stroke="#475569" strokeWidth="1.5" />
-                        <line x1="30" y1="20" x2="30" y2="140" stroke="#475569" strokeWidth="1.5" />
+                        <line x1="30" y1="20" x2="430" y2="20" stroke="#27272a" strokeDasharray="3 3" />
+                        <line x1="30" y1="60" x2="430" y2="60" stroke="#27272a" strokeDasharray="3 3" />
+                        <line x1="30" y1="100" x2="430" y2="100" stroke="#27272a" strokeDasharray="3 3" />
+                        <line x1="30" y1="140" x2="430" y2="140" stroke="#3f3f46" strokeWidth="1.5" />
+                        <line x1="30" y1="20" x2="30" y2="140" stroke="#3f3f46" strokeWidth="1.5" />
 
                         {/* Cruise Zone Highlight Band */}
-                        <rect x={cruiseX1} y="20" width={cruiseX2 - cruiseX1} height="120" fill="#059669" fillOpacity="0.25" />
-                        <text x={(cruiseX1 + cruiseX2) / 2} y="32" fill="#34d399" fontSize="9" textAnchor="middle" fontWeight="bold" fontFamily="monospace">
+                        <rect x={cruiseX1} y="20" width={cruiseX2 - cruiseX1} height="120" fill="#ef4444" fillOpacity="0.18" />
+                        <text x={(cruiseX1 + cruiseX2) / 2} y="32" fill="#ef4444" fontSize="9" textAnchor="middle" fontWeight="bold" fontFamily="monospace">
                           CRUISE ZONE (50-62%)
                         </text>
 
                         {/* Y-axis labels */}
-                        <text x="24" y="24" fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">10</text>
-                        <text x="24" y="64" fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">6.7</text>
-                        <text x="24" y="104" fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">3.3</text>
-                        <text x="24" y="144" fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">0</text>
+                        <text x="24" y="24" fill="#ffffff" fontSize="10" textAnchor="end" fontWeight="bold" fontFamily="monospace">10</text>
+                        <text x="24" y="64" fill="#ffffff" fontSize="10" textAnchor="end" fontWeight="bold" fontFamily="monospace">6.7</text>
+                        <text x="24" y="104" fill="#ffffff" fontSize="10" textAnchor="end" fontWeight="bold" fontFamily="monospace">3.3</text>
+                        <text x="24" y="144" fill="#ffffff" fontSize="10" textAnchor="end" fontWeight="bold" fontFamily="monospace">0</text>
 
                         {/* X-axis labels */}
-                        <text x="30" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">0%</text>
-                        <text x="127" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">25%</text>
-                        <text x="225" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">50%</text>
-                        <text x="322" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">75%</text>
-                        <text x="420" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">100%</text>
+                        <text x="30" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">0%</text>
+                        <text x="127" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">25%</text>
+                        <text x="225" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">50%</text>
+                        <text x="322" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">75%</text>
+                        <text x="420" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">100%</text>
 
                         {/* Efficiency curve */}
-                        <path d={effPath} fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" />
+                        <path d={effPath} fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
 
                         {/* Data dots */}
                         {effPoints.map((p: any, i: number) => (
@@ -762,9 +762,9 @@ export const HardwareCenterPage: React.FC = () => {
                             key={i}
                             cx={p.x}
                             cy={p.y}
-                            r={p.pt.in_cruise_efficiency_zone ? "4.5" : "3"}
-                            fill={p.pt.in_cruise_efficiency_zone ? "#34d399" : "#10b981"}
-                            stroke="#0f172a"
+                            r={p.pt.in_cruise_efficiency_zone ? "5" : "3.5"}
+                            fill={p.pt.in_cruise_efficiency_zone ? "#ef4444" : "#ffffff"}
+                            stroke="#000000"
                             strokeWidth="1.5"
                           />
                         ))}
@@ -773,44 +773,44 @@ export const HardwareCenterPage: React.FC = () => {
                   </div>
 
                   {/* Chart 2: Throttle vs Thrust & Power */}
-                  <div className="p-3 bg-slate-900 text-white rounded-xl border border-slate-800 space-y-2">
+                  <div className="p-4 bg-[#09090b] text-white rounded-xl border border-zinc-800 space-y-2">
                     <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="font-bold text-sky-400 flex items-center gap-1.5">
-                        <Gauge className="w-3.5 h-3.5" /> Delivered Thrust (g) & Power (W)
+                      <span className="font-bold text-white flex items-center gap-1.5">
+                        <Gauge className="w-3.5 h-3.5 text-red-500" /> Delivered Thrust (g) & Power (W)
                       </span>
-                      <div className="flex items-center gap-3 text-[10px]">
-                        <span className="text-sky-400 font-bold">― Thrust (g)</span>
-                        <span className="text-amber-400 font-bold">― Power (W)</span>
+                      <div className="flex items-center gap-3 text-[11px]">
+                        <span className="text-red-500 font-bold">― Thrust (g)</span>
+                        <span className="text-white font-bold">--- Power (W)</span>
                       </div>
                     </div>
 
                     <div className="relative h-44 w-full">
                       <svg className="w-full h-full" viewBox="0 0 460 160">
                         {/* Grid lines */}
-                        <line x1="30" y1="20" x2="430" y2="20" stroke="#334155" strokeDasharray="3 3" />
-                        <line x1="30" y1="60" x2="430" y2="60" stroke="#334155" strokeDasharray="3 3" />
-                        <line x1="30" y1="100" x2="430" y2="100" stroke="#334155" strokeDasharray="3 3" />
-                        <line x1="30" y1="140" x2="430" y2="140" stroke="#475569" strokeWidth="1.5" />
-                        <line x1="30" y1="20" x2="30" y2="140" stroke="#475569" strokeWidth="1.5" />
+                        <line x1="30" y1="20" x2="430" y2="20" stroke="#27272a" strokeDasharray="3 3" />
+                        <line x1="30" y1="60" x2="430" y2="60" stroke="#27272a" strokeDasharray="3 3" />
+                        <line x1="30" y1="100" x2="430" y2="100" stroke="#27272a" strokeDasharray="3 3" />
+                        <line x1="30" y1="140" x2="430" y2="140" stroke="#3f3f46" strokeWidth="1.5" />
+                        <line x1="30" y1="20" x2="30" y2="140" stroke="#3f3f46" strokeWidth="1.5" />
 
                         {/* Y-axis labels (Thrust) */}
-                        <text x="24" y="24" fill="#38bdf8" fontSize="9" textAnchor="end" fontFamily="monospace">1.4k</text>
-                        <text x="24" y="64" fill="#38bdf8" fontSize="9" textAnchor="end" fontFamily="monospace">930</text>
-                        <text x="24" y="104" fill="#38bdf8" fontSize="9" textAnchor="end" fontFamily="monospace">460</text>
-                        <text x="24" y="144" fill="#38bdf8" fontSize="9" textAnchor="end" fontFamily="monospace">0g</text>
+                        <text x="24" y="24" fill="#ffffff" fontSize="10" textAnchor="end" fontWeight="bold" fontFamily="monospace">1.4k</text>
+                        <text x="24" y="64" fill="#ffffff" fontSize="10" textAnchor="end" fontWeight="bold" fontFamily="monospace">930</text>
+                        <text x="24" y="104" fill="#ffffff" fontSize="10" textAnchor="end" fontWeight="bold" fontFamily="monospace">460</text>
+                        <text x="24" y="144" fill="#ffffff" fontSize="10" textAnchor="end" fontWeight="bold" fontFamily="monospace">0g</text>
 
                         {/* X-axis labels */}
-                        <text x="30" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">0%</text>
-                        <text x="127" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">25%</text>
-                        <text x="225" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">50%</text>
-                        <text x="322" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">75%</text>
-                        <text x="420" y="155" fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">100%</text>
+                        <text x="30" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">0%</text>
+                        <text x="127" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">25%</text>
+                        <text x="225" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">50%</text>
+                        <text x="322" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">75%</text>
+                        <text x="420" y="155" fill="#ffffff" fontSize="10" textAnchor="middle" fontWeight="bold" fontFamily="monospace">100%</text>
 
                         {/* Thrust path */}
-                        <path d={thrustPath} fill="none" stroke="#0ea5e9" strokeWidth="2.5" strokeLinecap="round" />
+                        <path d={thrustPath} fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" />
 
                         {/* Power path */}
-                        <path d={powerPath} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="4 2" strokeLinecap="round" />
+                        <path d={powerPath} fill="none" stroke="#ffffff" strokeWidth="2" strokeDasharray="4 2" strokeLinecap="round" />
                       </svg>
                     </div>
                   </div>

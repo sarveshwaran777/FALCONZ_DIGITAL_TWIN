@@ -91,36 +91,36 @@ export const DataTelemetryPage: React.FC = () => {
       {/* ========================================================
           1. HEADER & DEDICATED VIEW SWITCHER
          ======================================================== */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
         <div>
           <div className="flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-sky-600 dark:text-sky-400" />
-            <h1 className="text-base font-bold text-slate-900 dark:text-white tracking-tight font-mono">
+            <Cpu className="w-5 h-5 text-red-500" />
+            <h1 className="text-base font-black text-white tracking-tight font-mono">
               Real-Time Motor Telemetry Engine
             </h1>
-            <span className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+            <span className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-mono font-bold ${
               wsConnected 
-                ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800' 
-                : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                ? 'bg-red-950/40 text-white border border-red-500/40' 
+                : 'bg-zinc-900 text-zinc-400 border border-zinc-800'
             }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${wsConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full ${wsConnected ? 'bg-red-500 animate-pulse' : 'bg-zinc-600'}`} />
               {wsConnected ? 'LIVE 10 HZ STREAM' : 'DISCONNECTED'}
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-sans mt-0.5">
+          <p className="text-xs text-zinc-400 font-sans mt-0.5 font-medium">
             Calibrated to A2212 / 15T 930KV with 1045 Prop on 3S LiPo (11.1V–12.4V) • High-precision empirical dynamometer benchmark
           </p>
         </div>
 
         {/* View Mode Toggle & Export */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex rounded-lg bg-slate-100 dark:bg-slate-900 p-0.5 border border-slate-200 dark:border-slate-800 text-xs font-mono font-bold">
+          <div className="flex rounded-xl bg-black p-1 border border-zinc-800 text-xs font-mono font-bold">
             <button
               onClick={() => setViewMode('FOCUSED_MOTORS')}
-              className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === 'FOCUSED_MOTORS'
-                  ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-red-600 text-white shadow-xs font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
               <Cpu className="w-3.5 h-3.5" />
@@ -128,10 +128,10 @@ export const DataTelemetryPage: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('FULL_AUDIT')}
-              className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === 'FULL_AUDIT'
-                  ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-red-600 text-white shadow-xs font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
               <Table className="w-3.5 h-3.5" />
@@ -141,7 +141,7 @@ export const DataTelemetryPage: React.FC = () => {
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs font-mono shadow-xs transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs font-mono shadow-md shadow-red-950/40 transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" /> EXPORT CSV
           </button>
@@ -151,13 +151,13 @@ export const DataTelemetryPage: React.FC = () => {
       {/* ========================================================
           2. HARDWARE INGRESS & TELEMETRY LINK STATUS BAR
          ======================================================== */}
-      <div className="p-2.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 font-mono text-xs">
+      <div className="p-3 bg-[#09090b] rounded-xl border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 font-mono text-xs">
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold text-[10px] border border-sky-300 dark:border-sky-800 flex items-center gap-1">
-            <Radio className="w-3 h-3 text-sky-600" />
+          <span className="px-2.5 py-0.5 rounded bg-black text-red-400 font-bold text-[10px] border border-red-500/40 flex items-center gap-1.5">
+            <Radio className="w-3 h-3 text-red-500" />
             HARDWARE INGRESS TELEMETRY
           </span>
-          <span className="text-slate-600 dark:text-slate-400 text-xs hidden sm:inline">
+          <span className="text-zinc-400 text-xs hidden sm:inline">
             Active Ingress Channels:
           </span>
         </div>
@@ -165,19 +165,19 @@ export const DataTelemetryPage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <span className={`px-2.5 py-1 rounded font-bold border flex items-center gap-1.5 text-xs ${
             connectedCount === 4
-              ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+              ? 'bg-red-950/30 text-white border-red-500/40'
               : connectedCount > 0
-              ? 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-800'
-              : 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+              ? 'bg-black text-zinc-300 border-zinc-800'
+              : 'bg-red-950/50 text-red-400 border border-red-800'
           }`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${connectedCount > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${connectedCount > 0 ? 'bg-red-500 animate-pulse' : 'bg-zinc-600'}`} />
             {connectedCount === 4 
               ? 'ALL 4 HARDWARE CHANNELS ACTIVE' 
               : connectedCount > 0
               ? `${connectedCount} / 4 CHANNELS DETECTED (BENCH MODE)`
               : 'NO MOTOR TELEMETRY DETECTED'}
           </span>
-          <span className="text-[10px] text-slate-400 hidden md:inline">
+          <span className="text-[10px] text-zinc-400 hidden md:inline">
             • Auto-detected from incoming ESC telemetry packets
           </span>
         </div>

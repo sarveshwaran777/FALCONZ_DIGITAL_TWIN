@@ -65,25 +65,25 @@ export const MissionReplayPage: React.FC = () => {
   const totalFrames = replayData?.frames?.length || 120;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 max-w-[1200px] mx-auto">
       <div>
-        <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-          <PlaySquare className="w-5 h-5 text-sky-600" />
+        <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2">
+          <PlaySquare className="w-5 h-5 text-red-500" />
           Deterministic Flight Mission Replay & Black-Box Telemetry Analyzer
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-zinc-400 font-medium mt-1">
           Playback timestamped historical flight phases (Takeoff, Climb, Cruise, Ingress, Bearing Inception, Thermal Rise, RTB)
         </p>
       </div>
 
       {/* Playback Control Deck */}
-      <div className="aerospace-card p-4 bg-gradient-to-r from-slate-900 to-sky-950 text-white border-slate-800">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+      <div className="aerospace-card p-5 bg-[#09090b] text-white border-zinc-800">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
           <div>
-            <span className="text-[10px] font-bold text-sky-400 uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider block">
               FLIGHT PHASE:
             </span>
-            <h3 className="text-base font-bold text-white font-mono">
+            <h3 className="text-base font-black text-white font-mono">
               {currentFrame?.flight_phase || 'STANDBY'}
             </h3>
           </div>
@@ -92,7 +92,7 @@ export const MissionReplayPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={handleReset}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
+              className="p-2 rounded-xl bg-black hover:bg-zinc-800 text-white border border-zinc-800 cursor-pointer transition-colors"
               title="Reset to start"
             >
               <RotateCcw className="w-4 h-4" />
@@ -101,26 +101,26 @@ export const MissionReplayPage: React.FC = () => {
             {isPlaying ? (
               <button
                 onClick={handlePause}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs border border-zinc-700 cursor-pointer transition-colors"
               >
-                <Pause className="w-4 h-4" /> PAUSE
+                <Pause className="w-4 h-4 text-red-500" /> PAUSE
               </button>
             ) : (
               <button
                 onClick={handlePlay}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-950/40 cursor-pointer transition-colors"
               >
                 <Play className="w-4 h-4" /> PLAY REPLAY
               </button>
             )}
 
             {/* Speed Multipliers */}
-            <div className="flex rounded-lg bg-slate-800 p-0.5 border border-slate-700 text-xs font-mono">
+            <div className="flex rounded-xl bg-black p-1 border border-zinc-800 text-xs font-mono">
               {[0.5, 1.0, 2.0, 4.0].map((s) => (
                 <button
                   key={s}
                   onClick={() => handleSpeedChange(s)}
-                  className={`px-2 py-1 rounded font-bold ${speed === s ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors ${speed === s ? 'bg-red-600 text-white' : 'text-zinc-400 hover:text-white'}`}
                 >
                   {s}x
                 </button>
@@ -130,8 +130,8 @@ export const MissionReplayPage: React.FC = () => {
         </div>
 
         {/* Scrubbing Slider */}
-        <div className="space-y-1">
-          <div className="flex justify-between items-center text-xs font-mono text-slate-400">
+        <div className="space-y-1.5">
+          <div className="flex justify-between items-center text-xs font-mono font-bold text-zinc-300">
             <span>FRAME: {currentFrameIdx + 1} / {totalFrames}</span>
             <span>MISSION TIME: {currentFrame ? `${currentFrame.mission_time_sec.toFixed(0)}s` : '0s'}</span>
           </div>
@@ -141,70 +141,70 @@ export const MissionReplayPage: React.FC = () => {
             max={totalFrames - 1}
             value={currentFrameIdx}
             onChange={(e) => handleSeek(Number(e.target.value))}
-            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400"
+            className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-red-600"
           />
         </div>
       </div>
 
       {/* Synchronized Telemetry State at this Replay Frame */}
       {currentFrame && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="aerospace-card p-4">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 font-mono">
+          <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
               REPLAY ROTATIONAL SPEED
             </span>
-            <div className="text-2xl font-bold font-mono text-slate-900">
-              {tel?.rpm?.toFixed(0)} <span className="text-xs text-slate-500 font-sans">RPM</span>
+            <div className="text-2xl font-black text-white">
+              {tel?.rpm?.toFixed(0)} <span className="text-xs text-zinc-400 font-sans">RPM</span>
             </div>
-            <p className="text-[11px] text-slate-500">Throttle: {tel?.throttle_pct}%</p>
+            <p className="text-[11px] text-zinc-400 mt-1">Throttle: {tel?.throttle_pct}%</p>
           </div>
 
-          <div className="aerospace-card p-4">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+          <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
               REPLAY WINDING TEMP
             </span>
-            <div className="text-2xl font-bold font-mono text-amber-600">
-              {tel?.temperature_c?.toFixed(1)} <span className="text-xs text-slate-500 font-sans">°C</span>
+            <div className="text-2xl font-black text-red-400">
+              {tel?.temperature_c?.toFixed(1)} <span className="text-xs text-zinc-400 font-sans">°C</span>
             </div>
-            <p className="text-[11px] text-slate-500">Current: {tel?.current_a?.toFixed(1)}A</p>
+            <p className="text-[11px] text-zinc-400 mt-1">Current: {tel?.current_a?.toFixed(1)}A</p>
           </div>
 
-          <div className="aerospace-card p-4">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+          <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
               REPLAY HEALTH INDEX
             </span>
-            <div className="text-2xl font-bold font-mono text-emerald-600">
+            <div className="text-2xl font-black text-white">
               {health?.health_index?.toFixed(1)}%
             </div>
-            <p className="text-[11px] text-slate-500">Band: {health?.health_band}</p>
+            <p className="text-[11px] text-zinc-400 mt-1">Band: <strong className="text-red-400">{health?.health_band}</strong></p>
           </div>
 
-          <div className="aerospace-card p-4">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+          <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
               REPLAY RUL ESTIMATE
             </span>
-            <div className="text-2xl font-bold font-mono text-purple-600">
-              {health?.rul_hours?.toFixed(1)} <span className="text-xs text-slate-500 font-sans">HRS</span>
+            <div className="text-2xl font-black text-white">
+              {health?.rul_hours?.toFixed(1)} <span className="text-xs text-zinc-400 font-sans">HRS</span>
             </div>
-            <p className="text-[11px] text-slate-500">Fault: {health?.predicted_fault}</p>
+            <p className="text-[11px] text-zinc-400 mt-1">Fault: <strong className="text-white">{health?.predicted_fault}</strong></p>
           </div>
         </div>
       )}
 
       {/* Frame Diagnostic Summary */}
       {health && (
-        <div className="aerospace-card p-4">
-          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+        <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+          <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
             Replay Frame AI Diagnostics & Maintenance Action
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-              <span className="font-bold text-slate-700 block mb-1">XAI REASONING:</span>
-              <p className="text-slate-600">{health.xai_why}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div className="p-4 bg-black rounded-xl border border-zinc-800">
+              <span className="font-bold text-red-400 block mb-1">XAI REASONING:</span>
+              <p className="text-zinc-200 leading-relaxed font-medium">{health.xai_why}</p>
             </div>
-            <div className="p-3 bg-sky-50 rounded-lg border border-sky-200">
-              <span className="font-bold text-sky-900 block mb-1">PRESCRIBED MAINTENANCE ACTION:</span>
-              <p className="text-sky-800">{health.maintenance_action}</p>
+            <div className="p-4 bg-black rounded-xl border border-zinc-800">
+              <span className="font-bold text-white block mb-1">PRESCRIBED MAINTENANCE ACTION:</span>
+              <p className="text-zinc-200 leading-relaxed font-medium">{health.maintenance_action}</p>
             </div>
           </div>
         </div>
