@@ -34,8 +34,8 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
       elements.push(
         <ul key={key} className="space-y-1.5 my-2.5 pl-1">
           {listItems.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2.5 text-xs leading-relaxed text-slate-700 dark:text-slate-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0 mt-2" />
+            <li key={idx} className="flex items-start gap-2.5 text-xs leading-relaxed text-zinc-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 mt-2" />
               <div className="flex-1">{renderInline(item)}</div>
             </li>
           ))}
@@ -140,8 +140,8 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
       const match = trimmed.match(/^(\d+)\.\s+(.*)$/);
       if (match) {
         elements.push(
-          <div key={`num_${lineIdx}`} className="flex items-start gap-2.5 text-xs my-1.5 text-slate-700 dark:text-slate-200 leading-relaxed">
-            <span className="w-4 h-4 rounded-full bg-purple-600/15 border border-purple-500/30 text-purple-700 dark:text-purple-300 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+          <div key={`num_${lineIdx}`} className="flex items-start gap-2.5 text-xs my-1.5 text-zinc-200 leading-relaxed">
+            <span className="w-4 h-4 rounded-full bg-red-600/15 border border-red-500/30 text-red-400 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
               {match[1]}
             </span>
             <div className="flex-1">{renderInline(match[2])}</div>
@@ -525,15 +525,15 @@ export const AICopilotPage: React.FC = () => {
           {/* Welcome Screen when Empty */}
           {messages.length === 0 && (
             <div className="max-w-xl mx-auto py-10 text-center space-y-6 animate-fadeInUp">
-              <div className="w-16 h-16 rounded-3xl bg-purple-600/10 border border-purple-500/25 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto shadow-inner">
+              <div className="w-16 h-16 rounded-3xl bg-red-600/15 border border-red-500/30 text-red-500 flex items-center justify-center mx-auto shadow-inner">
                 <Bot className="w-8 h-8" />
               </div>
               
               <div>
-                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                <h2 className="text-xl font-black text-white tracking-tight">
                   How can I assist your propulsion test today?
                 </h2>
-                <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto mt-1.5 leading-relaxed">
+                <p className="text-xs text-zinc-300 max-w-md mx-auto mt-1.5 leading-relaxed font-medium">
                   Real-time physics residuals, 20 Hz multi-channel FFT vibration harmonics, stator temperature gradients, and quantile RUL forecasting.
                 </p>
               </div>
@@ -544,14 +544,13 @@ export const AICopilotPage: React.FC = () => {
                   <button
                     key={idx}
                     onClick={() => handleSend(p.prompt)}
-                    className="p-3.5 rounded-xl border text-xs transition-all flex flex-col justify-between group hover:border-purple-500 hover:shadow-xs"
-                    style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}
+                    className="p-3.5 rounded-xl border border-zinc-800 text-xs transition-all flex flex-col justify-between group hover:border-red-500 hover:shadow-xs bg-[#09090b]"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-slate-900 dark:text-white text-[12px]">{p.label}</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-purple-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                      <span className="font-bold text-white text-[12px]">{p.label}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-red-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
+                    <p className="text-[11px] text-zinc-400 line-clamp-2">
                       {p.prompt}
                     </p>
                   </button>
@@ -571,7 +570,7 @@ export const AICopilotPage: React.FC = () => {
                 className={`flex gap-3 max-w-3xl mx-auto w-full ${isUser ? 'justify-end' : 'justify-start'} animate-fadeInUp`}
               >
                 {!isUser && (
-                  <div className="w-8 h-8 rounded-xl bg-purple-600/15 border border-purple-500/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 mt-1">
+                  <div className="w-8 h-8 rounded-xl bg-red-600/15 border border-red-500/30 text-red-500 flex items-center justify-center shrink-0 mt-1">
                     <Bot className="w-4 h-4" />
                   </div>
                 )}
@@ -582,10 +581,9 @@ export const AICopilotPage: React.FC = () => {
                   <div
                     className={`p-4 rounded-2xl text-xs leading-relaxed shadow-xs transition-all ${
                       isUser
-                        ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white rounded-br-sm'
-                        : 'border rounded-bl-sm'
+                        ? 'bg-red-600 text-white rounded-br-sm shadow-md shadow-red-950/40 font-medium'
+                        : 'border border-zinc-800 rounded-bl-sm bg-[#0c0c0f]'
                     }`}
-                    style={!isUser ? { background: 'var(--card-subtle)', borderColor: 'var(--border)' } : {}}
                   >
                     {/* Rich Formatted Content */}
                     {isUser ? (
@@ -725,12 +723,11 @@ export const AICopilotPage: React.FC = () => {
                           key={idx}
                           onClick={() => handleSend(chip)}
                           disabled={loading}
-                          className="px-2.5 py-1 rounded-full text-[11px] font-semibold border flex items-center gap-1 group transition-all hover:border-purple-500 hover:shadow-xs"
-                          style={{ background: 'var(--card)', borderColor: 'var(--border)', color: 'var(--text)' }}
+                          className="px-2.5 py-1 rounded-full text-[11px] font-semibold border border-zinc-800 flex items-center gap-1 group transition-all hover:border-red-500 hover:shadow-xs bg-[#09090b] text-white"
                         >
-                          <Sparkles className="w-3 h-3 text-purple-500" />
+                          <Sparkles className="w-3 h-3 text-red-500" />
                           <span>{chip}</span>
-                          <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-purple-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                          <ArrowUpRight className="w-3 h-3 text-zinc-400 group-hover:text-red-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                         </button>
                       ))}
                     </div>
@@ -738,7 +735,7 @@ export const AICopilotPage: React.FC = () => {
                 </div>
 
                 {isUser && (
-                  <div className="w-8 h-8 rounded-xl bg-purple-700 text-white flex items-center justify-center shrink-0 mt-1 shadow-sm font-bold text-xs">
+                  <div className="w-8 h-8 rounded-xl bg-red-700 text-white flex items-center justify-center shrink-0 mt-1 shadow-sm font-bold text-xs shadow-red-950/40">
                     U
                   </div>
                 )}
@@ -748,13 +745,13 @@ export const AICopilotPage: React.FC = () => {
 
           {/* Thinking / Calculating Spinner */}
           {loading && (
-            <div className="flex gap-3 items-center max-w-3xl mx-auto w-full text-xs text-purple-600 dark:text-purple-400 animate-pulse py-2">
-              <div className="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center">
-                <RefreshCw className="w-4 h-4 animate-spin" />
+            <div className="flex gap-3 items-center max-w-3xl mx-auto w-full text-xs text-red-400 animate-pulse py-2">
+              <div className="w-8 h-8 rounded-xl bg-red-600/15 border border-red-500/30 flex items-center justify-center">
+                <RefreshCw className="w-4 h-4 animate-spin text-red-500" />
               </div>
               <div className="space-y-0.5">
-                <p className="font-bold text-xs">FALCONZ Copilot is analyzing live telemetry residuals...</p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Computing 20 Hz multi-channel FFT, Joule losses, and quantile RUL bounds.</p>
+                <p className="font-bold text-xs text-white">FALCONZ Copilot is analyzing live telemetry residuals...</p>
+                <p className="text-[11px] text-zinc-400">Computing 20 Hz multi-channel FFT, Joule losses, and quantile RUL bounds.</p>
               </div>
             </div>
           )}
@@ -763,12 +760,12 @@ export const AICopilotPage: React.FC = () => {
         </div>
 
         {/* 3. BOTTOM FLOATING CONSOLE: Quick Action Carousel + Voice + Input Dock */}
-        <div className="p-3 sm:p-4 border-t shrink-0" style={{ borderColor: 'var(--border)', background: 'var(--card)' }}>
+        <div className="p-3 sm:p-4 border-t border-zinc-800 shrink-0 bg-[#09090b]">
           <div className="max-w-3xl mx-auto space-y-2.5">
             
             {/* Quick Diagnostic Carousel Chips */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 shrink-0 mr-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-red-400 shrink-0 mr-1">
                 Quick Prompts:
               </span>
               {quickPrompts.map((act, i) => (
@@ -776,8 +773,7 @@ export const AICopilotPage: React.FC = () => {
                   key={i}
                   onClick={() => handleSend(act.prompt)}
                   disabled={loading}
-                  className="px-2.5 py-1 rounded-full text-[11px] font-medium border shrink-0 transition-all hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-300"
-                  style={{ background: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
+                  className="px-2.5 py-1 rounded-full text-[11px] font-bold border border-zinc-800 shrink-0 transition-all hover:border-red-500 hover:text-red-400 bg-black text-zinc-200"
                 >
                   {act.label}
                 </button>
@@ -790,8 +786,7 @@ export const AICopilotPage: React.FC = () => {
                 e.preventDefault();
                 handleSend();
               }}
-              className="flex items-center gap-2 p-1.5 rounded-2xl border shadow-xs"
-              style={{ background: 'var(--input-bg)', borderColor: 'var(--border)' }}
+              className="flex items-center gap-2 p-1.5 rounded-2xl border border-zinc-800 shadow-xs bg-black"
             >
               {/* Voice Microphone Dictation */}
               <button
@@ -799,8 +794,8 @@ export const AICopilotPage: React.FC = () => {
                 onClick={toggleVoiceInput}
                 className={`p-2.5 rounded-xl border transition-all ${
                   isListening
-                    ? 'bg-rose-500 text-white border-rose-600 animate-pulse shadow-md shadow-rose-500/25'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-purple-600 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ? 'bg-red-600 text-white border-red-700 animate-pulse shadow-md shadow-red-600/25'
+                    : 'text-zinc-400 hover:text-red-400 border-transparent hover:bg-white/5'
                 }`}
                 title={isListening ? 'Stop listening' : 'Speak your question (Voice dictation)'}
               >
@@ -813,15 +808,14 @@ export const AICopilotPage: React.FC = () => {
                 value={inputPrompt}
                 onChange={(e) => setInputPrompt(e.target.value)}
                 placeholder={isListening ? "Listening... Speak your flight question..." : "Ask Copilot: 'Which motor has highest vibration?', 'Why is M2 hot?', 'Can I fly?'..."}
-                className="flex-1 bg-transparent px-2 py-2 text-xs font-medium focus:outline-none"
-                style={{ color: 'var(--text)' }}
+                className="flex-1 bg-transparent px-2 py-2 text-xs font-semibold focus:outline-none text-white placeholder-zinc-500"
               />
 
               {/* Send Button */}
               <button
                 type="submit"
                 disabled={loading || !inputPrompt.trim()}
-                className="p-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white shadow-sm shadow-purple-600/20 transition-all shrink-0 font-bold"
+                className="p-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white shadow-sm shadow-red-900/40 transition-all shrink-0 font-bold"
                 title="Send message"
               >
                 <Send className="w-4 h-4" />

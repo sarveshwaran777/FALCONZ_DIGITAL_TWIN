@@ -36,42 +36,42 @@ export const Sidebar: React.FC = () => {
         { 
           id: 'rul-forecast', 
           label: 'RUL Prognostics', 
-          icon: <Clock className="w-4 h-4" />,
+          icon: <Clock className="w-4 h-4 text-red-500" />,
           badge: isProOrEnterprise ? undefined : 'PRO',
-          badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+          badgeColor: 'text-red-400 bg-red-500/10 border-red-500/30',
           premium: true
         },
-        { id: 'mission-sim', label: 'Mission Sim', icon: <Compass className="w-4 h-4" /> },
-        { id: 'mission-replay', label: 'Flight Blackbox', icon: <FileText className="w-4 h-4" /> },
-        { id: 'hardware-center', label: 'MAVLink / HAL', icon: <HardDrive className="w-4 h-4" /> },
-        { id: 'safety-center', label: 'Safety Interlocks', icon: <Sliders className="w-4 h-4" /> },
-        { id: 'settings', label: 'GCS Settings', icon: <Settings className="w-4 h-4" /> }
+        { id: 'mission-sim', label: 'Mission Sim', icon: <Compass className="w-4 h-4 text-white" /> },
+        { id: 'mission-replay', label: 'Flight Blackbox', icon: <FileText className="w-4 h-4 text-white" /> },
+        { id: 'hardware-center', label: 'MAVLink / HAL', icon: <HardDrive className="w-4 h-4 text-white" /> },
+        { id: 'safety-center', label: 'Safety Interlocks', icon: <Sliders className="w-4 h-4 text-red-500" /> },
+        { id: 'settings', label: 'GCS Settings', icon: <Settings className="w-4 h-4 text-white" /> }
       ]
     },
     {
       title: 'FALCONZ AI Intelligence',
       items: [
-        { id: 'ai-intelligence', label: 'AI Intelligence Hub', icon: <BrainCircuit className="w-4 h-4 text-purple-400" /> },
-        { id: 'ai-copilot', label: 'AI Engineering Copilot', icon: <Bot className="w-4 h-4 text-purple-400" />, badge: 'LIVE' },
-        { id: 'ai-reports', label: 'Automated Reports', icon: <FileText className="w-4 h-4 text-emerald-400" /> },
-        { id: 'ai-usage', label: 'AI Usage & Quotas', icon: <Zap className="w-4 h-4 text-amber-400" /> }
+        { id: 'ai-intelligence', label: 'AI Intelligence Hub', icon: <BrainCircuit className="w-4 h-4 text-red-500" /> },
+        { id: 'ai-copilot', label: 'AI Engineering Copilot', icon: <Bot className="w-4 h-4 text-red-500" />, badge: 'LIVE', badgeColor: 'text-red-400 bg-red-500/20 border-red-500/40' },
+        { id: 'ai-reports', label: 'Automated Reports', icon: <FileText className="w-4 h-4 text-white" /> },
+        { id: 'ai-usage', label: 'AI Usage & Quotas', icon: <Zap className="w-4 h-4 text-red-500" /> }
       ]
     },
     {
       title: 'Fleet & Cloud Ingress',
       items: [
-        { id: 'fleet-management', label: 'Drone Fleet', icon: <Users className="w-4 h-4 text-cyan-400" /> },
-        { id: 'flight-history', label: 'Cloud Flight Logs', icon: <Cloud className="w-4 h-4 text-cyan-400" /> }
+        { id: 'fleet-management', label: 'Drone Fleet', icon: <Users className="w-4 h-4 text-white" /> },
+        { id: 'flight-history', label: 'Cloud Flight Logs', icon: <Cloud className="w-4 h-4 text-white" /> }
       ]
     },
     {
       title: 'SaaS, Billing & Org',
       items: [
-        { id: 'pricing', label: 'Plans & Pricing', icon: <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" /> },
-        { id: 'billing', label: 'Billing & Invoices', icon: <CreditCard className="w-4 h-4 text-slate-600 dark:text-slate-300" /> },
-        { id: 'payment-history', label: 'Payment Ledger', icon: <History className="w-4 h-4 text-slate-600 dark:text-slate-300" /> },
-        { id: 'organization', label: 'Team & RBAC', icon: <Building2 className="w-4 h-4 text-slate-600 dark:text-slate-300" /> },
-        { id: 'profile', label: 'Account Security', icon: <User className="w-4 h-4 text-slate-600 dark:text-slate-300" /> }
+        { id: 'pricing', label: 'Plans & Pricing', icon: <Sparkles className="w-4 h-4 text-red-500" /> },
+        { id: 'billing', label: 'Billing & Invoices', icon: <CreditCard className="w-4 h-4 text-white" /> },
+        { id: 'payment-history', label: 'Payment Ledger', icon: <History className="w-4 h-4 text-white" /> },
+        { id: 'organization', label: 'Team & RBAC', icon: <Building2 className="w-4 h-4 text-white" /> },
+        { id: 'profile', label: 'Account Security', icon: <User className="w-4 h-4 text-white" /> }
       ]
     }
   ];
@@ -81,7 +81,7 @@ export const Sidebar: React.FC = () => {
     sections.push({
       title: 'System Administration',
       items: [
-        { id: 'admin', label: 'Super Admin Center', icon: <ShieldAlert className="w-4 h-4 text-red-400" />, badge: 'ROOT' }
+        { id: 'admin', label: 'Super Admin Center', icon: <ShieldAlert className="w-4 h-4 text-red-500" />, badge: 'ROOT', badgeColor: 'text-red-400 bg-red-500/20 border-red-500/40' }
       ]
     });
   }
@@ -108,7 +108,7 @@ export const Sidebar: React.FC = () => {
         {sections.map((sec, idx) => (
           <div key={idx} className="space-y-1">
             {sidebarOpen && (
-              <span className="px-2.5 text-[10.5px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold block pt-1">
+              <span className="px-2.5 text-[10.5px] font-mono uppercase tracking-wider text-zinc-400 font-extrabold block pt-1">
                 {sec.title}
               </span>
             )}
@@ -123,8 +123,8 @@ export const Sidebar: React.FC = () => {
                     sidebarOpen ? 'justify-start' : 'justify-center'
                   } ${
                     isActive
-                      ? 'bg-purple-600/15 text-purple-700 dark:text-purple-300 font-bold border border-purple-500/30'
-                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 font-medium'
+                      ? 'bg-red-600/15 text-white font-bold border-l-2 border-red-500 border border-red-500/30'
+                      : 'text-zinc-300 hover:text-white hover:bg-white/5 font-medium'
                   }`}
                 >
                   <span className="shrink-0">{item.icon}</span>
@@ -132,7 +132,7 @@ export const Sidebar: React.FC = () => {
                     <span className="truncate flex-1 text-left flex items-center justify-between">
                       <span className="truncate">{item.label}</span>
                       {item.badge && (
-                        <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border ${item.badgeColor || 'text-purple-700 dark:text-purple-300 bg-purple-500/10 border-purple-500/20'}`}>
+                        <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border ${item.badgeColor || 'text-red-400 bg-red-500/10 border-red-500/30'}`}>
                           {item.badge}
                         </span>
                       )}
@@ -141,7 +141,7 @@ export const Sidebar: React.FC = () => {
 
                   {!sidebarOpen && (
                     <span
-                      className="absolute left-full ml-2 px-2.5 py-1 text-xs rounded-md shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border bg-slate-900 text-white border-slate-700"
+                      className="absolute left-full ml-2 px-2.5 py-1 text-xs rounded-md shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border bg-black text-white border-red-500/40"
                     >
                       {item.label}
                     </span>
@@ -156,14 +156,14 @@ export const Sidebar: React.FC = () => {
       {/* Plan Status Footer */}
       <div className="p-3 border-t text-xs" style={{ borderColor: 'var(--border)' }}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2" style={{ color: 'var(--text-faint)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
-            {sidebarOpen && <span className="text-[11px] font-mono tracking-wide">20Hz Engine</span>}
+          <div className="flex items-center gap-2 text-zinc-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 animate-pulse" />
+            {sidebarOpen && <span className="text-[11px] font-mono font-bold tracking-wide text-white">20Hz Engine</span>}
           </div>
           {sidebarOpen && (
             <button
               onClick={() => setActivePage('pricing')}
-              className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-700 dark:text-purple-300 hover:bg-purple-500/30 border border-purple-500/30 transition-colors"
+              className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 transition-colors"
             >
               {currentPlan}
             </button>

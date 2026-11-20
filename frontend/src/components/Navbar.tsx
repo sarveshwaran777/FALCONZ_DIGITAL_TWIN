@@ -100,18 +100,18 @@ export const Navbar: React.FC = () => {
             <Menu className="w-4 h-4" />
           </button>
           <div className="flex items-center gap-2.5 pl-3 ml-1 border-l cursor-pointer" onClick={() => setActivePage('overview')} style={{ borderColor: 'var(--border)' }}>
-            <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-purple-700 to-indigo-600 flex items-center justify-center shadow-sm">
-              <span className="text-[11px] font-bold text-white tracking-widest">F</span>
+            <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-red-700 to-red-600 flex items-center justify-center shadow-sm shadow-red-900/40">
+              <span className="text-[11px] font-black text-white tracking-widest">F</span>
             </div>
-            <span className="text-[14px] font-extrabold tracking-[0.16em]" style={{ color: 'var(--text)' }}>FALCONZ</span>
-            <span className="hidden sm:inline text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+            <span className="text-[14px] font-black tracking-[0.16em] text-white">FALCONZ</span>
+            <span className="hidden sm:inline text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 border border-red-500/30">
               AERO-TWIN
             </span>
           </div>
 
           <div className="hidden md:flex items-center gap-1.5 ml-3 pl-3 border-l text-xs" style={{ borderColor: 'var(--border)' }}>
-            <span className={`w-2 h-2 rounded-full ${isStreaming ? 'animate-pulse' : ''}`} style={{ background: isHardwareLive ? '#10b981' : isSimLive ? '#0284c7' : '#d4d4d4' }} />
-            <span className="font-semibold tracking-wide text-[11px]" style={{ color: isStreaming ? 'var(--text)' : 'var(--text-faint)' }}>
+            <span className={`w-2 h-2 rounded-full ${isStreaming ? 'animate-pulse' : ''}`} style={{ background: isHardwareLive ? '#ef4444' : isSimLive ? '#ef4444' : '#52525b' }} />
+            <span className="font-semibold tracking-wide text-[11px]" style={{ color: isStreaming ? '#ffffff' : '#a1a1aa' }}>
               {isHardwareLive ? 'LIVE HARDWARE' : isSimLive ? 'SIMULATION (20 Hz)' : 'OFFLINE'}
             </span>
           </div>
@@ -120,9 +120,9 @@ export const Navbar: React.FC = () => {
         {/* CENTER — connect in interface */}
         <div className="hidden lg:flex items-center gap-1.5 px-2 py-1 rounded-full border" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-1">
-            <button onClick={handleSwitchToSim} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${isSimLive ? 'bg-sky-600 text-white' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}`} style={!isSimLive ? { color: 'var(--text-muted)' } : {}}>SIM</button>
-            <button onClick={() => setConnType('USB_SERIAL')} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${connType==='USB_SERIAL' && !isSimLive ? 'bg-black dark:bg-white text-white dark:text-black' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}`} style={connType!=='USB_SERIAL' || isSimLive ? {color:'var(--text-muted)'}:{}}>COM</button>
-            <button onClick={() => setConnType('UDP')} className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${connType==='UDP' && !isSimLive ? 'bg-black dark:bg-white text-white dark:text-black' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}`} style={connType!=='UDP' || isSimLive ? {color:'var(--text-muted)'}:{}}>UDP</button>
+            <button onClick={handleSwitchToSim} className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors ${isSimLive ? 'bg-red-600 text-white shadow-sm shadow-red-900/40' : 'hover:bg-neutral-800 text-zinc-300'}`}>SIM</button>
+            <button onClick={() => setConnType('USB_SERIAL')} className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors ${connType==='USB_SERIAL' && !isSimLive ? 'bg-white text-black' : 'hover:bg-neutral-800 text-zinc-300'}`}>COM</button>
+            <button onClick={() => setConnType('UDP')} className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors ${connType==='UDP' && !isSimLive ? 'bg-white text-black' : 'hover:bg-neutral-800 text-zinc-300'}`}>UDP</button>
           </div>
           <div className="w-px h-5 mx-1" style={{ background: 'var(--border)' }} />
           {connType === 'USB_SERIAL' ? (
@@ -160,20 +160,20 @@ export const Navbar: React.FC = () => {
           {/* Quick AI Copilot Button */}
           <button
             onClick={() => setActivePage('ai-copilot')}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-purple-600/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:bg-purple-600/25 transition-colors"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-600/15 text-red-400 border border-red-500/30 hover:bg-red-600/25 transition-colors"
           >
-            <Bot className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+            <Bot className="w-3.5 h-3.5 text-red-500" />
             <span>Copilot</span>
           </button>
 
           {/* Plan Pill with Upgrade Action */}
           <button
             onClick={() => setActivePage('pricing')}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold border transition-colors"
-            style={{ background: 'var(--card-subtle)', borderColor: 'var(--border)', color: 'var(--text)' }}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold border border-red-500/30 transition-colors"
+            style={{ background: 'var(--card-subtle)', color: 'var(--text)' }}
             title="Click to manage subscription"
           >
-            <Sparkles className="w-3 h-3 text-purple-500" />
+            <Sparkles className="w-3 h-3 text-red-500" />
             <span>{currentPlan}</span>
           </button>
 
@@ -182,7 +182,7 @@ export const Navbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:border-purple-500 transition-colors focus:outline-none"
+                className="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold hover:border-red-500 transition-colors focus:outline-none"
                 style={{ background: 'var(--card-subtle)', borderColor: 'var(--border)', color: 'var(--text)' }}
                 title={currentUser?.email || 'User Profile'}
               >
@@ -194,22 +194,22 @@ export const Navbar: React.FC = () => {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
                   <div 
-                    className="absolute right-0 mt-2 w-64 rounded-2xl border shadow-2xl p-3 z-50 animate-fadeInUp text-xs space-y-2.5"
-                    style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+                    className="absolute right-0 mt-2 w-64 rounded-2xl border border-red-600/30 shadow-2xl p-3 z-50 animate-fadeInUp text-xs space-y-2.5"
+                    style={{ background: 'var(--card)' }}
                   >
                     {/* User Header */}
                     <div className="pb-2.5 border-b" style={{ borderColor: 'var(--border)' }}>
-                      <div className="font-bold text-slate-900 dark:text-white truncate">
+                      <div className="font-bold text-white truncate">
                         {currentUser.full_name}
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate">
+                      <div className="text-[11px] text-zinc-400 font-mono truncate">
                         {currentUser.email}
                       </div>
                       <div className="flex items-center gap-1.5 mt-2">
-                        <span className="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                        <span className="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 border border-red-500/30">
                           {currentUser.role}
                         </span>
-                        <span className="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                        <span className="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full bg-white/10 text-white border border-white/20">
                           {currentPlan}
                         </span>
                       </div>
@@ -219,25 +219,25 @@ export const Navbar: React.FC = () => {
                     <div className="space-y-1">
                       <button
                         onClick={() => { setActivePage('profile'); setUserMenuOpen(false); }}
-                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-white/5 flex items-center gap-2 text-zinc-200 hover:text-white"
                       >
-                        <UserIcon className="w-3.5 h-3.5 text-purple-500" />
+                        <UserIcon className="w-3.5 h-3.5 text-red-500" />
                         <span>Account & Security</span>
                       </button>
 
                       <button
                         onClick={() => { setActivePage('billing'); setUserMenuOpen(false); }}
-                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-white/5 flex items-center gap-2 text-zinc-200 hover:text-white"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                        <Sparkles className="w-3.5 h-3.5 text-red-500" />
                         <span>Subscription & Invoices</span>
                       </button>
 
                       <button
                         onClick={() => { openAuthModal('LOGIN'); setUserMenuOpen(false); }}
-                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2 text-slate-700 dark:text-slate-200"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-white/5 flex items-center gap-2 text-zinc-200 hover:text-white"
                       >
-                        <KeyRound className="w-3.5 h-3.5 text-purple-500" />
+                        <KeyRound className="w-3.5 h-3.5 text-red-500" />
                         <span>Switch Operator Session</span>
                       </button>
                     </div>
@@ -246,7 +246,7 @@ export const Navbar: React.FC = () => {
                     <div className="pt-1.5 border-t" style={{ borderColor: 'var(--border)' }}>
                       <button
                         onClick={() => { logout(); setUserMenuOpen(false); openAuthModal('LOGIN'); }}
-                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold flex items-center gap-2"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-red-500/10 text-red-400 font-bold flex items-center gap-2"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                         <span>Log Out</span>
@@ -259,7 +259,7 @@ export const Navbar: React.FC = () => {
           ) : (
             <button
               onClick={() => openAuthModal('LOGIN')}
-              className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white shadow-sm flex items-center gap-1.5 transition-all"
+              className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-sm shadow-red-900/40 flex items-center gap-1.5 transition-all"
             >
               <KeyRound className="w-3.5 h-3.5" />
               <span>Sign In</span>

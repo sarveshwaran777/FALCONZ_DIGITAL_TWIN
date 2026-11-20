@@ -115,16 +115,16 @@ export const ParameterHelpModal: React.FC = () => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/60">
+        <div className="px-5 py-4 border-b border-zinc-800 flex items-center justify-between bg-black">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
+            <div className="p-2 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider">
+              <span className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-wider">
                 {currentInfo.category}
               </span>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white font-sans">
+              <h3 className="text-sm font-black text-white font-sans">
                 {currentInfo.title}
               </h3>
             </div>
@@ -132,29 +132,29 @@ export const ParameterHelpModal: React.FC = () => {
 
           <button
             onClick={() => setHelpModalParam(null)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-4 text-xs font-mono">
+        <div className="p-5 space-y-4 text-xs font-mono bg-[#09090b]">
           <div>
-            <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">
+            <span className="text-[10px] text-zinc-400 block uppercase font-bold mb-1">
               PHYSICAL DEFINITION
             </span>
-            <p className="font-sans text-xs text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-950/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+            <p className="font-sans text-xs text-zinc-200 leading-relaxed bg-black p-3 rounded-lg border border-zinc-800 font-medium">
               {currentInfo.description}
             </p>
           </div>
 
           {currentInfo.formula && (
             <div>
-              <span className="text-[10px] text-slate-400 block uppercase font-bold mb-1">
+              <span className="text-[10px] text-zinc-400 block uppercase font-bold mb-1">
                 GOVERNING EQUATION
               </span>
-              <div className="p-2.5 rounded-lg bg-sky-500/5 dark:bg-sky-950/30 border border-sky-500/20 text-sky-700 dark:text-sky-300 font-bold">
+              <div className="p-2.5 rounded-lg bg-red-950/20 border border-red-500/30 text-red-400 font-bold">
                 {currentInfo.formula}
               </div>
             </div>
@@ -162,50 +162,50 @@ export const ParameterHelpModal: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             {currentInfo.unit && (
-              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
-                <span className="text-[10px] text-slate-400 block uppercase">ENGINEERING UNIT</span>
-                <strong className="text-slate-900 dark:text-white">{currentInfo.unit}</strong>
+              <div className="p-2.5 rounded-lg bg-black border border-zinc-800">
+                <span className="text-[10px] text-zinc-400 block uppercase font-bold">ENGINEERING UNIT</span>
+                <strong className="text-white">{currentInfo.unit}</strong>
               </div>
             )}
             {currentInfo.source && (
-              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
-                <span className="text-[10px] text-slate-400 block uppercase">DATA PROVENANCE</span>
-                <strong className="text-sky-600 dark:text-sky-400 truncate block">{currentInfo.source}</strong>
+              <div className="p-2.5 rounded-lg bg-black border border-zinc-800">
+                <span className="text-[10px] text-zinc-400 block uppercase font-bold">DATA PROVENANCE</span>
+                <strong className="text-red-400 truncate block font-bold">{currentInfo.source}</strong>
               </div>
             )}
           </div>
 
           {/* Provenance Legend Guide */}
-          <div className="border-t border-slate-200 dark:border-slate-800 pt-3 text-[11px] font-sans">
-            <span className="text-[10px] font-mono text-slate-400 uppercase block mb-1.5 font-bold">
+          <div className="border-t border-zinc-800 pt-3 text-[11px] font-sans">
+            <span className="text-[10px] font-mono text-zinc-400 uppercase block mb-1.5 font-bold">
               Data Classification Badges
             </span>
             <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
               <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold">REAL</span>
-                <span className="text-slate-500">Hardware Telemetry</span>
+                <span className="px-1.5 py-0.5 rounded bg-white/10 text-white font-bold border border-white/20">REAL</span>
+                <span className="text-zinc-400">Hardware Telemetry</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-bold">DERIVED</span>
-                <span className="text-slate-500">Calculated Value</span>
+                <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-bold border border-red-500/30">DERIVED</span>
+                <span className="text-zinc-400">Calculated Value</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold">PROXY</span>
-                <span className="text-slate-500">Estimated Signal</span>
+                <span className="px-1.5 py-0.5 rounded bg-red-600/15 text-red-300 font-bold border border-red-500/20">PROXY</span>
+                <span className="text-zinc-400">Estimated Signal</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold">UNAVAILABLE</span>
-                <span className="text-slate-500">No Sensor Link</span>
+                <span className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-bold border border-zinc-700">UNAVAILABLE</span>
+                <span className="text-zinc-400">No Sensor Link</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+        <div className="p-3 bg-black border-t border-zinc-800 flex justify-end">
           <button
             onClick={() => setHelpModalParam(null)}
-            className="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold font-sans transition-colors"
+            className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold font-sans transition-colors shadow-sm shadow-red-900/40"
           >
             Got it
           </button>
