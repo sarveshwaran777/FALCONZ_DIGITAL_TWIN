@@ -36,13 +36,13 @@ export const MissionSimulatorPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-[1200px] mx-auto">
+    <div className="space-y-4">
       <div>
-        <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2">
-          <Compass className="w-5 h-5 text-red-500" />
+        <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <Compass className="w-5 h-5 text-sky-600" />
           MALE UAV Mission Profile & Life Consumption Simulator
         </h2>
-        <p className="text-xs text-zinc-400 font-medium mt-1">
+        <p className="text-xs text-slate-500">
           Project multi-hour degradation, equivalent operating hours consumed, and mission feasibility under diverse flight profiles
         </p>
       </div>
@@ -60,13 +60,13 @@ export const MissionSimulatorPage: React.FC = () => {
                 <button
                   key={key}
                   onClick={() => handleProfileChange(key)}
-                  className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all ${
+                  className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                     selectedProfile === key
-                      ? 'bg-red-950/30 text-white border-red-600 ring-1 ring-red-600 shadow-xs'
-                      : 'bg-black text-zinc-300 border-zinc-800 hover:border-zinc-700'
+                      ? 'bg-red-950/40 text-white border-red-600 ring-1 ring-red-600 shadow-md'
+                      : 'bg-black text-zinc-300 border-zinc-800 hover:bg-zinc-900 hover:text-white'
                   }`}
                 >
-                  <div className="font-bold mb-0.5 text-white">{prof.name}</div>
+                  <div className="font-bold text-white mb-0.5">{prof.name}</div>
                   <div className="text-[10px] text-zinc-400 font-mono">
                     ALT: {prof.altitude_m}m | TEMP: {prof.ambient_temp_c}°C
                   </div>
@@ -78,8 +78,8 @@ export const MissionSimulatorPage: React.FC = () => {
           {/* Mission Duration Slider */}
           <div className="space-y-3 bg-black p-4 rounded-xl border border-zinc-800">
             <div className="flex justify-between items-center text-xs">
-              <span className="font-bold text-zinc-300 uppercase">MISSION FLIGHT DURATION</span>
-              <span className="font-mono text-base font-black text-red-400">{durationHours} HOURS</span>
+              <span className="font-bold text-white uppercase tracking-wider">MISSION FLIGHT DURATION</span>
+              <span className="font-mono text-base font-black text-red-500">{durationHours} HOURS</span>
             </div>
             <input
               type="range"
@@ -91,7 +91,7 @@ export const MissionSimulatorPage: React.FC = () => {
             />
             <div className="flex justify-between text-[10px] font-mono text-zinc-400">
               <span>1 hr (Short sortie)</span>
-              <span>24 hrs (Standard loiter)</span>
+              <span>24 hrs (Standard MALE loiter)</span>
               <span>48 hrs (Max endurance)</span>
             </div>
           </div>
@@ -101,12 +101,12 @@ export const MissionSimulatorPage: React.FC = () => {
       {/* Simulation Results Grid */}
       {simulationResult && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 font-mono">
-            <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
               <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
                 PROJECTED FINAL HEALTH
               </span>
-              <div className="text-3xl font-black text-white my-1">
+              <div className="text-3xl font-black font-mono text-white my-1">
                 {simulationResult.final_health}%
               </div>
               <p className="text-[11px] text-zinc-400">
@@ -114,36 +114,36 @@ export const MissionSimulatorPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
               <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
                 EQUIVALENT LIFE CONSUMED
               </span>
-              <div className="text-3xl font-black text-red-500 my-1">
+              <div className="text-3xl font-black font-mono text-white my-1">
                 {simulationResult.equivalent_operating_hours} <span className="text-xs text-zinc-400 font-sans">HRS</span>
               </div>
               <p className="text-[11px] text-zinc-400">
-                Acceleration ratio: <strong className="text-white">{simulationResult.damage_acceleration_ratio}x</strong>
+                Acceleration ratio: <strong className="text-red-400">{simulationResult.damage_acceleration_ratio}x</strong>
               </p>
             </div>
 
-            <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
               <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
                 PEAK WINDING TEMPERATURE
               </span>
-              <div className="text-3xl font-black text-white my-1">
+              <div className="text-3xl font-black font-mono text-red-400 my-1">
                 {simulationResult.peak_winding_temp_c}°C
               </div>
               <p className="text-[11px] text-zinc-400">Altitude convective cooling factor</p>
             </div>
 
-            <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
+            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
               <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
                 MISSION FEASIBILITY
               </span>
-              <div className="text-xl font-black my-1 flex items-center gap-1.5 text-white">
+              <div className="text-xl font-black font-mono text-white my-1 flex items-center gap-1.5">
                 {simulationResult.is_mission_feasible ? (
                   <>
-                    <CheckCircle2 className="w-5 h-5 text-white" /> FEASIBLE
+                    <CheckCircle2 className="w-5 h-5 text-red-500" /> FEASIBLE
                   </>
                 ) : (
                   <>
@@ -151,7 +151,7 @@ export const MissionSimulatorPage: React.FC = () => {
                   </>
                 )}
               </div>
-              <p className="text-[11px] text-zinc-400">Risk rating: <strong className="text-red-400">{simulationResult.mission_risk}</strong></p>
+              <p className="text-[11px] text-zinc-400">Risk rating: <strong className="text-white">{simulationResult.mission_risk}</strong></p>
             </div>
           </div>
 
@@ -190,8 +190,6 @@ export const MissionSimulatorPage: React.FC = () => {
                   <YAxis stroke="#ffffff" fontSize={11} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
                   <Tooltip 
                     contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
-                    itemStyle={{ color: '#ffffff', fontWeight: 'bold' }}
-                    labelStyle={{ color: '#ffffff', fontWeight: 'bold' }}
                   />
                   <Area type="monotone" dataKey="health_index" stroke="#ffffff" strokeWidth={2.5} fill="url(#simHealth)" isAnimationActive={false} name="Health Index" />
                   <Area type="monotone" dataKey="rul_hours" stroke="#ef4444" strokeWidth={2.5} fill="none" isAnimationActive={false} name="RUL (Hours)" />

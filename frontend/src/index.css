@@ -157,12 +157,23 @@
 
 /* ========================================================
    GLOBAL HIGH VISIBILITY: PREVENT WHITE-ON-WHITE OR DIM TEXT
-   Overrides any accidental light background on dark cards
+   Universal elimination of accidental light or white rectangular boxes
    ======================================================== */
-.bg-slate-50, .bg-slate-100, .bg-slate-200,
-.bg-zinc-50, .bg-zinc-100, .bg-zinc-200,
-.bg-neutral-50, .bg-neutral-100, .bg-neutral-200,
-.bg-gray-50, .bg-gray-100, .bg-gray-200 {
+.bg-white:not(button):not(.badge-white):not(.keep-white) {
+  background-color: #0c0c10 !important;
+  color: #ffffff !important;
+  border-color: #27272a !important;
+}
+
+[class*="bg-slate-"],
+[class*="bg-zinc-50"], [class*="bg-zinc-100"], [class*="bg-zinc-200"],
+[class*="bg-gray-50"], [class*="bg-gray-100"], [class*="bg-gray-200"],
+[class*="bg-neutral-50"], [class*="bg-neutral-100"], [class*="bg-neutral-200"],
+[class*="bg-sky-50"], [class*="bg-sky-100"], [class*="bg-sky-200"],
+[class*="bg-blue-50"], [class*="bg-blue-100"],
+[class*="bg-emerald-50"], [class*="bg-emerald-100"],
+[class*="bg-amber-50"], [class*="bg-amber-100"],
+[class*="bg-rose-50"], [class*="bg-rose-100"] {
   background-color: #0c0c10 !important;
   color: #ffffff !important;
   border-color: #27272a !important;
@@ -172,6 +183,32 @@
 .border-zinc-100, .border-zinc-200, .border-zinc-300,
 .border-gray-100, .border-gray-200, .border-gray-300 {
   border-color: #27272a !important;
+}
+
+/* Ensure all form controls inside any card are dark and high-contrast */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #27272a !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+select:focus,
+textarea:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Sliders and Range Inputs: Dark track with bold Red thumb */
+input[type="range"] {
+  accent-color: #ef4444 !important;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background-color: #27272a !important;
+}
+input[type="range"]::-webkit-slider-thumb {
+  background-color: #ef4444 !important;
 }
 
 .text-slate-900, .text-slate-800, .text-slate-700,
@@ -310,19 +347,8 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9) !important;
 }
 .recharts-tooltip-item, 
-.recharts-tooltip-label,
-.recharts-tooltip-item-name,
-.recharts-tooltip-item-value,
-.recharts-tooltip-item-unit {
+.recharts-tooltip-label {
   color: #ffffff !important;
   font-weight: 700 !important;
   font-size: 12px !important;
-}
-
-/* Force all SVG text in charts and diagrams to crisp white */
-svg text {
-  text-rendering: optimizeLegibility;
-}
-.recharts-wrapper text {
-  fill: #ffffff !important;
 }

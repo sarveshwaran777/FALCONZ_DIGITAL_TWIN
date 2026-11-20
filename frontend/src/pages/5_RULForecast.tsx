@@ -136,8 +136,6 @@ export const RULForecastPage: React.FC = () => {
               <YAxis stroke="#ffffff" fontSize={11} unit="h" tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
               <Tooltip 
                 contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
-                itemStyle={{ color: '#ffffff', fontWeight: 'bold' }}
-                labelStyle={{ color: '#ffffff', fontWeight: 'bold' }}
               />
               <Area type="monotone" dataKey="upper" stroke="#ffffff" strokeWidth={1.5} strokeDasharray="4 4" fill="url(#rulUncertainty)" isAnimationActive={false} name="Upper 90%" />
               <Area type="monotone" dataKey="mean" stroke="#ef4444" strokeWidth={3} fill="none" isAnimationActive={false} name="Projected Mean" />

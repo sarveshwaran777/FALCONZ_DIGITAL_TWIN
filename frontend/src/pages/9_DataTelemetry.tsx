@@ -187,63 +187,61 @@ export const DataTelemetryPage: React.FC = () => {
           3. REAL-TIME PROPULSION FLEET KPI SUMMARY BAR
          ======================================================== */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
-        <div className="aerospace-card p-3">
+        <div className="aerospace-card p-3.5 bg-[#09090b] border-zinc-800">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 uppercase font-bold">CONNECTED MOTORS</span>
-            <span className={`w-2 h-2 rounded-full ${connectedCount > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+            <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">CONNECTED MOTORS</span>
+            <span className={`w-2 h-2 rounded-full ${connectedCount > 0 ? 'bg-red-500 animate-pulse' : 'bg-zinc-600'}`} />
           </div>
-          <div className="flex items-baseline gap-1.5 mt-1">
-            <span className={`text-2xl font-black ${
-              connectedCount === 4 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
-            }`}>
+          <div className="flex items-baseline gap-1.5 mt-1.5">
+            <span className="text-2xl font-black text-white">
               {connectedCount} / 4
             </span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-zinc-400 font-bold">
               {connectedCount === 4 ? 'FULL QUAD' : connectedCount === 1 ? 'SINGLE RIG' : `${connectedCount} ONLINE`}
             </span>
           </div>
         </div>
 
-        <div className="aerospace-card p-3">
+        <div className="aerospace-card p-3.5 bg-[#09090b] border-zinc-800">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 uppercase font-bold">TOTAL DELIVERED THRUST</span>
-            <Gauge className="w-3.5 h-3.5 text-sky-500" />
+            <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">TOTAL DELIVERED THRUST</span>
+            <Gauge className="w-3.5 h-3.5 text-red-500" />
           </div>
-          <div className="flex items-baseline gap-1.5 mt-1">
-            <span className="text-2xl font-black text-sky-600 dark:text-sky-400">
+          <div className="flex items-baseline gap-1.5 mt-1.5">
+            <span className="text-2xl font-black text-red-500">
               {Math.round(totalThrust).toLocaleString()} g
             </span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-zinc-400">
               ({(totalThrust / 1000).toFixed(2)} kgf)
             </span>
           </div>
         </div>
 
-        <div className="aerospace-card p-3">
+        <div className="aerospace-card p-3.5 bg-[#09090b] border-zinc-800">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 uppercase font-bold">TOTAL PROPULSION CURRENT</span>
-            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">TOTAL PROPULSION CURRENT</span>
+            <Zap className="w-3.5 h-3.5 text-red-500" />
           </div>
-          <div className="flex items-baseline gap-1.5 mt-1">
-            <span className="text-2xl font-black text-slate-900 dark:text-white">
+          <div className="flex items-baseline gap-1.5 mt-1.5">
+            <span className="text-2xl font-black text-white">
               {totalCurrent.toFixed(2)} A
             </span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-zinc-400">
               @ {tel?.battery_voltage_v ? tel.battery_voltage_v.toFixed(1) : (tel?.voltage_v ? tel.voltage_v.toFixed(1) : '11.8')} V
             </span>
           </div>
         </div>
 
-        <div className="aerospace-card p-3">
+        <div className="aerospace-card p-3.5 bg-[#09090b] border-zinc-800">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 uppercase font-bold">AVG CLUSTER EFFICIENCY</span>
-            <Activity className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">AVG CLUSTER EFFICIENCY</span>
+            <Activity className="w-3.5 h-3.5 text-red-500" />
           </div>
-          <div className="flex items-baseline gap-1.5 mt-1">
-            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+          <div className="flex items-baseline gap-1.5 mt-1.5">
+            <span className="text-2xl font-black text-white">
               {avgEfficiency > 0 ? `${avgEfficiency.toFixed(2)} g/W` : '0.00 g/W'}
             </span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-red-400 font-bold">
               {avgEfficiency >= 8.0 ? 'OPTIMAL' : avgEfficiency >= 6.0 ? 'EFFICIENT' : 'CRUISE'}
             </span>
           </div>
@@ -256,12 +254,12 @@ export const DataTelemetryPage: React.FC = () => {
       <div>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-            <h2 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-mono">
+            <Cpu className="w-4 h-4 text-red-500" />
+            <h2 className="text-xs font-black text-white uppercase tracking-wider font-mono">
               Individual Real-Time Motor Channels (A2212 930KV Benchmark)
             </h2>
           </div>
-          <span className="text-[11px] font-mono text-slate-500">
+          <span className="text-[11px] font-mono text-zinc-400">
             Auto-synchronizing via WebSocket at 10 Hz • Zero phantom data on disconnected channels
           </span>
         </div>
@@ -299,47 +297,47 @@ export const DataTelemetryPage: React.FC = () => {
             return (
               <div 
                 key={mKey}
-                className={`aerospace-card p-3.5 transition-all flex flex-col justify-between ${
+                className={`aerospace-card p-3.5 transition-all flex flex-col justify-between bg-[#09090b] ${
                   isMotorConnected
-                    ? 'border-slate-200 dark:border-slate-800 shadow-xs'
-                    : 'border-rose-300 dark:border-rose-900/60 bg-rose-50/20 dark:bg-rose-950/10'
+                    ? 'border-zinc-800'
+                    : 'border-red-900/60 bg-red-950/20'
                 }`}
               >
                 {/* Header: Motor Name & Connection Badge */}
                 <div>
-                  <div className="flex items-center justify-between gap-1 pb-2 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between gap-1 pb-2 border-b border-zinc-800">
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className={`w-2 h-2 rounded-full ${isMotorConnected ? (liveRpm > 50 ? 'bg-emerald-500 animate-pulse' : 'bg-sky-500') : 'bg-rose-500'}`} />
-                        <h3 className="text-xs font-bold text-slate-900 dark:text-white font-mono">
+                        <span className={`w-2 h-2 rounded-full ${isMotorConnected ? (liveRpm > 50 ? 'bg-red-500 animate-pulse' : 'bg-zinc-500') : 'bg-red-600'}`} />
+                        <h3 className="text-xs font-black text-white font-mono">
                           MOTOR {idx + 1}
                         </h3>
                       </div>
-                      <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                      <p className="text-[10px] text-zinc-400 font-mono mt-0.5">
                         {label} • {escCh}
                       </p>
                     </div>
 
                     <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 ${
                       !isMotorConnected
-                        ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+                        ? 'bg-red-950 text-red-300 border border-red-800'
                         : liveRpm > 50
-                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                        : 'bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-800'
+                        ? 'bg-red-600 text-white border border-red-500 shadow-sm'
+                        : 'bg-zinc-900 text-zinc-300 border border-zinc-800'
                     }`}>
                       {!isMotorConnected ? (
                         <>
-                          <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                          <XCircle className="w-3 h-3 text-red-400" />
                           NOT CONNECTED
                         </>
                       ) : liveRpm > 50 ? (
                         <>
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                          <CheckCircle2 className="w-3 h-3 text-white" />
                           RUNNING ({liveRpm.toFixed(0)} RPM)
                         </>
                       ) : (
                         <>
-                          <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
                           IDLE (0 RPM)
                         </>
                       )}
@@ -352,42 +350,42 @@ export const DataTelemetryPage: React.FC = () => {
                       {/* Primary Hero Digital Gauges: RPM & Thrust */}
                       <div className="grid grid-cols-2 gap-2">
                         {/* Measured RPM Gauge */}
-                        <div className="p-2.5 bg-slate-50 dark:bg-slate-900/90 rounded-lg border border-slate-200/80 dark:border-slate-800">
-                          <div className="flex items-center justify-between text-[9px] text-slate-400 font-bold uppercase">
+                        <div className="p-2.5 bg-black rounded-lg border border-zinc-800">
+                          <div className="flex items-center justify-between text-[9px] text-zinc-400 font-bold uppercase">
                             <span>MEASURED RPM</span>
-                            <span>{rpmPct.toFixed(0)}%</span>
+                            <span className="text-white">{rpmPct.toFixed(0)}%</span>
                           </div>
                           <div className="flex items-baseline gap-1 mt-1">
-                            <strong className="text-lg font-black text-slate-900 dark:text-white">
+                            <strong className="text-lg font-black text-white">
                               {Math.round(liveRpm).toLocaleString()}
                             </strong>
-                            <span className="text-[9px] text-slate-400">RPM</span>
+                            <span className="text-[9px] text-zinc-400">RPM</span>
                           </div>
                           {/* Animated Visual Bar */}
-                          <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
+                          <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-1.5">
                             <div 
-                              className="bg-sky-500 h-full rounded-full transition-all duration-300"
+                              className="bg-white h-full rounded-full transition-all duration-300"
                               style={{ width: `${rpmPct}%` }}
                             />
                           </div>
                         </div>
 
                         {/* Delivered Thrust Gauge */}
-                        <div className="p-2.5 bg-slate-50 dark:bg-slate-900/90 rounded-lg border border-slate-200/80 dark:border-slate-800">
-                          <div className="flex items-center justify-between text-[9px] text-slate-400 font-bold uppercase">
+                        <div className="p-2.5 bg-black rounded-lg border border-zinc-800">
+                          <div className="flex items-center justify-between text-[9px] text-zinc-400 font-bold uppercase">
                             <span>DELIVERED THRUST</span>
-                            <span>{thrustPct.toFixed(0)}%</span>
+                            <span className="text-red-400">{thrustPct.toFixed(0)}%</span>
                           </div>
                           <div className="flex items-baseline gap-1 mt-1">
-                            <strong className="text-lg font-black text-sky-600 dark:text-sky-400">
+                            <strong className="text-lg font-black text-red-500">
                               {Math.round(liveThrust).toLocaleString()}
                             </strong>
-                            <span className="text-[9px] text-slate-400">g</span>
+                            <span className="text-[9px] text-zinc-400">g</span>
                           </div>
                           {/* Animated Visual Bar */}
-                          <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
+                          <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-1.5">
                             <div 
-                              className="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                              className="bg-red-600 h-full rounded-full transition-all duration-300"
                               style={{ width: `${thrustPct}%` }}
                             />
                           </div>
@@ -396,58 +394,58 @@ export const DataTelemetryPage: React.FC = () => {
 
                       {/* Precision Telemetry Metrics Grid */}
                       <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-                        <div className="p-1.5 bg-slate-50/80 dark:bg-slate-900/60 rounded border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] text-slate-400 block font-bold">CURRENT</span>
-                          <strong className="text-slate-800 dark:text-slate-200 font-black">
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-[9px] text-zinc-400 block font-bold uppercase">CURRENT</span>
+                          <strong className="text-white font-black font-mono">
                             {liveCurrent.toFixed(2)} A
                           </strong>
                         </div>
 
-                        <div className="p-1.5 bg-slate-50/80 dark:bg-slate-900/60 rounded border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] text-slate-400 block font-bold">VOLTAGE</span>
-                          <strong className="text-slate-800 dark:text-slate-200 font-black">
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-[9px] text-zinc-400 block font-bold uppercase">VOLTAGE</span>
+                          <strong className="text-white font-black font-mono">
                             {liveVoltage.toFixed(2)} V
                           </strong>
                         </div>
 
-                        <div className="p-1.5 bg-slate-50/80 dark:bg-slate-900/60 rounded border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] text-slate-400 block font-bold">POWER (W)</span>
-                          <strong className="text-slate-800 dark:text-slate-200 font-black">
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-[9px] text-zinc-400 block font-bold uppercase">POWER (W)</span>
+                          <strong className="text-white font-black font-mono">
                             {livePower.toFixed(1)} W
                           </strong>
                         </div>
 
-                        <div className="p-1.5 bg-slate-50/80 dark:bg-slate-900/60 rounded border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] text-slate-400 block font-bold">EFFICIENCY</span>
-                          <strong className="text-emerald-600 dark:text-emerald-400 font-black">
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-[9px] text-zinc-400 block font-bold uppercase">EFFICIENCY</span>
+                          <strong className="text-white font-black font-mono">
                             {liveEfficiency.toFixed(2)} g/W
                           </strong>
                         </div>
 
-                        <div className="p-1.5 bg-slate-50/80 dark:bg-slate-900/60 rounded border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] text-slate-400 block font-bold">TEMPERATURE</span>
-                          <strong className="text-amber-600 dark:text-amber-400 font-black">
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-[9px] text-zinc-400 block font-bold uppercase">TEMPERATURE</span>
+                          <strong className="text-red-400 font-black font-mono">
                             {liveTemp.toFixed(1)} °C
                           </strong>
                         </div>
 
-                        <div className="p-1.5 bg-slate-50/80 dark:bg-slate-900/60 rounded border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] text-slate-400 block font-bold">VIBRATION RMS</span>
-                          <strong className="text-slate-700 dark:text-slate-300 font-black">
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-[9px] text-zinc-400 block font-bold uppercase">VIBRATION RMS</span>
+                          <strong className="text-white font-black font-mono">
                             {liveVib.toFixed(3)} g
                           </strong>
                         </div>
 
-                        <div className="p-1.5 bg-slate-50/80 dark:bg-slate-900/60 rounded border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] text-slate-400 block font-bold">SHAFT TORQUE</span>
-                          <strong className="text-slate-700 dark:text-slate-300 font-black">
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-[9px] text-zinc-400 block font-bold uppercase">SHAFT TORQUE</span>
+                          <strong className="text-white font-black font-mono">
                             {liveTorque > 0 ? `${liveTorque.toFixed(4)} N·m` : '0.0000 N·m'}
                           </strong>
                         </div>
 
-                        <div className="p-1.5 bg-slate-50/80 dark:bg-slate-900/60 rounded border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] text-slate-400 block font-bold">THROTTLE CMD</span>
-                          <strong className="text-sky-600 dark:text-sky-400 font-black">
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-[9px] text-zinc-400 block font-bold uppercase">THROTTLE CMD</span>
+                          <strong className="text-red-400 font-black font-mono">
                             {liveThrottle.toFixed(1)} %
                           </strong>
                         </div>
@@ -455,8 +453,8 @@ export const DataTelemetryPage: React.FC = () => {
 
                       {/* Optimal Cruise Zone Badge if Active */}
                       {inCruiseZone && (
-                        <div className="p-1.5 rounded bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-[10px] text-emerald-700 dark:text-emerald-300 flex items-center gap-1 font-bold">
-                          <Check className="w-3 h-3 text-emerald-600" />
+                        <div className="p-2 rounded-lg bg-red-950/40 border border-red-500/40 text-[10px] text-red-300 flex items-center gap-1.5 font-bold">
+                          <Check className="w-3.5 h-3.5 text-red-500" />
                           PEAK CRUISE EFFICIENCY ZONE (50–62%)
                         </div>
                       )}
@@ -464,32 +462,32 @@ export const DataTelemetryPage: React.FC = () => {
                   ) : (
                     /* NOT CONNECTED STATE */
                     <div className="pt-2.5 space-y-2.5 font-mono text-xs">
-                      <div className="p-3 rounded-lg bg-rose-100/60 dark:bg-rose-950/50 border border-rose-300 dark:border-rose-900 text-rose-900 dark:text-rose-200">
-                        <div className="flex items-center gap-1.5 font-bold text-xs text-rose-700 dark:text-rose-400">
+                      <div className="p-3 rounded-lg bg-red-950/40 border border-red-900 text-red-200">
+                        <div className="flex items-center gap-1.5 font-bold text-xs text-red-400">
                           <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                           HARDWARE DISCONNECTED
                         </div>
-                        <p className="text-[10px] text-rose-600 dark:text-rose-400 mt-1 leading-relaxed">
+                        <p className="text-[10px] text-red-300 mt-1 leading-relaxed">
                           {m?.disconnection_reason || 'Hardware cable unplugged. No telemetry signal detected on this channel.'}
                         </p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-1.5 text-[10px]">
-                        <div className="p-1.5 bg-slate-100 dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-800">
-                          <span className="text-slate-400 block font-bold">RPM</span>
-                          <strong className="text-slate-400">0 RPM (OFFLINE)</strong>
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-zinc-500 block font-bold">RPM</span>
+                          <strong className="text-zinc-400">0 RPM (OFFLINE)</strong>
                         </div>
-                        <div className="p-1.5 bg-slate-100 dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-800">
-                          <span className="text-slate-400 block font-bold">CURRENT</span>
-                          <strong className="text-slate-400">0.00 A</strong>
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-zinc-500 block font-bold">CURRENT</span>
+                          <strong className="text-zinc-400">0.00 A</strong>
                         </div>
-                        <div className="p-1.5 bg-slate-100 dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-800">
-                          <span className="text-slate-400 block font-bold">THRUST</span>
-                          <strong className="text-slate-400">0 g</strong>
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-zinc-500 block font-bold">THRUST</span>
+                          <strong className="text-zinc-400">0 g</strong>
                         </div>
-                        <div className="p-1.5 bg-slate-100 dark:bg-slate-900/60 rounded border border-slate-200 dark:border-slate-800">
-                          <span className="text-slate-400 block font-bold">POWER</span>
-                          <strong className="text-slate-400">0.0 W</strong>
+                        <div className="p-2 bg-black rounded-lg border border-zinc-800">
+                          <span className="text-zinc-500 block font-bold">POWER</span>
+                          <strong className="text-zinc-400">0.0 W</strong>
                         </div>
                       </div>
                     </div>
@@ -497,20 +495,20 @@ export const DataTelemetryPage: React.FC = () => {
                 </div>
 
                 {/* Card Status Footer */}
-                <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] font-mono">
+                <div className="pt-3 mt-3 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono">
                   {isMotorConnected ? (
                     <>
-                      <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-bold">
-                        <span className={`w-1.5 h-1.5 rounded-full ${liveRpm > 50 ? 'bg-emerald-500 animate-pulse' : 'bg-sky-500'}`} />
+                      <span className="text-red-400 flex items-center gap-1 font-bold">
+                        <span className={`w-1.5 h-1.5 rounded-full ${liveRpm > 50 ? 'bg-red-500 animate-pulse' : 'bg-zinc-500'}`} />
                         {liveRpm > 50 ? `${liveRpm.toFixed(0)} RPM LIVE` : 'STANDBY (0 RPM)'}
                       </span>
-                      <span className="text-slate-400">
-                        THROTTLE: <strong className="text-slate-700 dark:text-slate-300">{liveThrottle.toFixed(0)}%</strong>
+                      <span className="text-zinc-400">
+                        THROTTLE: <strong className="text-white">{liveThrottle.toFixed(0)}%</strong>
                       </span>
                     </>
                   ) : (
-                    <div className="w-full text-[10px] text-slate-400 dark:text-slate-500 text-center font-mono py-1 flex items-center justify-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400/60 animate-ping" />
+                    <div className="w-full text-[10px] text-zinc-500 text-center font-mono py-1 flex items-center justify-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-ping" />
                       Awaiting physical cable connection...
                     </div>
                   )}

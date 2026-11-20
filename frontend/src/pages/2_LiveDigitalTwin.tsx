@@ -10,16 +10,12 @@ export const LiveDigitalTwinPage: React.FC = () => {
   const tel = systemState.telemetry;
   const dt = systemState.digital_twin;
   const res = systemState.residuals;
-  const rawChartData = history.map((h, i) => ({
-    time: i,
+  const chartData = history.map(h => ({
     actualRpm: h.telemetry?.rpm ?? 0,
     expectedRpm: h.digital_twin?.expected_rpm ?? 0,
     actualTemp: h.telemetry?.temperature_c ?? 25,
     expectedTemp: h.digital_twin?.expected_temperature_c ?? 25,
   }));
-  const chartData = rawChartData.length > 0 ? rawChartData : [
-    { time: 0, actualRpm: tel.rpm ?? 0, expectedRpm: dt.expected_rpm ?? 0, actualTemp: tel.temperature_c ?? 25, expectedTemp: dt.expected_temperature_c ?? 25 }
-  ];
   const rows = [
     { name: 'Rotational Speed', actual: `${(tel.rpm ?? 0).toFixed(0)} RPM`, expected: `${(dt.expected_rpm ?? 0).toFixed(0)} RPM`, delta: `${(res.residual_rpm ?? 0).toFixed(0)}` },
     { name: 'Temperature', actual: `${(tel.temperature_c ?? 25).toFixed(1)} °C`, expected: `${(dt.expected_temperature_c ?? 25).toFixed(1)} °C`, delta: `${(res.residual_temperature_c ?? 0).toFixed(1)}` },
@@ -54,8 +50,6 @@ export const LiveDigitalTwinPage: React.FC = () => {
                 <YAxis stroke="#ffffff" fontSize={11} width={45} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
                 <Tooltip 
                   contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }} 
-                  itemStyle={{ color: '#ffffff', fontWeight: 'bold' }}
-                  labelStyle={{ color: '#ffffff', fontWeight: 'bold' }}
                 />
                 <Line type="monotone" dataKey="actualRpm" stroke="#ef4444" strokeWidth={2.5} dot={false} isAnimationActive={false} name="Actual RPM" />
                 <Line type="monotone" dataKey="expectedRpm" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} isAnimationActive={false} name="Expected RPM" />
@@ -81,8 +75,6 @@ export const LiveDigitalTwinPage: React.FC = () => {
                 <YAxis stroke="#ffffff" fontSize={11} width={45} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
                 <Tooltip 
                   contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }} 
-                  itemStyle={{ color: '#ffffff', fontWeight: 'bold' }}
-                  labelStyle={{ color: '#ffffff', fontWeight: 'bold' }}
                 />
                 <Line type="monotone" dataKey="actualTemp" stroke="#ef4444" strokeWidth={2.5} dot={false} isAnimationActive={false} name="Actual Temp" />
                 <Line type="monotone" dataKey="expectedTemp" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} isAnimationActive={false} name="Expected Temp" />

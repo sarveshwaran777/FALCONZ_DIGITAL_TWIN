@@ -12,15 +12,12 @@ export const HealthIntelligencePage: React.FC = () => {
   const intel = systemState.intelligence;
   const res = systemState.residuals;
 
-  const rawHealthData = history.map((h, i) => ({
+  const healthData = history.map((h, i) => ({
     time: i,
     health: h.intelligence?.health_index ?? 100,
     anomaly: h.intelligence?.anomaly_score ?? 0,
     compositeRes: h.residuals?.composite_residual_score ?? 0
   }));
-  const healthData = rawHealthData.length > 0 ? rawHealthData : [
-    { time: 0, health: intel.health_index ?? 100, anomaly: intel.anomaly_score ?? 0, compositeRes: res.composite_residual_score ?? 0 }
-  ];
 
   const residualHeatmap = [
     { label: 'Normalized Stator Temp Residual', value: res.norm_residual_temp ?? 0, unit: 'σ', status: Math.abs(res.norm_residual_temp ?? 0) > 3 ? 'CRITICAL' : Math.abs(res.norm_residual_temp ?? 0) > 1.8 ? 'WARNING' : 'NORMAL' },
@@ -121,8 +118,6 @@ export const HealthIntelligencePage: React.FC = () => {
               <YAxis domain={[0, 100]} stroke="#ffffff" fontSize={11} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
               <Tooltip 
                 contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
-                itemStyle={{ color: '#ffffff', fontWeight: 'bold' }}
-                labelStyle={{ color: '#ffffff', fontWeight: 'bold' }}
               />
               <Area type="monotone" dataKey="health" stroke="#ffffff" strokeWidth={2.5} fill="rgba(255, 255, 255, 0.15)" isAnimationActive={false} name="Health Index" />
               <Area type="monotone" dataKey="anomaly" stroke="#ef4444" strokeWidth={2} fill="rgba(239, 68, 68, 0.25)" isAnimationActive={false} name="Anomaly Score" />
