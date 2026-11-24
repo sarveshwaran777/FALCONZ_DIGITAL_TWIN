@@ -108,12 +108,12 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white selection:bg-red-600 selection:text-white">
+    <div className="h-screen w-full flex flex-col bg-black text-white selection:bg-red-600 selection:text-white overflow-hidden">
       <Navbar />
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden w-full h-[calc(100vh-56px)]">
         <Sidebar />
-        <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto w-full bg-black">
-          <div className="max-w-[1400px] mx-auto w-full animate-fadeInUp" key={activePage}>
+        <main className="flex-1 h-full py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto w-full bg-black">
+          <div className="max-w-[1400px] mx-auto w-full animate-fadeInUp pb-16" key={activePage}>
             {renderActivePage()}
           </div>
         </main>

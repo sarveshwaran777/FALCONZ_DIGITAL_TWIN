@@ -92,7 +92,7 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center h-14 px-3 sm:px-6 border-b select-none bg-[#09090b] border-zinc-800">
+    <header className="sticky top-0 z-40 flex items-center h-14 shrink-0 px-3 sm:px-6 border-b select-none bg-[#09090b] border-zinc-800">
       <div className="flex items-center justify-between gap-3 w-full min-w-0">
         {/* LEFT — menu + brand + live */}
         <div className="flex items-center gap-3 shrink-0">
