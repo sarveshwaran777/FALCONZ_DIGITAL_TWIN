@@ -49,42 +49,15 @@ export const Sidebar: React.FC = () => {
       ]
     },
     {
-      title: 'FALCONZ AI Intelligence',
+      title: 'AI Intelligence',
       items: [
         { id: 'ai-intelligence', label: 'AI Intelligence Hub', icon: <BrainCircuit className="w-4 h-4 text-red-500" /> },
-        { id: 'ai-copilot', label: 'AI Engineering Copilot', icon: <Bot className="w-4 h-4 text-red-500" />, badge: 'LIVE', badgeColor: 'text-red-400 bg-red-500/20 border-red-500/40' },
+        { id: 'ai-copilot', label: 'AI Copilot', icon: <Bot className="w-4 h-4 text-red-500" />, badge: 'LIVE', badgeColor: 'text-red-400 bg-red-500/20 border-red-500/40' },
         { id: 'ai-reports', label: 'Automated Reports', icon: <FileText className="w-4 h-4 text-white" /> },
         { id: 'ai-usage', label: 'AI Usage & Quotas', icon: <Zap className="w-4 h-4 text-red-500" /> }
       ]
-    },
-    {
-      title: 'Fleet & Cloud Ingress',
-      items: [
-        { id: 'fleet-management', label: 'Drone Fleet', icon: <Users className="w-4 h-4 text-white" /> },
-        { id: 'flight-history', label: 'Cloud Flight Logs', icon: <Cloud className="w-4 h-4 text-white" /> }
-      ]
-    },
-    {
-      title: 'SaaS, Billing & Org',
-      items: [
-        { id: 'pricing', label: 'Plans & Pricing', icon: <Sparkles className="w-4 h-4 text-red-500" /> },
-        { id: 'billing', label: 'Billing & Invoices', icon: <CreditCard className="w-4 h-4 text-white" /> },
-        { id: 'payment-history', label: 'Payment Ledger', icon: <History className="w-4 h-4 text-white" /> },
-        { id: 'organization', label: 'Team & RBAC', icon: <Building2 className="w-4 h-4 text-white" /> },
-        { id: 'profile', label: 'Account Security', icon: <User className="w-4 h-4 text-white" /> }
-      ]
     }
   ];
-
-  // Super Admin section
-  if (currentUser?.role === 'SUPER_ADMIN') {
-    sections.push({
-      title: 'System Administration',
-      items: [
-        { id: 'admin', label: 'Super Admin Center', icon: <ShieldAlert className="w-4 h-4 text-red-500" />, badge: 'ROOT', badgeColor: 'text-red-400 bg-red-500/20 border-red-500/40' }
-      ]
-    });
-  }
 
   const handleNavClick = (item: any) => {
     // Entitlement check for premium features
@@ -101,13 +74,13 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className={`${sidebarOpen ? 'w-[252px]' : 'w-[64px]'} flex flex-col h-full shrink-0 border-r select-none transition-all duration-200 bg-[#09090b] border-zinc-800`}
+      className={`${sidebarOpen ? 'w-[220px]' : 'w-[56px]'} flex flex-col h-full shrink-0 border-r select-none transition-all duration-200 bg-[#09090b] border-zinc-800`}
     >
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
+      <nav className="flex-1 overflow-y-auto py-2 px-1.5 space-y-2.5">
         {sections.map((sec, idx) => (
-          <div key={idx} className="space-y-1">
+          <div key={idx} className="space-y-0.5">
             {sidebarOpen && (
-              <span className="px-3 text-[10.5px] font-mono uppercase tracking-wider text-zinc-400 font-extrabold block pt-1">
+              <span className="px-2.5 text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-extrabold block py-1">
                 {sec.title}
               </span>
             )}
@@ -118,7 +91,7 @@ export const Sidebar: React.FC = () => {
                   key={item.id}
                   onClick={() => handleNavClick(item)}
                   title={!sidebarOpen ? item.label : undefined}
-                  className={`w-full h-9 min-h-[36px] flex items-center gap-3 px-3 rounded-xl text-[12.5px] transition-colors relative group border cursor-pointer ${
+                  className={`w-full h-8 flex items-center gap-2.5 px-2.5 rounded-lg text-xs transition-colors relative group border cursor-pointer ${
                     sidebarOpen ? 'justify-start' : 'justify-center'
                   } ${
                     isActive
@@ -129,7 +102,7 @@ export const Sidebar: React.FC = () => {
                   <span className="w-4 h-4 flex items-center justify-center shrink-0">{item.icon}</span>
                   {sidebarOpen && (
                     <span className="flex-1 text-left flex items-center justify-between min-w-0">
-                      <span className={`truncate text-[12.5px] ${isActive ? 'font-bold text-white' : 'font-medium text-zinc-300 group-hover:text-white'}`}>
+                      <span className={`truncate text-xs ${isActive ? 'font-bold text-white' : 'font-medium text-zinc-300 group-hover:text-white'}`}>
                         {item.label}
                       </span>
                       {item.badge && (
@@ -155,7 +128,7 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Plan Status Footer */}
-      <div className="p-3 border-t text-xs shrink-0 bg-[#09090b] border-zinc-800">
+      <div className="p-2.5 border-t text-xs shrink-0 bg-[#09090b] border-zinc-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-zinc-300">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 animate-pulse" />
