@@ -48,8 +48,8 @@ export const LiveDigitalTwinPage: React.FC = () => {
                 <CartesianGrid stroke="#27272a" strokeDasharray="3 3" />
                 <XAxis hide />
                 <YAxis stroke="#ffffff" fontSize={11} width={45} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
-                <Tooltip 
-                  contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }} 
+                <Tooltip
+                  contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
                 />
                 <Line type="monotone" dataKey="actualRpm" stroke="#ef4444" strokeWidth={2.5} dot={false} isAnimationActive={false} name="Actual RPM" />
                 <Line type="monotone" dataKey="expectedRpm" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} isAnimationActive={false} name="Expected RPM" />
@@ -73,8 +73,8 @@ export const LiveDigitalTwinPage: React.FC = () => {
                 <CartesianGrid stroke="#27272a" strokeDasharray="3 3" />
                 <XAxis hide />
                 <YAxis stroke="#ffffff" fontSize={11} width={45} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
-                <Tooltip 
-                  contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }} 
+                <Tooltip
+                  contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
                 />
                 <Line type="monotone" dataKey="actualTemp" stroke="#ef4444" strokeWidth={2.5} dot={false} isAnimationActive={false} name="Actual Temp" />
                 <Line type="monotone" dataKey="expectedTemp" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} isAnimationActive={false} name="Expected Temp" />

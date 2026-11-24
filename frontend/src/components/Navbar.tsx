@@ -92,12 +92,12 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex items-center h-14 px-3 sm:px-6 border-b select-none" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+    <header className="sticky top-0 z-40 flex items-center h-14 px-3 sm:px-6 border-b select-none bg-[#09090b] border-zinc-800">
       <div className="flex items-center justify-between gap-3 w-full min-w-0">
         {/* LEFT — menu + brand + live */}
         <div className="flex items-center gap-3 shrink-0">
-          <button onClick={toggleSidebar} className="w-8 h-8 rounded-md flex items-center justify-center border hover:bg-neutral-50 dark:hover:bg-neutral-900" style={{ borderColor: 'var(--border)', color: 'var(--text)' }} aria-label="Toggle menu">
-            <Menu className="w-4 h-4" />
+          <button onClick={toggleSidebar} className="w-8 h-8 rounded-md flex items-center justify-center border border-zinc-800 bg-black text-white hover:border-red-500 cursor-pointer transition-colors" aria-label="Toggle menu">
+            <Menu className="w-4 h-4 text-white" />
           </button>
           <div className="flex items-center gap-2.5 pl-3 ml-1 border-l cursor-pointer" onClick={() => setActivePage('overview')} style={{ borderColor: 'var(--border)' }}>
             <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-red-700 to-red-600 flex items-center justify-center shadow-sm shadow-red-900/40">

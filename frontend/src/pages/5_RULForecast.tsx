@@ -134,7 +134,7 @@ export const RULForecastPage: React.FC = () => {
               <CartesianGrid stroke="#27272a" strokeDasharray="3 3" />
               <XAxis dataKey="hour" stroke="#ffffff" fontSize={11} unit="h" tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
               <YAxis stroke="#ffffff" fontSize={11} unit="h" tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
               />
               <Area type="monotone" dataKey="upper" stroke="#ffffff" strokeWidth={1.5} strokeDasharray="4 4" fill="url(#rulUncertainty)" isAnimationActive={false} name="Upper 90%" />

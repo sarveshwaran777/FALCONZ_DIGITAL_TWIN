@@ -60,7 +60,7 @@ export const MissionSimulatorPage: React.FC = () => {
                 <button
                   key={key}
                   onClick={() => handleProfileChange(key)}
-                  className={`text-left p-3.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer flex flex-col justify-center ${
+                  className={`text-left h-[74px] min-h-[74px] p-3.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer flex flex-col justify-center ${
                     selectedProfile === key
                       ? 'bg-red-950/40 text-white border-red-600 ring-1 ring-red-600 shadow-md shadow-red-950/50'
                       : 'bg-black text-zinc-300 border-zinc-800 hover:bg-zinc-900 hover:text-white'

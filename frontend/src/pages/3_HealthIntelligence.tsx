@@ -55,9 +55,8 @@ export const HealthIntelligencePage: React.FC = () => {
           </div>
           <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden mt-3">
             <div
-              className={`h-full transition-all duration-300 ${
-                healthIndex >= 85 ? 'bg-white' : healthIndex >= 70 ? 'bg-red-400' : 'bg-red-600'
-              }`}
+              className={`h-full transition-all duration-300 ${healthIndex >= 85 ? 'bg-white' : healthIndex >= 70 ? 'bg-red-400' : 'bg-red-600'
+                }`}
               style={{ width: `${healthIndex}%` }}
             />
           </div>
@@ -66,9 +65,8 @@ export const HealthIntelligencePage: React.FC = () => {
         <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Isolation Forest Anomaly Score</span>
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-              intel.is_anomaly ? 'bg-red-600 text-white border-red-700' : 'bg-white/10 text-white border-white/20'
-            }`}>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${intel.is_anomaly ? 'bg-red-600 text-white border-red-700' : 'bg-white/10 text-white border-white/20'
+              }`}>
               {intel.is_anomaly ? 'ANOMALY DETECTED' : 'NOMINAL'}
             </span>
           </div>
@@ -116,7 +114,7 @@ export const HealthIntelligencePage: React.FC = () => {
               <CartesianGrid stroke="#27272a" strokeDasharray="3 3" />
               <XAxis dataKey="time" hide />
               <YAxis domain={[0, 100]} stroke="#ffffff" fontSize={11} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
               />
               <Area type="monotone" dataKey="health" stroke="#ffffff" strokeWidth={2.5} fill="rgba(255, 255, 255, 0.15)" isAnimationActive={false} name="Health Index" />
@@ -139,9 +137,8 @@ export const HealthIntelligencePage: React.FC = () => {
               <div className="flex-1 flex items-center gap-3">
                 <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
                   <div
-                    className={`h-full ${
-                      item.status === 'CRITICAL' ? 'bg-red-600' : item.status === 'WARNING' ? 'bg-red-400' : 'bg-white'
-                    }`}
+                    className={`h-full ${item.status === 'CRITICAL' ? 'bg-red-600' : item.status === 'WARNING' ? 'bg-red-400' : 'bg-white'
+                      }`}
                     style={{ width: `${Math.min(100, Math.abs(item.value) * 20)}%` }}
                   />
                 </div>
@@ -149,9 +146,8 @@ export const HealthIntelligencePage: React.FC = () => {
                   {item.value > 0 ? `+${item.value.toFixed(2)}` : item.value.toFixed(2)} {item.unit}
                 </span>
               </div>
-              <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold w-24 text-center border ${
-                item.status === 'CRITICAL' ? 'bg-red-600 text-white border-red-700' : item.status === 'WARNING' ? 'bg-red-500/20 text-red-400 border-red-500/40' : 'bg-white/10 text-white border-white/20'
-              }`}>
+              <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold w-24 text-center border ${item.status === 'CRITICAL' ? 'bg-red-600 text-white border-red-700' : item.status === 'WARNING' ? 'bg-red-500/20 text-red-400 border-red-500/40' : 'bg-white/10 text-white border-white/20'
+                }`}>
                 {item.status}
               </span>
             </div>
