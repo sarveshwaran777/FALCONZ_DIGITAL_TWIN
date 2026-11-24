@@ -167,7 +167,7 @@ export const FleetManagementPage: React.FC = () => {
                   placeholder="e.g. Falcon-Surveyor-04"
                   value={droneName}
                   onChange={(e) => setDroneName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-cyan-500"
+                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-red-500"
                   style={{ background: 'var(--input-bg)', color: 'var(--text)', borderColor: 'var(--border)' }}
                 />
               </div>
@@ -180,7 +180,7 @@ export const FleetManagementPage: React.FC = () => {
                   placeholder="e.g. FLC-F450-SN-004"
                   value={serialNumber}
                   onChange={(e) => setSerialNumber(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-cyan-500"
+                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-red-500"
                   style={{ background: 'var(--input-bg)', color: 'var(--text)', borderColor: 'var(--border)' }}
                 />
               </div>
@@ -190,7 +190,7 @@ export const FleetManagementPage: React.FC = () => {
                 <select
                   value={frameType}
                   onChange={(e) => setFrameType(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-cyan-500"
+                  className="w-full px-3 py-2.5 rounded-xl border focus:outline-none focus:border-red-500"
                   style={{ background: 'var(--input-bg)', color: 'var(--text)', borderColor: 'var(--border)' }}
                 >
                   <option value="Quadcopter F450">Quadcopter F450 (4× BLDC)</option>
@@ -204,13 +204,13 @@ export const FleetManagementPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl font-bold bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-600/20"
+                  className="px-5 py-2.5 rounded-xl font-bold bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-950/40 cursor-pointer transition-colors"
                 >
                   Confirm Registration
                 </button>

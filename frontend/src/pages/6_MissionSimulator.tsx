@@ -12,7 +12,7 @@ export const MissionSimulatorPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    api.getMissionProfiles().then(setProfiles).catch(() => {});
+    api.getMissionProfiles().then(setProfiles).catch(() => { });
     runSimulation('HIGH_ALTITUDE', 12);
   }, []);
 
@@ -21,7 +21,7 @@ export const MissionSimulatorPage: React.FC = () => {
     try {
       const res = await api.simulateMission(profKey, dur);
       setSimulationResult(res);
-    } catch (err) {}
+    } catch (err) { }
     setLoading(false);
   };
 
@@ -188,7 +188,7 @@ export const MissionSimulatorPage: React.FC = () => {
                   <CartesianGrid stroke="#27272a" strokeDasharray="3 3" />
                   <XAxis dataKey="time_hours" stroke="#ffffff" fontSize={11} unit="h" tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
                   <YAxis stroke="#ffffff" fontSize={11} tick={{ fill: '#ffffff', fontWeight: 600 }} tickLine={false} axisLine={{ stroke: '#27272a' }} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ background: '#09090b', border: '1px solid #ef4444', borderRadius: 8, color: '#ffffff', fontWeight: 'bold' }}
                   />
                   <Area type="monotone" dataKey="health_index" stroke="#ffffff" strokeWidth={2.5} fill="url(#simHealth)" isAnimationActive={false} name="Health Index" />

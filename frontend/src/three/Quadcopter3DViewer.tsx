@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -11,6 +11,12 @@ export const Quadcopter3DViewer: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
   const { systemState, theme } = useAppStore();
+  const [activeDroneView, setActiveDroneView] = useState<'DRONE_1' | 'DRONE_2' | 'FORMATION'>('FORMATION');
+  const activeDroneViewRef = useRef<'DRONE_1' | 'DRONE_2' | 'FORMATION'>('FORMATION');
+
+  useEffect(() => {
+    activeDroneViewRef.current = activeDroneView;
+  }, [activeDroneView]);
 
   const telemetryRef = useRef({
     m1Rpm: 0, m2Rpm: 0, m3Rpm: 0, m4Rpm: 0,
@@ -628,6 +634,7 @@ export const Quadcopter3DViewer: React.FC = () => {
 
       // Prop group at shaft top (elevated cleanly above the motor assembly)
       const propGroup = new THREE.Group();
+      propGroup.name = `propGroup_${arm.id}`;
       propGroup.position.y = 0.195;
       base.add(propGroup);
       propGroups[arm.id] = propGroup;
@@ -700,6 +707,11 @@ export const Quadcopter3DViewer: React.FC = () => {
       propGroup.add(rotorDisc);
       rotorDiscs[arm.id] = rotorDisc;
     });
+
+    // Secondary Aircraft (Drone 2) for Dual 3D Swarm Formation
+    const droneGroup2 = droneGroup.clone(true);
+    droneGroup2.position.set(1.8, 0, 0);
+    scene.add(droneGroup2);
 
     let animationFrameId: number;
     const clock = new THREE.Clock();
@@ -800,16 +812,40 @@ export const Quadcopter3DViewer: React.FC = () => {
         aliveLedMat.emissiveIntensity = 0;
       }
 
-      // Vibration micro-jitter on whole drone
+      // Vibration & Swarm Formation Kinematics
       const vib = Math.min(0.025, t.vib * 0.04);
-      droneGroup.position.y = Math.sin(now*38)*vib*0.5 + Math.sin(now*72)*vib*0.25;
-      droneGroup.position.x = Math.sin(now*31)*vib*0.15;
-      droneGroup.position.z = Math.cos(now*29)*vib*0.12;
+      const mode = activeDroneViewRef.current;
 
-      // Temperature tint: if hot, slight emissive on belly
-      // (handled via batteryMat emissive? keep subtle)
+      if (mode === 'FORMATION') {
+        droneGroup.visible = true;
+        droneGroup2.visible = true;
 
-      // Attitude: zero-latency tracking with smooth 60fps convergence
+        droneGroup.position.set(-1.8 + Math.sin(now*31)*vib*0.15, Math.sin(now*38)*vib*0.5 + Math.sin(now*72)*vib*0.25, Math.cos(now*29)*vib*0.12);
+        droneGroup2.position.set(1.8 + Math.sin(now*27)*vib*0.15, Math.sin(now*1.8 + 0.8)*0.08 + Math.sin(now*34)*vib*0.35, Math.cos(now*23)*vib*0.12);
+        droneGroup2.rotation.y = Math.sin(now * 0.28) * 0.06;
+        droneGroup2.rotation.z = Math.sin(now * 0.6) * 0.02;
+
+        droneGroup2.traverse((child) => {
+          if (child.name && child.name.startsWith('propGroup_')) {
+            child.rotation.y += 18.0 * dt;
+          }
+        });
+      } else if (mode === 'DRONE_1') {
+        droneGroup.visible = true;
+        droneGroup2.visible = false;
+        droneGroup.position.set(Math.sin(now*31)*vib*0.15, Math.sin(now*38)*vib*0.5 + Math.sin(now*72)*vib*0.25, Math.cos(now*29)*vib*0.12);
+      } else {
+        droneGroup.visible = false;
+        droneGroup2.visible = true;
+        droneGroup2.position.set(Math.sin(now*27)*vib*0.15, Math.sin(now*1.8)*0.06, Math.cos(now*23)*vib*0.12);
+        droneGroup2.traverse((child) => {
+          if (child.name && child.name.startsWith('propGroup_')) {
+            child.rotation.y += 18.0 * dt;
+          }
+        });
+      }
+
+      // Attitude: zero-latency tracking on active target
       if (t.hasRealAttitude) {
         const tp = (t.pitchDeg * Math.PI)/180, tr = (t.rollDeg * Math.PI)/180, ty = (t.yawDeg * Math.PI)/180;
         droneGroup.rotation.x += (tp - droneGroup.rotation.x) * Math.min(1, dt * 25);
@@ -853,7 +889,16 @@ export const Quadcopter3DViewer: React.FC = () => {
   }, [theme]);
 
   const handleResetView = () => {
-    if (controlsRef.current) { controlsRef.current.reset(); controlsRef.current.target.set(0, 0.18, 0); }
+    if (controlsRef.current) {
+      if (activeDroneViewRef.current === 'FORMATION') {
+        controlsRef.current.object.position.set(0, 3.8, 6.2);
+        controlsRef.current.target.set(0, 0.18, 0);
+      } else {
+        controlsRef.current.object.position.set(0, 3.1, 4.3);
+        controlsRef.current.target.set(0, 0.18, 0);
+      }
+      controlsRef.current.update();
+    }
   };
 
   const tel = systemState?.telemetry;
@@ -909,13 +954,13 @@ export const Quadcopter3DViewer: React.FC = () => {
   };
 
   return (
-    <div className="aerospace-card p-5 relative overflow-hidden flex flex-col h-[520px] min-h-[480px] select-none bg-[#09090b] border-zinc-800">
-      <div className="flex items-center justify-between gap-3 mb-3">
+    <div className="aerospace-card p-5 relative overflow-hidden flex flex-col h-[540px] min-h-[480px] select-none bg-[#09090b] border-zinc-800">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-3 pb-3 border-b border-zinc-800">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-md flex items-center justify-center bg-white text-black font-black"><Cpu className="w-3.5 h-3.5" /></div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-bold text-white">3D Digital Twin</span>
+              <span className="text-xs font-black text-white uppercase tracking-wider">3D Digital Twin</span>
               <span className="hidden sm:inline text-[11px] px-2 py-0.5 rounded-full border border-zinc-800 font-bold text-zinc-300 bg-zinc-900">{flightMode}</span>
               <span
                 className="text-[11px] px-2.5 py-0.5 rounded-full border font-bold flex items-center gap-1.5"
@@ -944,9 +989,85 @@ export const Quadcopter3DViewer: React.FC = () => {
             </div>
           </div>
         </div>
-        <button onClick={handleResetView} className="text-xs px-3 py-1.5 rounded-full border border-zinc-800 bg-black text-white font-bold transition-colors hover:border-red-500 cursor-pointer">Reset view</button>
+
+        {/* Multi-Drone Aircraft Switcher & 3D Formation Toggle */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1 p-1 bg-black border border-zinc-800 rounded-xl text-xs font-mono font-bold">
+            <button
+              onClick={() => {
+                setActiveDroneView('DRONE_1');
+                if (controlsRef.current) {
+                  controlsRef.current.object.position.set(0, 3.1, 4.3);
+                  controlsRef.current.target.set(0, 0.18, 0);
+                  controlsRef.current.update();
+                }
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeDroneView === 'DRONE_1' ? 'bg-red-600 text-white shadow-sm' : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <span>✈ #1 Falcon-X1</span>
+              <span className="text-[9px] px-1 py-0.2 bg-black/40 rounded text-zinc-300">98.5%</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveDroneView('DRONE_2');
+                if (controlsRef.current) {
+                  controlsRef.current.object.position.set(0, 3.1, 4.3);
+                  controlsRef.current.target.set(0, 0.18, 0);
+                  controlsRef.current.update();
+                }
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeDroneView === 'DRONE_2' ? 'bg-red-600 text-white shadow-sm' : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <span>✈ #2 Falcon-X2</span>
+              <span className="text-[9px] px-1 py-0.2 bg-black/40 rounded text-zinc-300">84.0%</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveDroneView('FORMATION');
+                if (controlsRef.current) {
+                  controlsRef.current.object.position.set(0, 3.8, 6.2);
+                  controlsRef.current.target.set(0, 0.18, 0);
+                  controlsRef.current.update();
+                }
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeDroneView === 'FORMATION' ? 'bg-red-600 text-white shadow-sm' : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <span>⚔ Dual 3D Formation</span>
+            </button>
+          </div>
+
+          <button onClick={handleResetView} className="text-xs px-3 py-1.5 rounded-xl border border-zinc-800 bg-black text-white font-bold transition-colors hover:border-red-500 cursor-pointer">
+            <RotateCcw className="w-3.5 h-3.5 inline mr-1 text-red-500" />
+            Reset View
+          </button>
+        </div>
       </div>
+
       <div ref={containerRef} className="w-full flex-1 rounded-xl overflow-hidden border border-zinc-800 relative cursor-grab active:cursor-grabbing bg-black" />
+
+      {/* Real-Time Dual Formation Aerial Overlay */}
+      {activeDroneView === 'FORMATION' && (
+        <div className="absolute top-24 left-6 right-6 z-10 flex items-center justify-between pointer-events-none text-xs font-mono font-bold animate-fadeIn">
+          <div className="p-2 px-3 rounded-xl bg-black/85 border border-zinc-700 text-white flex items-center gap-2 shadow-xl backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            <span>#1 FALCON-X1 (PRIMARY TWIN) • 98.5% NOMINAL</span>
+          </div>
+
+          <div className="p-2 px-3 rounded-xl bg-black/85 border border-red-500/50 text-white flex items-center gap-2 shadow-xl backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span>#2 FALCON-X2 (ENDURANCE SCOUT) • 84.0% IN-FLIGHT</span>
+          </div>
+        </div>
+      )}
+
       <div className="absolute bottom-6 left-6 right-6 z-10 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] select-none pointer-events-none">
         {renderHud('motor_1', 'M1 Front-R (CW)')}
         {renderHud('motor_2', 'M2 Rear-L (CW)')}
