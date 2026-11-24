@@ -74,13 +74,13 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className={`${sidebarOpen ? 'w-[220px]' : 'w-[56px]'} flex flex-col h-full shrink-0 border-r select-none transition-all duration-200 bg-[#09090b] border-zinc-800`}
+      className={`${sidebarOpen ? 'w-[216px]' : 'w-[56px]'} flex flex-col h-full shrink-0 border-r select-none transition-all duration-200 bg-[#09090b] border-zinc-800`}
     >
-      <nav className="flex-1 overflow-y-auto py-2 px-1.5 space-y-2.5">
+      <nav className="flex-1 overflow-hidden py-1.5 px-1.5 space-y-1.5 flex flex-col justify-start">
         {sections.map((sec, idx) => (
           <div key={idx} className="space-y-0.5">
             {sidebarOpen && (
-              <span className="px-2.5 text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-extrabold block py-1">
+              <span className="px-2 text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-extrabold block py-0.5">
                 {sec.title}
               </span>
             )}
@@ -91,7 +91,7 @@ export const Sidebar: React.FC = () => {
                   key={item.id}
                   onClick={() => handleNavClick(item)}
                   title={!sidebarOpen ? item.label : undefined}
-                  className={`w-full h-8 flex items-center gap-2.5 px-2.5 rounded-lg text-xs transition-colors relative group border cursor-pointer ${
+                  className={`w-full h-7 min-h-[28px] flex items-center gap-2 px-2 rounded-md text-[11.5px] transition-colors relative group border cursor-pointer ${
                     sidebarOpen ? 'justify-start' : 'justify-center'
                   } ${
                     isActive
@@ -99,14 +99,14 @@ export const Sidebar: React.FC = () => {
                       : 'border-transparent text-zinc-300 hover:text-white hover:bg-white/5 font-medium'
                   }`}
                 >
-                  <span className="w-4 h-4 flex items-center justify-center shrink-0">{item.icon}</span>
+                  <span className="w-3.5 h-3.5 flex items-center justify-center shrink-0">{item.icon}</span>
                   {sidebarOpen && (
                     <span className="flex-1 text-left flex items-center justify-between min-w-0">
-                      <span className={`truncate text-xs ${isActive ? 'font-bold text-white' : 'font-medium text-zinc-300 group-hover:text-white'}`}>
+                      <span className={`truncate text-[11.5px] ${isActive ? 'font-bold text-white' : 'font-medium text-zinc-300 group-hover:text-white'}`}>
                         {item.label}
                       </span>
                       {item.badge && (
-                        <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border shrink-0 ml-1.5 ${item.badgeColor || 'text-red-400 bg-red-500/10 border-red-500/30'}`}>
+                        <span className={`text-[8.5px] font-mono font-bold px-1 py-0.2 rounded-full border shrink-0 ml-1 ${item.badgeColor || 'text-red-400 bg-red-500/10 border-red-500/30'}`}>
                           {item.badge}
                         </span>
                       )}
@@ -128,16 +128,16 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Plan Status Footer */}
-      <div className="p-2.5 border-t text-xs shrink-0 bg-[#09090b] border-zinc-800">
+      <div className="py-2 px-2.5 border-t text-xs shrink-0 bg-[#09090b] border-zinc-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-zinc-300">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 animate-pulse" />
-            {sidebarOpen && <span className="text-[11px] font-mono font-bold tracking-wide text-white">20Hz Engine</span>}
+            {sidebarOpen && <span className="text-[10px] font-mono font-bold tracking-wide text-white">20Hz Engine</span>}
           </div>
           {sidebarOpen && (
             <button
               onClick={() => setActivePage('pricing')}
-              className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 transition-colors cursor-pointer"
+              className="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 transition-colors cursor-pointer"
             >
               {currentPlan}
             </button>
