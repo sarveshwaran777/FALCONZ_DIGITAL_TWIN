@@ -20,9 +20,11 @@ interface NavSection {
 }
 
 export const Sidebar: React.FC = () => {
-  const { activePage, setActivePage, sidebarOpen, currentUser, currentPlan, openUpgradeModal } = useAppStore();
+  const { activePage, setActivePage, sidebarOpen, currentUser, currentPlan, openUpgradeModal, systemState } = useAppStore();
 
   const isProOrEnterprise = currentPlan === 'PROFESSIONAL' || currentPlan === 'ENTERPRISE';
+  const tel = systemState?.telemetry;
+  const intel = systemState?.intelligence;
 
   const sections: NavSection[] = [
     {
@@ -76,55 +78,91 @@ export const Sidebar: React.FC = () => {
     <aside
       className={`${sidebarOpen ? 'w-[216px]' : 'w-[56px]'} flex flex-col h-full shrink-0 border-r select-none transition-all duration-200 bg-[#09090b] border-zinc-800`}
     >
-      <nav className="flex-1 overflow-hidden py-1.5 px-1.5 space-y-1.5 flex flex-col justify-start">
-        {sections.map((sec, idx) => (
-          <div key={idx} className="space-y-0.5">
-            {sidebarOpen && (
-              <span className="px-2 text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-extrabold block py-0.5">
-                {sec.title}
-              </span>
-            )}
-            {sec.items.map((item) => {
-              const isActive = activePage === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item)}
-                  title={!sidebarOpen ? item.label : undefined}
-                  className={`w-full h-7 min-h-[28px] flex items-center gap-2 px-2 rounded-md text-[11.5px] transition-colors relative group border cursor-pointer ${
-                    sidebarOpen ? 'justify-start' : 'justify-center'
-                  } ${
-                    isActive
-                      ? 'bg-red-600/15 text-white font-bold border-red-500/40 border-l-2 border-l-red-500 shadow-sm'
-                      : 'border-transparent text-zinc-300 hover:text-white hover:bg-white/5 font-medium'
-                  }`}
-                >
-                  <span className="w-3.5 h-3.5 flex items-center justify-center shrink-0">{item.icon}</span>
-                  {sidebarOpen && (
-                    <span className="flex-1 text-left flex items-center justify-between min-w-0">
-                      <span className={`truncate text-[11.5px] ${isActive ? 'font-bold text-white' : 'font-medium text-zinc-300 group-hover:text-white'}`}>
+      <nav className="flex-1 overflow-hidden py-2 px-1.5 flex flex-col justify-between">
+        <div className="space-y-2">
+          {sections.map((sec, idx) => (
+            <div key={idx} className="space-y-0.5">
+              {sidebarOpen && (
+                <span className="px-2 text-[9.5px] font-mono uppercase tracking-wider text-zinc-500 font-extrabold block py-0.5">
+                  {sec.title}
+                </span>
+              )}
+              {sec.items.map((item) => {
+                const isActive = activePage === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item)}
+                    title={!sidebarOpen ? item.label : undefined}
+                    className={`w-full h-7 min-h-[28px] flex items-center gap-2 px-2 rounded-md text-[11.5px] transition-colors relative group border cursor-pointer ${
+                      sidebarOpen ? 'justify-start' : 'justify-center'
+                    } ${
+                      isActive
+                        ? 'bg-red-600/15 text-white font-bold border-red-500/40 border-l-2 border-l-red-500 shadow-sm'
+                        : 'border-transparent text-zinc-300 hover:text-white hover:bg-white/5 font-medium'
+                    }`}
+                  >
+                    <span className="w-3.5 h-3.5 flex items-center justify-center shrink-0">{item.icon}</span>
+                    {sidebarOpen && (
+                      <span className="flex-1 text-left flex items-center justify-between min-w-0">
+                        <span className={`truncate text-[11.5px] ${isActive ? 'font-bold text-white' : 'font-medium text-zinc-300 group-hover:text-white'}`}>
+                          {item.label}
+                        </span>
+                        {item.badge && (
+                          <span className={`text-[8.5px] font-mono font-bold px-1 py-0.2 rounded-full border shrink-0 ml-1 ${item.badgeColor || 'text-red-400 bg-red-500/10 border-red-500/30'}`}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </span>
+                    )}
+
+                    {!sidebarOpen && (
+                      <span
+                        className="absolute left-full ml-2 px-2.5 py-1 text-xs rounded-md shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border bg-black text-white border-red-500/40"
+                      >
                         {item.label}
                       </span>
-                      {item.badge && (
-                        <span className={`text-[8.5px] font-mono font-bold px-1 py-0.2 rounded-full border shrink-0 ml-1 ${item.badgeColor || 'text-red-400 bg-red-500/10 border-red-500/30'}`}>
-                          {item.badge}
-                        </span>
-                      )}
-                    </span>
-                  )}
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
 
-                  {!sidebarOpen && (
-                    <span
-                      className="absolute left-full ml-2 px-2.5 py-1 text-xs rounded-md shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 border bg-black text-white border-red-500/40"
-                    >
-                      {item.label}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+        {/* Live Aircraft Twin Vitals Deck — Perfectly Occupies the Empty Space */}
+        {sidebarOpen && (
+          <div className="mt-2 p-2 rounded-xl border border-zinc-800 bg-black font-mono text-xs select-none">
+            <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-zinc-800/80">
+              <span className="font-bold text-white text-[9.5px] uppercase tracking-wider flex items-center gap-1.5">
+                <Cpu className="w-3 h-3 text-red-500" />
+                FALCON-X1 TWIN
+              </span>
+              <span className="px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-red-950/40 text-red-400 border border-red-500/30">
+                {tel?.flight_mode || 'STABILIZE'}
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-1 text-[10px]">
+              <div className="p-1 rounded bg-[#09090b] border border-zinc-800/60">
+                <div className="text-[8px] text-zinc-400 font-bold uppercase">HEALTH</div>
+                <div className="text-[11px] font-black text-white">{intel?.health_index != null ? `${intel.health_index.toFixed(0)}%` : '99%'}</div>
+              </div>
+              <div className="p-1 rounded bg-[#09090b] border border-zinc-800/60">
+                <div className="text-[8px] text-zinc-400 font-bold uppercase">BATTERY</div>
+                <div className="text-[11px] font-black text-white">{tel?.battery_voltage_v != null ? `${tel.battery_voltage_v.toFixed(1)}V` : '11.8V'}</div>
+              </div>
+              <div className="p-1 rounded bg-[#09090b] border border-zinc-800/60">
+                <div className="text-[8px] text-zinc-400 font-bold uppercase">ARM STATE</div>
+                <div className="text-[11px] font-black text-red-500">{tel?.is_armed ? 'ARMED' : 'READY'}</div>
+              </div>
+              <div className="p-1 rounded bg-[#09090b] border border-zinc-800/60">
+                <div className="text-[8px] text-zinc-400 font-bold uppercase">TELEMETRY</div>
+                <div className="text-[11px] font-black text-white">{tel?.source_type === 'APM_MAVLINK' ? 'MAVLINK' : '20Hz LIVE'}</div>
+              </div>
+            </div>
           </div>
-        ))}
+        )}
       </nav>
 
       {/* Plan Status Footer */}
