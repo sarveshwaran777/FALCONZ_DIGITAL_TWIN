@@ -87,7 +87,7 @@ export const DataTelemetryPage: React.FC = () => {
   }));
 
   return (
-    <div className="space-y-4 select-none">
+    <div className="space-y-6 w-full select-none">
       {/* ========================================================
           1. HEADER & DEDICATED VIEW SWITCHER
          ======================================================== */}
@@ -522,15 +522,15 @@ export const DataTelemetryPage: React.FC = () => {
       {/* ========================================================
           5. MULTI-MOTOR TELEMETRY CROSS-CHANNEL MATRIX TABLE
          ======================================================== */}
-      <div className="aerospace-card p-4">
+      <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-mono">
+            <Layers className="w-4 h-4 text-red-500" />
+            <h3 className="text-xs font-black text-white uppercase tracking-wider font-mono">
               Multi-Motor Telemetry Cross-Channel Matrix
             </h3>
           </div>
-          <span className="text-[11px] font-mono text-slate-500">
+          <span className="text-[11px] font-mono text-zinc-400">
             Real-time side-by-side empirical verification across all 4 channels
           </span>
         </div>
@@ -753,25 +753,25 @@ export const DataTelemetryPage: React.FC = () => {
           6. OPTIONAL FULL AUDIT & BUFFER VIEW (WHEN TOGGLED)
          ======================================================== */}
       {viewMode === 'FULL_AUDIT' && (
-        <div className="space-y-4 pt-2 border-t border-slate-200 dark:border-slate-800">
+        <div className="space-y-4 pt-2 border-t border-zinc-800">
           {/* Raw Streaming Buffer Table */}
-          <div className="aerospace-card p-4">
+          <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-mono">
+                <h3 className="text-xs font-black text-white uppercase tracking-wider font-mono">
                   Raw Canonical Telemetry Buffer Stream ({filteredHistory.length} Frames Cached)
                 </h3>
-                <p className="text-[11px] text-slate-500 font-mono">
+                <p className="text-[11px] text-zinc-400 font-mono">
                   Streaming at 10 Hz ring buffer with data-quality validation flags
                 </p>
               </div>
 
               <div className="flex items-center gap-2 text-xs">
-                <Filter className="w-3.5 h-3.5 text-slate-400" />
+                <Filter className="w-3.5 h-3.5 text-zinc-400" />
                 <select
                   value={filterSource}
                   onChange={(e) => setFilterSource(e.target.value)}
-                  className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-xs px-2 py-1 font-mono text-slate-700 dark:text-slate-300"
+                  className="bg-black border border-zinc-800 rounded-md text-xs px-2 py-1 font-mono text-zinc-300"
                 >
                   <option value="ALL">ALL SOURCES</option>
                   <option value="SIMULATION">SIMULATION</option>
@@ -851,25 +851,25 @@ export const DataTelemetryPage: React.FC = () => {
           </div>
 
           {/* System Audit Log */}
-          <div className="aerospace-card p-4">
-            <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">
-              <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-mono">
+          <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
+            <div className="flex items-center justify-between mb-3 border-b border-zinc-800 pb-2">
+              <h3 className="text-xs font-black text-white uppercase tracking-wider font-mono">
                 Telemetry & Motor Connection Event Audit Log
               </h3>
-              <button onClick={fetchEvents} className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1 font-mono">
-                <RefreshCw className="w-3.5 h-3.5" /> Refresh
+              <button onClick={fetchEvents} className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 font-mono cursor-pointer transition-colors">
+                <RefreshCw className="w-3.5 h-3.5 text-red-500" /> Refresh
               </button>
             </div>
 
             <div className="space-y-2 max-h-[180px] overflow-y-auto">
               {events.map((ev, idx) => (
-                <div key={idx} className="p-2 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 rounded-lg text-xs font-mono flex items-center justify-between">
+                <div key={idx} className="p-2 bg-black border border-zinc-800 rounded-lg text-xs font-mono flex items-center justify-between">
                   <div>
-                    <span className="text-slate-400 text-[10px] mr-2">
+                    <span className="text-zinc-500 text-[10px] mr-2">
                       {new Date(ev.timestamp * 1000).toLocaleTimeString()}
                     </span>
-                    <strong className="text-slate-800 dark:text-slate-200 mr-2">[{ev.event_type}]</strong>
-                    <span className="text-slate-600 dark:text-slate-400">{ev.message}</span>
+                    <strong className="text-white mr-2">[{ev.event_type}]</strong>
+                    <span className="text-zinc-300">{ev.message}</span>
                   </div>
                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                     ev.severity === 'EMERGENCY' || ev.severity === 'CRITICAL'

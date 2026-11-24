@@ -6,7 +6,7 @@ export const SettingsPage: React.FC = () => {
   const { systemState } = useAppStore();
 
   return (
-    <div className="space-y-6 max-w-[1200px] mx-auto">
+    <div className="space-y-6 w-full">
       <div>
         <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2">
           <Settings className="w-5 h-5 text-red-500" />

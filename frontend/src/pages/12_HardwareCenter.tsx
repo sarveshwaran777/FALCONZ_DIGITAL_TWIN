@@ -215,14 +215,14 @@ export const HardwareCenterPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="aerospace-card p-4">
+          <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
             <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
               <div>
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <Cpu className="w-4 h-4 text-sky-600" />
+                <h3 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2 font-mono">
+                  <Cpu className="w-4 h-4 text-red-500" />
                   Physical Motor ↔ ESC Instance ↔ ArduPilot Servo Channel Mapping & Status
                 </h3>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-zinc-400 font-medium">
                   Individual motor telemetry monitoring: Track connected vs disconnected state, measured RPM, current draw, thrust output, and efficiency.
                 </p>
               </div>

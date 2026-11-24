@@ -101,7 +101,7 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className={`${sidebarOpen ? 'w-[230px]' : 'w-[64px]'} flex flex-col h-[calc(100vh-56px)] sticky top-14 shrink-0 border-r transition-all select-none`}
+      className={`${sidebarOpen ? 'w-[230px]' : 'w-[64px]'} flex flex-col h-full shrink-0 border-r transition-all select-none`}
       style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
     >
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
@@ -119,12 +119,12 @@ export const Sidebar: React.FC = () => {
                   key={item.id}
                   onClick={() => handleNavClick(item)}
                   title={!sidebarOpen ? item.label : undefined}
-                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] transition-colors relative group ${
+                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] transition-colors relative group border ${
                     sidebarOpen ? 'justify-start' : 'justify-center'
                   } ${
                     isActive
-                      ? 'bg-red-600/15 text-white font-bold border-l-2 border-red-500 border border-red-500/30'
-                      : 'text-zinc-300 hover:text-white hover:bg-white/5 font-medium'
+                      ? 'bg-red-600/15 text-white font-bold border-red-500/40 border-l-2 border-l-red-500'
+                      : 'border-transparent text-zinc-300 hover:text-white hover:bg-white/5 font-medium'
                   }`}
                 >
                   <span className="shrink-0">{item.icon}</span>

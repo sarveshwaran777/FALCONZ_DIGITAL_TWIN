@@ -45,7 +45,7 @@ export const PricingPlansPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-10 py-4 max-w-6xl mx-auto">
+    <div className="space-y-10 py-4 w-full">
       {/* Header */}
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-mono font-bold uppercase tracking-widest">

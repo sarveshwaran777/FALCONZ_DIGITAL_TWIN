@@ -30,7 +30,7 @@ export const UserProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 w-full">
       {/* Header */}
       <div className="p-6 rounded-2xl border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
         <div className="flex items-center gap-2 mb-1">

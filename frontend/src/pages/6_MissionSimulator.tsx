@@ -36,37 +36,37 @@ export const MissionSimulatorPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 w-full">
       <div>
-        <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-          <Compass className="w-5 h-5 text-sky-600" />
+        <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2 font-mono">
+          <Compass className="w-5 h-5 text-red-500" />
           MALE UAV Mission Profile & Life Consumption Simulator
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-zinc-400 font-medium mt-1">
           Project multi-hour degradation, equivalent operating hours consumed, and mission feasibility under diverse flight profiles
         </p>
       </div>
 
       {/* Control Configuration Card */}
       <div className="aerospace-card p-5 bg-[#09090b] border-zinc-800">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
           {/* Mission Profile Selection */}
-          <div>
-            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-2">
+          <div className="flex flex-col justify-between">
+            <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-2 font-mono">
               SELECT UAV FLIGHT MISSION PROFILE
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5 flex-1">
               {Object.entries(profiles).map(([key, prof]: [string, any]) => (
                 <button
                   key={key}
                   onClick={() => handleProfileChange(key)}
-                  className={`text-left p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                  className={`text-left p-3.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer flex flex-col justify-center ${
                     selectedProfile === key
-                      ? 'bg-red-950/40 text-white border-red-600 ring-1 ring-red-600 shadow-md'
+                      ? 'bg-red-950/40 text-white border-red-600 ring-1 ring-red-600 shadow-md shadow-red-950/50'
                       : 'bg-black text-zinc-300 border-zinc-800 hover:bg-zinc-900 hover:text-white'
                   }`}
                 >
-                  <div className="font-bold text-white mb-0.5">{prof.name}</div>
+                  <div className="font-bold text-white mb-1">{prof.name}</div>
                   <div className="text-[10px] text-zinc-400 font-mono">
                     ALT: {prof.altitude_m}m | TEMP: {prof.ambient_temp_c}°C
                   </div>
@@ -76,23 +76,25 @@ export const MissionSimulatorPage: React.FC = () => {
           </div>
 
           {/* Mission Duration Slider */}
-          <div className="space-y-3 bg-black p-4 rounded-xl border border-zinc-800">
-            <div className="flex justify-between items-center text-xs">
+          <div className="flex flex-col justify-between bg-black p-5 rounded-xl border border-zinc-800 space-y-4">
+            <div className="flex justify-between items-center text-xs font-mono">
               <span className="font-bold text-white uppercase tracking-wider">MISSION FLIGHT DURATION</span>
-              <span className="font-mono text-base font-black text-red-500">{durationHours} HOURS</span>
+              <span className="text-base font-black text-red-500">{durationHours} HOURS</span>
             </div>
-            <input
-              type="range"
-              min="1"
-              max="48"
-              value={durationHours}
-              onChange={(e) => handleDurationChange(Number(e.target.value))}
-              className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-red-600"
-            />
-            <div className="flex justify-between text-[10px] font-mono text-zinc-400">
-              <span>1 hr (Short sortie)</span>
-              <span>24 hrs (Standard MALE loiter)</span>
-              <span>48 hrs (Max endurance)</span>
+            <div className="space-y-2">
+              <input
+                type="range"
+                min="1"
+                max="48"
+                value={durationHours}
+                onChange={(e) => handleDurationChange(Number(e.target.value))}
+                className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-red-600"
+              />
+              <div className="flex justify-between text-[10px] font-mono text-zinc-400">
+                <span>1 hr (Short sortie)</span>
+                <span>24 hrs (Standard MALE loiter)</span>
+                <span>48 hrs (Max endurance)</span>
+              </div>
             </div>
           </div>
         </div>
@@ -101,57 +103,65 @@ export const MissionSimulatorPage: React.FC = () => {
       {/* Simulation Results Grid */}
       {simulationResult && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
-              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
-                PROJECTED FINAL HEALTH
-              </span>
-              <div className="text-3xl font-black font-mono text-white my-1">
-                {simulationResult.final_health}%
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
+            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800 flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
+                  PROJECTED FINAL HEALTH
+                </span>
+                <div className="text-3xl font-black text-white my-1">
+                  {simulationResult.final_health}%
+                </div>
               </div>
-              <p className="text-[11px] text-zinc-400">
+              <p className="text-[11px] text-zinc-400 mt-2 font-sans">
                 Initial: {simulationResult.initial_health}% (Δ -{(simulationResult.initial_health - simulationResult.final_health).toFixed(1)}%)
               </p>
             </div>
 
-            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
-              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
-                EQUIVALENT LIFE CONSUMED
-              </span>
-              <div className="text-3xl font-black font-mono text-white my-1">
-                {simulationResult.equivalent_operating_hours} <span className="text-xs text-zinc-400 font-sans">HRS</span>
+            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800 flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
+                  EQUIVALENT LIFE CONSUMED
+                </span>
+                <div className="text-3xl font-black text-white my-1">
+                  {simulationResult.equivalent_operating_hours} <span className="text-xs text-zinc-400 font-sans">HRS</span>
+                </div>
               </div>
-              <p className="text-[11px] text-zinc-400">
+              <p className="text-[11px] text-zinc-400 mt-2 font-sans">
                 Acceleration ratio: <strong className="text-red-400">{simulationResult.damage_acceleration_ratio}x</strong>
               </p>
             </div>
 
-            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
-              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
-                PEAK WINDING TEMPERATURE
-              </span>
-              <div className="text-3xl font-black font-mono text-red-400 my-1">
-                {simulationResult.peak_winding_temp_c}°C
+            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800 flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
+                  PEAK WINDING TEMPERATURE
+                </span>
+                <div className="text-3xl font-black text-red-500 my-1">
+                  {simulationResult.peak_winding_temp_c}°C
+                </div>
               </div>
-              <p className="text-[11px] text-zinc-400">Altitude convective cooling factor</p>
+              <p className="text-[11px] text-zinc-400 mt-2 font-sans">Altitude convective cooling factor</p>
             </div>
 
-            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800">
-              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
-                MISSION FEASIBILITY
-              </span>
-              <div className="text-xl font-black font-mono text-white my-1 flex items-center gap-1.5">
-                {simulationResult.is_mission_feasible ? (
-                  <>
-                    <CheckCircle2 className="w-5 h-5 text-red-500" /> FEASIBLE
-                  </>
-                ) : (
-                  <>
-                    <AlertTriangle className="w-5 h-5 text-red-500" /> HIGH RISK
-                  </>
-                )}
+            <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800 flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
+                  MISSION FEASIBILITY
+                </span>
+                <div className="text-xl font-black text-white my-1 flex items-center gap-1.5">
+                  {simulationResult.is_mission_feasible ? (
+                    <>
+                      <CheckCircle2 className="w-5 h-5 text-red-500" /> FEASIBLE
+                    </>
+                  ) : (
+                    <>
+                      <AlertTriangle className="w-5 h-5 text-red-500" /> HIGH RISK
+                    </>
+                  )}
+                </div>
               </div>
-              <p className="text-[11px] text-zinc-400">Risk rating: <strong className="text-white">{simulationResult.mission_risk}</strong></p>
+              <p className="text-[11px] text-zinc-400 mt-2 font-sans">Risk rating: <strong className="text-white">{simulationResult.mission_risk}</strong></p>
             </div>
           </div>
 

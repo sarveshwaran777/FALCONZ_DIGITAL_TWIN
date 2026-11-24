@@ -90,7 +90,7 @@ export const OverviewPage: React.FC = () => {
   const motorList = [getMotor('motor_1', 0), getMotor('motor_2', 1), getMotor('motor_3', 2), getMotor('motor_4', 3)];
 
   return (
-    <div className="space-y-6 max-w-[1200px] mx-auto">
+    <div className="space-y-6 w-full">
       {critical && (
         <div className="flex items-start gap-3 px-4 py-3 rounded-lg border text-sm bg-red-950/40 border-red-600 text-white shadow-lg shadow-red-950/50">
           <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />

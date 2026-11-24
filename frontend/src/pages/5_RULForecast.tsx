@@ -33,7 +33,7 @@ export const RULForecastPage: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 max-w-[1200px] mx-auto">
+    <div className="space-y-6 w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2">
