@@ -72,7 +72,7 @@ export function createMockSystemState(
       throttle_pct: effectiveThrottle,
       torque_nm: +(torqueNm / 4).toFixed(3),
       in_cruise_efficiency_zone: effectiveThrottle >= 45 && effectiveThrottle <= 68,
-      status: isOnGround ? 'READY' : 'SIMULATION',
+      status: isOnGround ? 'READY' : (effectiveThrottle < 50 ? 'SPOOLING' : 'SIMULATION'),
       source_message: isOnGround ? 'GROUND_READY' : 'CLIENT_SIMULATOR'
     };
   });
@@ -100,7 +100,7 @@ export function createMockSystemState(
     emergency_stop_active: emergencyStop,
     data_source: 'SIMULATION',
     connection_status: 'SIMULATED',
-    flight_phase: liveRpm > 100 ? 'CRUISE / LOITER' : 'STANDBY / GROUND',
+    flight_phase: isOnGround ? 'STANDBY / GROUND' : (effectiveThrottle < 50 ? 'SPOOLING UP' : 'HOVER STABILIZED'),
     pipeline_stages: pipelineStages,
 
     telemetry: {
@@ -126,9 +126,9 @@ export function createMockSystemState(
       vibration_rms_g: liveVib,
       load_pct: Math.round(effectiveThrottle * 0.95),
       ambient_temperature_c: ambientTemp,
-      altitude_m: 48.5 + Math.sin(t * 0.4) * 2.5,
-      airspeed_mps: 12.8 + Math.cos(t * 0.3) * 0.8,
-      total_thrust_g: Math.round((liveRpm / 9800) * 1800),
+      altitude_m: isOnGround ? 0.0 : +(Math.min(2.5, Math.max(0, ((effectiveThrottle - 35) / 20) * 2.5))).toFixed(2),
+      airspeed_mps: isOnGround ? 0.0 : +(Math.max(0, (effectiveThrottle - 40) * 0.15)).toFixed(1),
+      total_thrust_g: isOnGround ? 0 : Math.round((liveRpm / 9800) * 1800),
       is_armed: !emergencyStop && liveRpm > 100,
 
       // Motors

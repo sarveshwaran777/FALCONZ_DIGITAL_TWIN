@@ -117,7 +117,7 @@ def get_full_system_state():
 
 @router.post("/throttle")
 def set_throttle(req: ThrottleRequest):
-    telemetry_generator.set_operating_point(req.throttle_pct, req.load_pct, req.ambient_temp_c)
+    telemetry_generator.set_operating_point(req.throttle_pct, req.load_pct, req.ambient_temp_c, instant=False)
     buffer_store.add_event(
         event_type="OPERATOR_THROTTLE_SET",
         severity="INFO",

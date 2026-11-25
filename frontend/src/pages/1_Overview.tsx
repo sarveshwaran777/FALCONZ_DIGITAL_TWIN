@@ -67,10 +67,16 @@ export const OverviewPage: React.FC = () => {
   const isConnected = (tel.connection_status !== 'DISCONNECTED' && tel.connection_status !== undefined) || tel.source_type === 'SIMULATION' || !!tel.heartbeat_received;
   const critical = activeAlerts.find(a => a.level === 'CRITICAL');
 
+  const liveThrottle = tel.throttle_pct ?? 0;
+  const isArmed = Boolean(tel.is_armed);
+  const isOnGround = !isArmed || liveThrottle < 0.5;
+  const isSpooling = isArmed && liveThrottle >= 0.5 && liveThrottle < 50;
+  const isAirborne = isArmed && liveThrottle >= 50;
+
   const getMotor = (key: 'motor_1' | 'motor_2' | 'motor_3' | 'motor_4', idx: number) => {
     const m: any = motors[key];
     const connected = m ? (m.is_connected !== false && m.connection_status !== 'DISCONNECTED' && m.connection_status !== 'NOT CONNECTED') : isConnected;
-    const liveRpm = connected ? Math.round(m?.live_rpm ?? m?.rpm ?? (tel.is_armed ? (tel.rpm ?? 0) : 0)) : 0;
+    const liveRpm = connected ? Math.round(m?.live_rpm ?? m?.rpm ?? (isArmed ? (tel.rpm ?? 0) : 0)) : 0;
     const liveCurr = connected ? (m?.current_a ?? (tel.current_a ? tel.current_a / 4 : 0)) : 0;
     const liveTemp = connected ? (m?.temperature_c ?? tel.temperature_c ?? null) : null;
     const liveThrust = connected ? (m?.thrust_g ?? (tel.total_thrust_g ? tel.total_thrust_g / 4 : 0)) : 0;
@@ -132,74 +138,106 @@ export const OverviewPage: React.FC = () => {
       </div>
 
       {/* Flight Operations Deck: Pre-Flight (0 Initial Values) & Takeoff / Landing Controls */}
-      <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className={`w-3 h-3 rounded-full ${tel.is_armed && (tel.throttle_pct ?? 0) > 2 ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-black uppercase tracking-wider text-white">
-                {tel.is_armed && (tel.throttle_pct ?? 0) > 2 ? 'FLIGHT ACTIVE: AIRBORNE' : 'PRE-FLIGHT STATE: ON GROUND (0 RPM)'}
-              </span>
-              <span className={`text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full border ${tel.is_armed && (tel.throttle_pct ?? 0) > 2 ? 'bg-red-950/40 text-red-400 border-red-500/40' : 'bg-zinc-900 text-zinc-300 border-zinc-700'}`}>
-                {tel.is_armed && (tel.throttle_pct ?? 0) > 2 ? `THROTTLE ${Math.round(tel.throttle_pct)}%` : 'INITIAL 0 VALUES'}
-              </span>
+      <div className="aerospace-card p-4 bg-[#09090b] border-zinc-800 flex flex-col gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-3 h-3 rounded-full ${isOnGround ? 'bg-emerald-500' : isSpooling ? 'bg-red-500 animate-ping' : 'bg-red-500 animate-pulse'}`} />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-black uppercase tracking-wider text-white">
+                  {isOnGround 
+                    ? 'PRE-FLIGHT STATE: ON GROUND (0 RPM)' 
+                    : isSpooling 
+                      ? `SPOOLING UP: PROGRESSIVE LIFTOFF (${Math.round(tel.rpm ?? 0)} RPM)` 
+                      : 'FLIGHT ACTIVE: HOVER STABILIZED'}
+                </span>
+                <span className={`text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                  isOnGround 
+                    ? 'bg-emerald-950/40 text-emerald-400 border-emerald-500/40' 
+                    : isSpooling 
+                      ? 'bg-amber-950/40 text-amber-300 border-amber-500/40 animate-pulse' 
+                      : 'bg-red-950/40 text-red-400 border-red-500/40'
+                }`}>
+                  {isOnGround ? 'INITIAL 0 VALUES' : isSpooling ? `RAMPING (${Math.round(liveThrottle)}%)` : `55% HOVER`}
+                </span>
+              </div>
+              <div className="text-[11px] text-zinc-400 font-medium mt-0.5">
+                {isOnGround
+                  ? 'All 4 propulsion channels held strictly at 0.0 RPM resting state before takeoff.'
+                  : isSpooling
+                    ? `Simulating physical motor spool-up inertia and aerodynamic liftoff. Altitude: ${(tel.altitude_m ?? 0).toFixed(1)}m`
+                    : `Motors engaged: Total thrust ${(tel.total_thrust_g ?? 0).toFixed(0)}g | Current ${(tel.current_a ?? 0).toFixed(2)}A | Alt: ${(tel.altitude_m ?? 2.5).toFixed(1)}m`}
+              </div>
             </div>
-            <div className="text-[11px] text-zinc-400 font-medium mt-0.5">
-              {tel.is_armed && (tel.throttle_pct ?? 0) > 2 
-                ? `Motors engaged: Total thrust ${(tel.total_thrust_g ?? 0).toFixed(0)}g | Current ${(tel.current_a ?? 0).toFixed(2)}A`
-                : 'Propulsion channels held at 0 initial values until takeoff command is issued.'}
+          </div>
+
+          {/* Action Controls & Throttle Slider */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Takeoff / Land Trigger */}
+            {isOnGround ? (
+              <button
+                onClick={() => takeoff(55)}
+                className="h-8 px-4 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold font-mono tracking-wider flex items-center gap-2 shadow-md shadow-red-900/40 cursor-pointer transition-colors"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                INITIATE TAKEOFF (55%)
+              </button>
+            ) : isSpooling ? (
+              <button
+                onClick={land}
+                className="h-8 px-4 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold font-mono tracking-wider flex items-center gap-2 cursor-pointer transition-colors"
+              >
+                <Power className="w-3.5 h-3.5" />
+                ABORT / RETURN TO 0
+              </button>
+            ) : (
+              <button
+                onClick={land}
+                className="h-8 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold font-mono tracking-wider flex items-center gap-2 cursor-pointer transition-colors border border-zinc-700"
+              >
+                <Power className="w-3.5 h-3.5 text-red-400" />
+                LAND (RETURN TO 0)
+              </button>
+            )}
+
+            {/* Quick Ground Reset */}
+            <button
+              onClick={groundReset}
+              className="h-8 px-3 rounded-lg border border-zinc-800 bg-black hover:bg-zinc-900 text-zinc-400 hover:text-white text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+              title="Reset telemetry to initial 0 state on ground"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              RESET (0)
+            </button>
+
+            {/* Throttle Range Slider */}
+            <div className="flex items-center gap-2 px-3 py-1 bg-black rounded-lg border border-zinc-800">
+              <Sliders className="w-3.5 h-3.5 text-zinc-400" />
+              <span className="text-[10px] font-mono text-zinc-400 font-bold uppercase">THROTTLE</span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={Math.round(liveThrottle)}
+                onChange={(e) => setThrottle(Number(e.target.value))}
+                className="w-24 h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-red-600"
+              />
+              <span className="text-xs font-mono font-black text-white w-9 text-right">
+                {Math.round(liveThrottle)}%
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Action Controls & Throttle Slider */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Takeoff / Land Trigger */}
-          {(!tel.is_armed || (tel.throttle_pct ?? 0) <= 2) ? (
-            <button
-              onClick={() => takeoff(55)}
-              className="h-8 px-4 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold font-mono tracking-wider flex items-center gap-2 shadow-md shadow-red-900/40 cursor-pointer transition-colors"
-            >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              INITIATE TAKEOFF (55%)
-            </button>
-          ) : (
-            <button
-              onClick={land}
-              className="h-8 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold font-mono tracking-wider flex items-center gap-2 cursor-pointer transition-colors border border-zinc-700"
-            >
-              <Power className="w-3.5 h-3.5 text-red-400" />
-              LAND (RETURN TO 0)
-            </button>
-          )}
-
-          {/* Quick Ground Reset */}
-          <button
-            onClick={groundReset}
-            className="h-8 px-3 rounded-lg border border-zinc-800 bg-black hover:bg-zinc-900 text-zinc-400 hover:text-white text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
-            title="Reset telemetry to initial 0 state on ground"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            RESET (0)
-          </button>
-
-          {/* Throttle Range Slider */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-black rounded-lg border border-zinc-800">
-            <Sliders className="w-3.5 h-3.5 text-zinc-400" />
-            <span className="text-[10px] font-mono text-zinc-400 font-bold uppercase">THROTTLE</span>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={Math.round(tel.throttle_pct ?? 0)}
-              onChange={(e) => setThrottle(Number(e.target.value))}
-              className="w-24 h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-red-600"
+        {/* Visual Progressive Spool-up Progress Track */}
+        {isSpooling && (
+          <div className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden border border-zinc-800">
+            <div 
+              className="bg-gradient-to-r from-amber-500 to-red-600 h-full transition-all duration-200" 
+              style={{ width: `${Math.min(100, (liveThrottle / 55) * 100)}%` }} 
             />
-            <span className="text-xs font-mono font-black text-white w-9 text-right">
-              {Math.round(tel.throttle_pct ?? 0)}%
-            </span>
           </div>
-        </div>
+        )}
       </div>
 
       <Quadcopter3DViewer />
@@ -217,11 +255,15 @@ export const OverviewPage: React.FC = () => {
                 <span
                   className={`text-[11px] px-2 py-0.5 rounded-full border font-bold ${
                     m.connected 
-                      ? (m.isRunning ? 'bg-red-600/20 text-red-400 border-red-500/40' : 'bg-white/10 text-white border-white/20') 
+                      ? (m.rpm > 4500 
+                          ? 'bg-red-600/20 text-red-400 border-red-500/40' 
+                          : m.rpm > 50 
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' 
+                            : 'bg-emerald-950/30 text-emerald-400 border-emerald-500/30') 
                       : 'bg-zinc-900 text-zinc-500 border-zinc-800'
                   }`}
                 >
-                  {m.connected ? (m.isRunning ? 'Running' : 'Standby') : 'Offline'}
+                  {m.connected ? (m.rpm > 4500 ? 'Running' : m.rpm > 50 ? 'Spooling' : 'Ready') : 'Offline'}
                 </span>
               </div>
 

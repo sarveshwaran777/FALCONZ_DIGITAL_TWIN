@@ -151,7 +151,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Client-side simulation state when backend is disconnected
   const simStepRef = useRef(0);
-  const simThrottleRef = useRef(0);
+  const simTargetThrottleRef = useRef(0);
+  const simCurrentThrottleRef = useRef(0);
   const simEStopRef = useRef(false);
   const simScenarioRef = useRef<ScenarioType>('NORMAL');
   const simSeverityRef = useRef(0.0);
@@ -291,15 +292,27 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       api.getDemoState().then(setDemoState).catch(() => {});
     }, 2000);
 
-    // Client-side simulation ticker at 5 Hz when backend is offline
+    // Client-side simulation ticker at 5 Hz with smooth realistic spool-up / spool-down
     const simInterval = setInterval(() => {
       if (!isBackendLiveRef.current) {
         simStepRef.current += 1;
+        // Smoothly slew throttle towards target: ~15% per second = ~3.0% per 200ms tick
+        if (simCurrentThrottleRef.current < simTargetThrottleRef.current) {
+          simCurrentThrottleRef.current = Math.min(
+            simTargetThrottleRef.current,
+            +(simCurrentThrottleRef.current + 3.0).toFixed(1)
+          );
+        } else if (simCurrentThrottleRef.current > simTargetThrottleRef.current) {
+          simCurrentThrottleRef.current = Math.max(
+            simTargetThrottleRef.current,
+            +(simCurrentThrottleRef.current - 3.6).toFixed(1)
+          );
+        }
         const mock = createMockSystemState(
           simStepRef.current,
           simScenarioRef.current,
           simSeverityRef.current,
-          simThrottleRef.current,
+          simCurrentThrottleRef.current,
           simEStopRef.current
         );
         setSystemState(mock);
@@ -414,34 +427,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const setThrottle = async (throttle: number, load?: number) => {
-    simThrottleRef.current = throttle;
+    simTargetThrottleRef.current = throttle;
     try {
       await api.setThrottle(throttle, load);
     } catch {}
   };
 
   const takeoff = async (throttle = 55) => {
-    simThrottleRef.current = throttle;
+    simTargetThrottleRef.current = throttle;
     try {
       await api.takeoff(throttle);
-      showToast(`Takeoff initiated: Throttle set to ${throttle}% hover.`, 'success');
+      showToast(`Takeoff initiated: Spooling up to ${throttle}% hover.`, 'success');
     } catch {
       await api.setThrottle(throttle, 40);
     }
   };
 
   const land = async () => {
-    simThrottleRef.current = 0;
+    simTargetThrottleRef.current = 0;
     try {
       await api.land();
-      showToast('Aircraft landed: Throttle set to 0% initial state.', 'info');
+      showToast('Landing initiated: Spooling down to 0% ground state.', 'info');
     } catch {
       await api.setThrottle(0, 0);
     }
   };
 
   const groundReset = async () => {
-    simThrottleRef.current = 0;
+    simTargetThrottleRef.current = 0;
+    simCurrentThrottleRef.current = 0;
     try {
       await api.groundReset();
       showToast('Reset to ground initial state (0 RPM).', 'info');

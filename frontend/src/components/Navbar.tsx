@@ -58,7 +58,10 @@ export const Navbar: React.FC = () => {
   const isSimLive = systemState?.telemetry?.source_type === 'SIMULATION' || connType === 'SIM';
   const isArmed = Boolean(systemState?.telemetry?.is_armed);
   const liveThrottle = systemState?.telemetry?.throttle_pct ?? 0;
+  const liveRpm = systemState?.telemetry?.rpm ?? 0;
   const isOnGround = !isArmed || liveThrottle < 0.5;
+  const isSpooling = isArmed && liveThrottle >= 0.5 && liveThrottle < 50;
+  const isHovering = isArmed && liveThrottle >= 50;
   const isStreaming = isHardwareLive || isSimLive;
   const unread = activeAlerts.length;
 
@@ -121,7 +124,15 @@ export const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center gap-1.5 ml-3 pl-3 border-l text-xs" style={{ borderColor: 'var(--border)' }}>
             <span className={`w-2 h-2 rounded-full ${isStreaming ? 'animate-pulse' : ''}`} style={{ background: isHardwareLive ? '#ef4444' : (isSimLive && !isOnGround) ? '#ef4444' : '#22c55e' }} />
             <span className="font-semibold tracking-wide text-[11px]" style={{ color: isStreaming ? '#ffffff' : '#a1a1aa' }}>
-              {isHardwareLive ? 'LIVE HARDWARE (APM)' : (isSimLive ? (isOnGround ? 'SIM: ON GROUND (0 RPM)' : `SIM: AIRBORNE (${Math.round(liveThrottle)}%)`) : 'OFFLINE')}
+              {isHardwareLive 
+                ? 'LIVE HARDWARE (APM)' 
+                : (isSimLive 
+                  ? (isOnGround 
+                    ? 'SIM: ON GROUND (0 RPM)' 
+                    : isSpooling 
+                      ? `SIM: SPOOLING UP (${Math.round(liveRpm)} RPM)` 
+                      : `SIM: AIRBORNE (${Math.round(liveThrottle)}%)`) 
+                  : 'OFFLINE')}
             </span>
           </div>
         </div>
@@ -143,14 +154,28 @@ export const Navbar: React.FC = () => {
                   <button 
                     onClick={() => takeoff(55)} 
                     disabled={loading}
-                    className="h-7 px-3 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-red-900/40 cursor-pointer transition-colors"
+                    className="h-7 px-3.5 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-red-900/40 cursor-pointer transition-colors"
                   >
                     Takeoff (55%)
                   </button>
                 </>
+              ) : isSpooling ? (
+                <>
+                  <span className="text-[10.5px] font-mono text-red-400 font-bold px-1 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block" />
+                    SPOOLING ({Math.round(liveRpm)} RPM)
+                  </span>
+                  <button 
+                    onClick={land} 
+                    disabled={loading}
+                    className="h-7 px-3 rounded-full bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    Abort / Land
+                  </button>
+                </>
               ) : (
                 <>
-                  <span className="text-[10.5px] font-mono text-red-400 font-bold px-1">AIRBORNE ({Math.round(liveThrottle)}%)</span>
+                  <span className="text-[10.5px] font-mono text-white font-bold px-1">HOVER ({Math.round(liveThrottle)}%)</span>
                   <button 
                     onClick={land} 
                     disabled={loading}

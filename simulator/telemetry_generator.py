@@ -23,8 +23,13 @@ class TelemetryGenerator:
         self.scenario_severity: float = 0.5  # 0.0 to 1.0
         # Initial values start at 0 before takeoff
         self.throttle_pct: float = 0.0
+        self.target_throttle_pct: float = 0.0
         self.load_pct: float = 0.0
+        self.target_load_pct: float = 0.0
         self.is_armed: bool = False
+        self.altitude_m: float = 0.0
+        self.target_altitude_m: float = 0.0
+        self.flight_phase: str = "GROUND"
         self.battery_voltage: float = 12.4   # 3S LiPo testbed resting pack nominal (12.4V - 12.6V)
         self.ambient_temp_c: float = settings.DEFAULT_AMBIENT_TEMP_C
         self.internal_temp: float = settings.DEFAULT_AMBIENT_TEMP_C
@@ -76,38 +81,97 @@ class TelemetryGenerator:
         self.active_scenario = scenario
         self.scenario_severity = max(0.0, min(1.0, severity))
         
-    def set_operating_point(self, throttle_pct: float, load_pct: Optional[float] = None, ambient_temp_c: Optional[float] = None):
-        self.throttle_pct = max(0.0, min(100.0, throttle_pct))
-        if self.throttle_pct > 2.0:
-            self.is_armed = True
+    def set_operating_point(self, throttle_pct: float, load_pct: Optional[float] = None, ambient_temp_c: Optional[float] = None, instant: bool = True):
+        throttle_val = max(0.0, min(100.0, throttle_pct))
+        if instant:
+            self.throttle_pct = throttle_val
+            self.target_throttle_pct = throttle_val
+            if self.throttle_pct > 2.0:
+                self.is_armed = True
+            else:
+                self.is_armed = False
+            if load_pct is not None:
+                self.load_pct = max(0.0, min(100.0, load_pct))
+                self.target_load_pct = self.load_pct
         else:
-            self.is_armed = False
-        if load_pct is not None:
-            self.load_pct = max(0.0, min(100.0, load_pct))
+            self.target_throttle_pct = throttle_val
+            if throttle_val > 2.0:
+                self.is_armed = True
+            if load_pct is not None:
+                self.target_load_pct = max(0.0, min(100.0, load_pct))
         if ambient_temp_c is not None:
             self.ambient_temp_c = ambient_temp_c
 
     def takeoff(self, target_throttle: float = 55.0):
-        """Initiates simulated takeoff and transitions into hover (55% nominal)."""
+        """Initiates simulated progressive takeoff spooling up towards hover equilibrium."""
         self.is_armed = True
-        self.set_operating_point(target_throttle, 40.0)
+        self.target_throttle_pct = max(10.0, min(100.0, target_throttle))
+        self.target_load_pct = 40.0
+        self.target_altitude_m = 2.5
+        self.flight_phase = "SPOOLING_UP"
 
     def land(self):
-        """Initiates simulated landing to ground (0% throttle, disarmed)."""
-        self.is_armed = False
-        self.set_operating_point(0.0, 0.0)
+        """Initiates simulated smooth landing descent to ground (spooling down to 0% throttle, disarmed)."""
+        self.target_throttle_pct = 0.0
+        self.target_load_pct = 0.0
+        self.target_altitude_m = 0.0
+        self.flight_phase = "DESCENT"
 
     def reset_to_ground(self):
         """Resets telemetry generator to ground zero-state before takeoff."""
         self.is_armed = False
-        self.set_operating_point(0.0, 0.0)
+        self.throttle_pct = 0.0
+        self.target_throttle_pct = 0.0
+        self.load_pct = 0.0
+        self.target_load_pct = 0.0
+        self.altitude_m = 0.0
+        self.target_altitude_m = 0.0
+        self.flight_phase = "GROUND"
         self.internal_temp = self.ambient_temp_c
         self.sim_yaw_deg = 0.0
 
     def generate_packet(self) -> Dict[str, Any]:
         now = time.time()
-        dt = max(0.05, min(2.0, now - self.last_step_time))
+        dt = max(0.01, min(0.5, now - self.last_step_time))
         self.last_step_time = now
+
+        # --- Dynamic Slew-Rate Spooling Engine ---
+        if self.throttle_pct < self.target_throttle_pct:
+            # Progressive motor spool-up: ~15% per second (0% to 55% hover takes ~3.6s, realistic rotor inertia)
+            slew_up = 15.0 * dt
+            self.throttle_pct = min(self.target_throttle_pct, self.throttle_pct + slew_up)
+            if self.target_load_pct > 0:
+                self.load_pct = min(self.target_load_pct, self.load_pct + (self.target_load_pct / max(1.0, self.target_throttle_pct)) * slew_up)
+        elif self.throttle_pct > self.target_throttle_pct:
+            # Smooth descent / spool-down: ~18% per second (55% down to 0% takes ~3.0s)
+            slew_down = 18.0 * dt
+            self.throttle_pct = max(self.target_throttle_pct, self.throttle_pct - slew_down)
+            self.load_pct = max(0.0, self.load_pct - (40.0 / 55.0) * slew_down)
+            if self.throttle_pct <= 0.2:
+                self.throttle_pct = 0.0
+                self.load_pct = 0.0
+                self.is_armed = False
+
+        # Altitude dynamics
+        if self.throttle_pct >= 40.0 and self.target_altitude_m > 0:
+            # Liftoff thrust overcomes weight above 40% throttle
+            climb_rate = 0.9 * ((self.throttle_pct - 40.0) / 15.0)
+            self.altitude_m = min(self.target_altitude_m, self.altitude_m + climb_rate * dt)
+        elif self.target_altitude_m == 0.0 or self.throttle_pct < 40.0:
+            descent_rate = 1.0
+            self.altitude_m = max(0.0, self.altitude_m - descent_rate * dt)
+
+        # Dynamic flight phase
+        if self.throttle_pct < 0.5:
+            self.flight_phase = "GROUND"
+        elif self.throttle_pct < self.target_throttle_pct - 1.0:
+            self.flight_phase = "SPOOLING_UP"
+        elif self.target_throttle_pct == 0.0 and self.throttle_pct > 0.5:
+            self.flight_phase = "DESCENT"
+        elif self.throttle_pct >= 50.0:
+            self.flight_phase = "HOVER_STABILIZED"
+        else:
+            self.flight_phase = "AIRBORNE"
         
         try:
             from backend.digital_twin.config import mapping_store
@@ -348,6 +412,9 @@ class TelemetryGenerator:
             "pitchspeed_deg_s": pitch_speed,
             "yawspeed_deg_s": yaw_speed,
             "flight_mode": flight_mode_sim,
+            "flight_phase": self.flight_phase,
+            "altitude_m": round(self.altitude_m, 2),
+            "relative_altitude_m": round(self.altitude_m, 2),
             "is_armed": is_armed_sim,
             "satellites_visible": sats_sim,
             "heartbeat_received": True if conn_count>0 else False,
