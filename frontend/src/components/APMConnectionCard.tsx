@@ -33,21 +33,18 @@ export const APMConnectionCard: React.FC = () => {
       if (mc?.connections) {
         setMotorConns(mc.connections);
       }
-      if (p?.ports && Array.isArray(p.ports)) {
+      if (p?.ports && Array.isArray(p.ports) && p.ports.length > 0) {
         setDetectedPorts(p.ports);
-        if (p.ports.length > 0) {
-          const portNames = p.ports.map((item: any) => item.port);
-          if (!serialPort || !portNames.includes(serialPort)) {
-            setSerialPort(p.ports[0].port);
-            // If CP210x or 3DR telemetry radio detected, default baud rate to 57600
-            const desc = (p.ports[0].description || '').toLowerCase();
-            if (desc.includes('cp210') || desc.includes('radio') || desc.includes('3dr') || desc.includes('telemetry')) {
-              setBaudRate(57600);
-            }
+        const portNames = p.ports.map((item: any) => item.port);
+        if (!serialPort || !portNames.includes(serialPort)) {
+          setSerialPort(p.ports[0].port);
+          const desc = (p.ports[0].description || '').toLowerCase();
+          if (desc.includes('cp210') || desc.includes('radio') || desc.includes('3dr') || desc.includes('telemetry')) {
+            setBaudRate(57600);
           }
-        } else {
-          setSerialPort('');
         }
+      } else {
+        if (!serialPort) setSerialPort('COM3');
       }
     } catch (err) {}
   };
@@ -153,7 +150,7 @@ export const APMConnectionCard: React.FC = () => {
         {connType === 'USB_SERIAL' ? (
           <div>
             <label className="text-[11px] font-bold text-zinc-300 block mb-1 uppercase tracking-wider">
-              AVAILABLE PHYSICAL SERIAL PORT
+              SERIAL TELEMETRY PORT
             </label>
             <div className="flex gap-1.5">
               {detectedPorts.length > 0 ? (
@@ -165,14 +162,19 @@ export const APMConnectionCard: React.FC = () => {
                 >
                   {detectedPorts.map((p, idx) => (
                     <option key={idx} value={p.port}>
-                      {p.port} {p.description ? `(${p.description})` : ''}
+                      {p.port} {p.description ? `(${p.description.slice(0, 20)})` : ''}
                     </option>
                   ))}
                 </select>
               ) : (
-                <div className="flex-1 bg-black border border-zinc-800 rounded-xl text-xs font-mono px-3 py-2 text-zinc-400 flex items-center">
-                  No physical ports detected
-                </div>
+                <input
+                  type="text"
+                  value={serialPort}
+                  onChange={(e) => setSerialPort(e.target.value)}
+                  disabled={isConnected || loading}
+                  placeholder="e.g. COM3"
+                  className="flex-1 bg-black border border-zinc-800 rounded-xl text-xs font-mono px-3 py-2 text-white font-bold focus:border-red-500"
+                />
               )}
             </div>
           </div>
@@ -210,7 +212,7 @@ export const APMConnectionCard: React.FC = () => {
           <select
             value={baudRate}
             onChange={(e) => setBaudRate(Number(e.target.value))}
-            disabled={isConnected || loading || (connType === 'USB_SERIAL' && detectedPorts.length === 0)}
+            disabled={isConnected || loading}
             className="w-full bg-black border border-zinc-800 rounded-xl text-xs font-mono px-3 py-2 text-white font-bold focus:border-red-500"
           >
             <option value={57600}>57600 (3DR / Sik Telemetry Radio 433/915 MHz)</option>
@@ -236,11 +238,11 @@ export const APMConnectionCard: React.FC = () => {
           ) : (
             <button
               onClick={handleConnect}
-              disabled={loading || (connType === 'USB_SERIAL' && detectedPorts.length === 0)}
+              disabled={loading || (connType === 'USB_SERIAL' && !serialPort)}
               className="flex-1 bg-red-600 hover:bg-red-700 text-white font-black text-xs py-2 px-4 rounded-xl shadow-md shadow-red-950/40 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
             >
               <Radio className="w-3.5 h-3.5" />
-              {connType === 'UDP' ? 'CONNECT UDP DEMO' : 'CONNECT APM'}
+              {loading ? 'READING...' : connType === 'UDP' ? 'CONNECT & READ UDP' : 'CONNECT & READ APM'}
             </button>
           )}
 

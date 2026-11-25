@@ -64,47 +64,51 @@ class MAVLinkConnectionManager:
     @staticmethod
     def list_available_ports() -> List[Dict[str, str]]:
         """
-        Scans and returns ONLY active physical USB/UART serial telemetry ports.
-        Filters out Bluetooth virtual COM ports and phantom software endpoints.
+        Scans and returns all available serial telemetry ports on the host system.
+        Prioritizes known USB-UART and flight controller devices (FTDI, CP210x, CH340, STM, etc.),
+        while ensuring all serial endpoints (including Bluetooth telemetry bridges) remain selectable.
         """
         ports = []
         try:
             import serial.tools.list_ports
-            for p in serial.tools.list_ports.comports():
-                desc_lower = (p.description or "").lower()
-                hwid_lower = (p.hwid or "").lower()
+            detected = list(serial.tools.list_ports.comports())
+            for p in detected:
+                desc = p.description or ""
+                hwid = p.hwid or ""
+                desc_lower = desc.lower()
+                hwid_lower = hwid.lower()
                 
-                # Filter out standard Windows Bluetooth serial links
-                if "bluetooth" in desc_lower or "bthenum" in hwid_lower or "bth\\" in hwid_lower:
-                    continue
-                    
-                # Must have USB provenance, real hardware VID/PID, or physical UART device
+                # Check for preferred physical USB telemetry / FC hardware
                 is_usb_telemetry = (
                     p.vid is not None or
-                    "usb" in hwid_lower or
-                    "usb" in desc_lower or
-                    "ftdi" in desc_lower or
-                    "cp210" in desc_lower or
-                    "ch34" in desc_lower or
-                    "prolific" in desc_lower or
-                    "stm" in desc_lower or
-                    "arduino" in desc_lower or
-                    "ardupilot" in desc_lower or
-                    "pixhawk" in desc_lower or
-                    "cube" in desc_lower or
-                    "uart" in desc_lower or
-                    "ttyusb" in p.device.lower() or
-                    "ttyacm" in p.device.lower()
+                    any(k in hwid_lower or k in desc_lower for k in [
+                        "usb", "ftdi", "cp210", "ch34", "prolific", "stm", 
+                        "arduino", "ardupilot", "pixhawk", "cube", "uart", 
+                        "telemetry", "radio", "3dr", "sik", "esp32", "ttyusb", "ttyacm"
+                    ])
                 )
                 
-                if is_usb_telemetry:
-                    ports.append({
-                        "port": p.device,
-                        "description": p.description,
-                        "hwid": p.hwid
-                    })
+                ports.append({
+                    "port": p.device,
+                    "description": desc,
+                    "hwid": hwid,
+                    "preferred": is_usb_telemetry
+                })
+            
+            # Sort so preferred hardware ports appear first, followed by remaining ports
+            ports.sort(key=lambda x: (not x.get("preferred", False), x["port"]))
         except Exception as e:
             logger.warning(f"Error scanning COM ports: {e}")
+        
+        # If no ports detected by scan, offer standard fallback ports so user can still connect
+        if not ports:
+            for fallback_port in ["COM3", "COM4", "COM5", "COM6", "COM7", "COM8"]:
+                ports.append({
+                    "port": fallback_port,
+                    "description": f"Serial Port ({fallback_port})",
+                    "hwid": "GENERIC_FALLBACK",
+                    "preferred": False
+                })
         return ports
 
     def configure_serial(self, port: str = "COM3", baud: int = 115200):
@@ -128,6 +132,7 @@ class MAVLinkConnectionManager:
             
         self.disconnect()
         self.connection_status = ConnectionStatus.CONNECTING
+        self.connect_time = time.time()
         
         try:
             from pymavlink import mavutil
@@ -347,7 +352,12 @@ class MAVLinkConnectionManager:
 
     def get_status(self) -> Dict[str, Any]:
         now = time.time()
-        is_stale = (now - self.last_packet_time > 3.0) if self.last_packet_time > 0 else True
+        connect_age = (now - getattr(self, "connect_time", 0.0)) if getattr(self, "connect_time", 0.0) > 0 else 999.0
+        if self.last_packet_time > 0:
+            is_stale = (now - self.last_packet_time > 3.0)
+        else:
+            # When newly connected, give 10 seconds grace period to establish stream before declaring stale
+            is_stale = (connect_age > 10.0)
         
         status = self.connection_status
         if self.connection_status == ConnectionStatus.CONNECTED and is_stale:

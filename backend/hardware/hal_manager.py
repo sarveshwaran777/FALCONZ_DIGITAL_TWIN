@@ -230,8 +230,8 @@ class HardwareAbstractionLayer:
         if self.active_source == TelemetrySource.APM_MAVLINK:
             status = mavlink_manager.get_status()
             last_age = status.get("last_packet_age_sec")
-            # Seamless fallback: If APM is disconnected or telemetry is stale (>3.0s), provide active telemetry
-            if (status["status"] in ("DISCONNECTED", "STALE") or (last_age is not None and last_age > 3.0)) and simulated_packet:
+            # Only fall back to simulation if APM is completely stopped/disconnected and simulation packet is provided
+            if not mavlink_manager.running and status["status"] == "DISCONNECTED" and simulated_packet:
                 return validator.validate_and_enrich(simulated_packet, TelemetrySource.SIMULATION)
 
             raw_apm = telemetry_mapper.to_canonical_dict()
