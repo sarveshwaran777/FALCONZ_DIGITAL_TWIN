@@ -68,6 +68,9 @@ interface AppContextType {
 
   // Hardware & Propulsion Actions
   setThrottle: (throttle: number, load?: number) => Promise<void>;
+  takeoff: (throttle?: number) => Promise<void>;
+  land: () => Promise<void>;
+  groundReset: () => Promise<void>;
   setScenario: (scenario: ScenarioType, severity?: number) => Promise<void>;
   setSource: (source: TelemetrySource) => Promise<void>;
   setControlMode: (mode: ControlMode) => Promise<void>;
@@ -107,12 +110,12 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | null>(null);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [systemState, setSystemState] = useState<FullSystemState | null>(() => createMockSystemState(0));
+  const [systemState, setSystemState] = useState<FullSystemState | null>(() => createMockSystemState(0, 'NORMAL', 0, 0, false));
   const [wsConnected, setWsConnected] = useState<boolean>(false);
   const [history, setHistory] = useState<FullSystemState[]>(() => {
     const init: FullSystemState[] = [];
     for (let i = 20; i >= 0; i--) {
-      init.push(createMockSystemState(-i, 'NORMAL', 0, 55, false));
+      init.push(createMockSystemState(-i, 'NORMAL', 0, 0, false));
     }
     return init;
   });
@@ -148,7 +151,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Client-side simulation state when backend is disconnected
   const simStepRef = useRef(0);
-  const simThrottleRef = useRef(55);
+  const simThrottleRef = useRef(0);
   const simEStopRef = useRef(false);
   const simScenarioRef = useRef<ScenarioType>('NORMAL');
   const simSeverityRef = useRef(0.0);
@@ -417,6 +420,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch {}
   };
 
+  const takeoff = async (throttle = 55) => {
+    simThrottleRef.current = throttle;
+    try {
+      await api.takeoff(throttle);
+      showToast(`Takeoff initiated: Throttle set to ${throttle}% hover.`, 'success');
+    } catch {
+      await api.setThrottle(throttle, 40);
+    }
+  };
+
+  const land = async () => {
+    simThrottleRef.current = 0;
+    try {
+      await api.land();
+      showToast('Aircraft landed: Throttle set to 0% initial state.', 'info');
+    } catch {
+      await api.setThrottle(0, 0);
+    }
+  };
+
+  const groundReset = async () => {
+    simThrottleRef.current = 0;
+    try {
+      await api.groundReset();
+      showToast('Reset to ground initial state (0 RPM).', 'info');
+    } catch {
+      await api.setThrottle(0, 0);
+    }
+  };
+
   const setScenario = async (scenario: ScenarioType, severity = 0.5) => {
     simScenarioRef.current = scenario;
     simSeverityRef.current = severity;
@@ -483,6 +516,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         askFalconzOpen,
         setAskFalconzOpen,
         setThrottle,
+        takeoff,
+        land,
+        groundReset,
         setScenario,
         setSource,
         setControlMode,

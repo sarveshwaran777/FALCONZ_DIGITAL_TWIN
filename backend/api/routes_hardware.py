@@ -152,6 +152,15 @@ def disconnect_mavlink():
     hal_manager.set_source(TelemetrySource.SIMULATION)
     return {"status": "DISCONNECTED"}
 
+class MAVLinkArmRequest(BaseModel):
+    armed: bool = True
+
+@router.post("/mavlink/arm")
+def arm_mavlink(req: MAVLinkArmRequest):
+    """Sends arm/disarm command to connected MAVLink flight controller."""
+    ok = mavlink_manager.arm(req.armed)
+    return {"success": ok, "armed": req.armed}
+
 @router.post("/serial/connect")
 def connect_serial_device(req: SerialConnectRequest):
     if req.device_type.upper() == "ESP32":

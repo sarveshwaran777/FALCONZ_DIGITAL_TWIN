@@ -126,6 +126,47 @@ def set_throttle(req: ThrottleRequest):
     )
     return {"status": "SUCCESS", "throttle_pct": req.throttle_pct, "load_pct": req.load_pct}
 
+class TakeoffRequest(BaseModel):
+    throttle_pct: float = 55.0
+
+@router.post("/takeoff")
+def initiate_takeoff(req: TakeoffRequest = TakeoffRequest()):
+    """Initiates takeoff from 0 initial ground state to hover."""
+    telemetry_generator.takeoff(target_throttle=req.throttle_pct)
+    # If MAVLink hardware is connected, also command arm
+    from backend.hardware.mavlink.mavlink_connection import mavlink_manager
+    if mavlink_manager.connection:
+        mavlink_manager.arm(True)
+        mavlink_manager.takeoff(2.5)
+    buffer_store.add_event(
+        event_type="TAKEOFF_INITIATED",
+        severity="INFO",
+        message=f"Takeoff initiated: Throttle set to {req.throttle_pct}% hover.",
+        details={"throttle_pct": req.throttle_pct}
+    )
+    return {"status": "TAKEOFF_INITIATED", "throttle_pct": req.throttle_pct, "is_armed": True}
+
+@router.post("/land")
+def initiate_landing():
+    """Lands aircraft, sets throttle to 0.0%, and disarms."""
+    telemetry_generator.land()
+    from backend.hardware.mavlink.mavlink_connection import mavlink_manager
+    if mavlink_manager.connection:
+        mavlink_manager.arm(False)
+    buffer_store.add_event(
+        event_type="LANDING_COMPLETED",
+        severity="INFO",
+        message="Aircraft landed on ground. Throttle returned to 0% initial state.",
+        details={"throttle_pct": 0.0, "is_armed": False}
+    )
+    return {"status": "LANDED", "throttle_pct": 0.0, "is_armed": False}
+
+@router.post("/ground-reset")
+def reset_to_ground_state():
+    """Resets telemetry state to 0 initial values before takeoff."""
+    telemetry_generator.reset_to_ground()
+    return {"status": "GROUND_RESET", "throttle_pct": 0.0, "is_armed": False}
+
 @router.post("/scenario")
 def set_scenario(req: ScenarioRequest):
     telemetry_generator.set_scenario(req.scenario, req.severity)

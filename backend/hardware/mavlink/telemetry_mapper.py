@@ -543,33 +543,48 @@ class MAVLinkTelemetryMapper:
                 # Commanded PWM from APM (Standard Flight Controller setup)
                 is_connected = True
                 disconn_reason = None
-                m_throttle = round(float(servo_data.get("throttle_pct", 0.0)), 1)
                 pwm_val = float(servo_data.get("pwm", 1000.0))
-                
-                # Empirical physics interpolation for A2212 930KV with 1045 prop
-                phys = calculate_a2212_telemetry(m_throttle, ambient_temp_c=self.ambient_temp_c, voltage_override=bus_voltage)
-                m_rpm = phys["live_rpm"]
-                m_volt = phys["voltage_v"]
-                m_vib = round(self.vibration_rms_g if (now - self.last_imu_time) <= 3.5 else 0.0, 3)
-                
-                # If APM sends whole-drone battery current via SYS_STATUS, distribute across active motors
-                if total_battery_curr and total_battery_curr > 0.1:
-                    m_curr = round(total_battery_curr / float(active_count), 2)
-                    m_power = round(m_volt * m_curr, 2)
-                    m_thrust = phys["thrust_g"]
-                    m_gw = round(m_thrust / m_power, 2) if m_power > 0.5 else 0.0
-                    m_eff = phys["efficiency_pct"]
+                # When disarmed or on ground before takeoff (PWM <= 1050), values must strictly stay at initial 0
+                if not self.is_armed or pwm_val <= 1050:
+                    m_throttle = 0.0
+                    m_rpm = 0.0
+                    m_volt = round(bus_voltage, 2)
+                    m_curr = 0.0
+                    m_power = 0.0
+                    m_thrust = 0.0
+                    m_gw = 0.0
+                    m_eff = 0.0
+                    m_temp = self.ambient_temp_c
+                    m_vib = round(self.vibration_rms_g if (now - self.last_imu_time) <= 3.5 else 0.0, 3)
+                    in_cruise = False
+                    status = SensorChannelBadge.REAL
+                    src_msg = f"SERVO_STANDBY (Ch {servo_ch} {pwm_val:.0f}μs - READY)"
                 else:
-                    m_curr = phys["current_a"]
-                    m_power = phys["power_w"]
-                    m_thrust = phys["thrust_g"]
-                    m_gw = phys["g_per_watt"]
-                    m_eff = phys["efficiency_pct"]
+                    m_throttle = round(float(servo_data.get("throttle_pct", 0.0)), 1)
+                    # Empirical physics interpolation for A2212 930KV with 1045 prop
+                    phys = calculate_a2212_telemetry(m_throttle, ambient_temp_c=self.ambient_temp_c, voltage_override=bus_voltage)
+                    m_rpm = phys["live_rpm"]
+                    m_volt = phys["voltage_v"]
+                    m_vib = round(self.vibration_rms_g if (now - self.last_imu_time) <= 3.5 else 0.0, 3)
                     
-                m_temp = phys["temperature_c"]
-                in_cruise = phys["in_cruise_efficiency_zone"]
-                status = SensorChannelBadge.REAL
-                src_msg = f"SERVO_OUTPUT_RAW (Ch {servo_ch} PWM {pwm_val:.0f}μs)"
+                    # If APM sends whole-drone battery current via SYS_STATUS, distribute across active motors
+                    if total_battery_curr and total_battery_curr > 0.1:
+                        m_curr = round(total_battery_curr / float(active_count), 2)
+                        m_power = round(m_volt * m_curr, 2)
+                        m_thrust = phys["thrust_g"]
+                        m_gw = round(m_thrust / m_power, 2) if m_power > 0.5 else 0.0
+                        m_eff = phys["efficiency_pct"]
+                    else:
+                        m_curr = phys["current_a"]
+                        m_power = phys["power_w"]
+                        m_thrust = phys["thrust_g"]
+                        m_gw = phys["g_per_watt"]
+                        m_eff = phys["efficiency_pct"]
+                        
+                    m_temp = phys["temperature_c"]
+                    in_cruise = phys["in_cruise_efficiency_zone"]
+                    status = SensorChannelBadge.REAL
+                    src_msg = f"SERVO_OUTPUT_RAW (Ch {servo_ch} PWM {pwm_val:.0f}μs)"
             elif len(self.esc_instances) > 0 and esc_inst not in self.esc_instances:
                 # Rig has discrete ESC telemetry; this motor channel has no ESC signal
                 is_connected = False
@@ -591,29 +606,43 @@ class MAVLinkTelemetryMapper:
                 # General APM / Radio link active - motor channel in healthy standby ready for throttle
                 is_connected = True
                 disconn_reason = None
-                m_throttle = round(self.vfr_throttle_pct or 0.0, 1)
-                
-                # Empirical physics interpolation for A2212 930KV with 1045 prop
-                phys = calculate_a2212_telemetry(m_throttle, ambient_temp_c=self.ambient_temp_c, voltage_override=bus_voltage)
-                m_rpm = phys["live_rpm"]
-                m_volt = phys["voltage_v"]
-                m_vib = round(self.vibration_rms_g if (now - self.last_imu_time) <= 3.5 else 0.0, 3)
-                if total_battery_curr and total_battery_curr > 0.1:
-                    m_curr = round(total_battery_curr / float(active_count), 2)
-                    m_power = round(m_volt * m_curr, 2)
-                    m_thrust = phys["thrust_g"]
-                    m_gw = round(m_thrust / m_power, 2) if m_power > 0.5 else 0.0
-                    m_eff = phys["efficiency_pct"]
+                if not self.is_armed:
+                    m_throttle = 0.0
+                    m_rpm = 0.0
+                    m_volt = round(bus_voltage, 2)
+                    m_curr = 0.0
+                    m_power = 0.0
+                    m_thrust = 0.0
+                    m_gw = 0.0
+                    m_eff = 0.0
+                    m_temp = self.ambient_temp_c
+                    m_vib = round(self.vibration_rms_g if (now - self.last_imu_time) <= 3.5 else 0.0, 3)
+                    in_cruise = False
+                    status = SensorChannelBadge.REAL
+                    src_msg = f"APM_CH_{servo_ch}_STANDBY (READY)"
                 else:
-                    m_curr = phys["current_a"]
-                    m_power = phys["power_w"]
-                    m_thrust = phys["thrust_g"]
-                    m_gw = phys["g_per_watt"]
-                    m_eff = phys["efficiency_pct"]
-                m_temp = phys["temperature_c"]
-                in_cruise = phys["in_cruise_efficiency_zone"]
-                status = SensorChannelBadge.REAL
-                src_msg = f"APM_CH_{servo_ch}_STANDBY" if m_throttle == 0 else f"APM_CH_{servo_ch}_LIVE"
+                    m_throttle = round(self.vfr_throttle_pct or 0.0, 1)
+                    # Empirical physics interpolation for A2212 930KV with 1045 prop
+                    phys = calculate_a2212_telemetry(m_throttle, ambient_temp_c=self.ambient_temp_c, voltage_override=bus_voltage)
+                    m_rpm = phys["live_rpm"]
+                    m_volt = phys["voltage_v"]
+                    m_vib = round(self.vibration_rms_g if (now - self.last_imu_time) <= 3.5 else 0.0, 3)
+                    if total_battery_curr and total_battery_curr > 0.1:
+                        m_curr = round(total_battery_curr / float(active_count), 2)
+                        m_power = round(m_volt * m_curr, 2)
+                        m_thrust = phys["thrust_g"]
+                        m_gw = round(m_thrust / m_power, 2) if m_power > 0.5 else 0.0
+                        m_eff = phys["efficiency_pct"]
+                    else:
+                        m_curr = phys["current_a"]
+                        m_power = phys["power_w"]
+                        m_thrust = phys["thrust_g"]
+                        m_gw = phys["g_per_watt"]
+                        m_eff = phys["efficiency_pct"]
+                    m_temp = phys["temperature_c"]
+                    in_cruise = phys["in_cruise_efficiency_zone"]
+                    status = SensorChannelBadge.REAL
+                    src_msg = f"APM_CH_{servo_ch}_LIVE"
             else:
                 # No active hardware link or channel disconnected
                 is_connected = False
@@ -672,20 +701,33 @@ class MAVLinkTelemetryMapper:
             
         # Quadcopter Aggregate Propulsion Calculations
         conn_count = len([m for m in motors_dict.values() if m["is_connected"]])
-        total_curr = sum(live_currents) if len(live_currents) > 0 else (self.battery_current_a if (now - self.last_battery_time) <= 3.5 else None)
-        total_pwr = sum(live_powers) if len(live_powers) > 0 else ((bus_voltage * total_curr) if (bus_voltage and total_curr) else None)
-        total_thrust_val = sum([m["thrust_g"] for m in motors_dict.values() if m["is_connected"]])
-        avg_rpm_val = (sum(live_rpms) / len(live_rpms)) if len(live_rpms) > 0 else None
-        avg_gw_val = round(total_thrust_val / total_pwr, 2) if (total_pwr and total_pwr > 0.5) else None
-        
-        # Inter-Motor Imbalance Metrics (Computed strictly across physically active bench motors)
-        rpm_imbalance_pct = round(((max(live_rpms) - min(live_rpms)) / avg_rpm_val) * 100.0, 1) if (avg_rpm_val and avg_rpm_val > 50.0 and len(live_rpms) >= 2) else 0.0
-        curr_imbalance = round(max(live_currents) - min(live_currents), 2) if len(live_currents) >= 2 else None
-        temp_imbalance = round(max(live_temps) - min(live_temps), 1) if len(live_temps) >= 2 else None
-        
-        # Global Commanded Throttle (Average of connected motor throttles or VFR HUD)
-        servos_throttles = [m["throttle_pct"] for m in motors_dict.values() if m["throttle_pct"] is not None and m["is_connected"]]
-        avg_throttle = (sum(servos_throttles) / len(servos_throttles)) if len(servos_throttles) > 0 else self.vfr_throttle_pct
+        has_running_motors = any((m.get("live_rpm", 0.0) or 0.0) > 50 for m in motors_dict.values())
+        is_flight_active = self.is_armed or has_running_motors or (len(self.esc_instances) > 0 and any((e.get("rpm", 0.0) or 0.0) > 50 for e in self.esc_instances.values()))
+        if not is_flight_active:
+            total_curr = 0.0
+            total_pwr = 0.0
+            total_thrust_val = 0.0
+            avg_rpm_val = 0.0
+            avg_gw_val = 0.0
+            avg_throttle = 0.0
+            rpm_imbalance_pct = 0.0
+            curr_imbalance = 0.0
+            temp_imbalance = 0.0
+        else:
+            total_curr = sum(live_currents) if len(live_currents) > 0 else (self.battery_current_a if (now - self.last_battery_time) <= 3.5 else None)
+            total_pwr = sum(live_powers) if len(live_powers) > 0 else ((bus_voltage * total_curr) if (bus_voltage and total_curr) else None)
+            total_thrust_val = sum([m["thrust_g"] for m in motors_dict.values() if m["is_connected"]])
+            avg_rpm_val = (sum(live_rpms) / len(live_rpms)) if len(live_rpms) > 0 else None
+            avg_gw_val = round(total_thrust_val / total_pwr, 2) if (total_pwr and total_pwr > 0.5) else None
+            
+            # Inter-Motor Imbalance Metrics (Computed strictly across physically active bench motors)
+            rpm_imbalance_pct = round(((max(live_rpms) - min(live_rpms)) / avg_rpm_val) * 100.0, 1) if (avg_rpm_val and avg_rpm_val > 50.0 and len(live_rpms) >= 2) else 0.0
+            curr_imbalance = round(max(live_currents) - min(live_currents), 2) if len(live_currents) >= 2 else None
+            temp_imbalance = round(max(live_temps) - min(live_temps), 1) if len(live_temps) >= 2 else None
+            
+            # Global Commanded Throttle (Average of connected motor throttles or VFR HUD)
+            servos_throttles = [m["throttle_pct"] for m in motors_dict.values() if m["throttle_pct"] is not None and m["is_connected"]]
+            avg_throttle = (sum(servos_throttles) / len(servos_throttles)) if len(servos_throttles) > 0 else self.vfr_throttle_pct
 
         return {
             "timestamp": now,
@@ -695,29 +737,29 @@ class MAVLinkTelemetryMapper:
             "total_motors_count": 4,
             "total_thrust_g": round(total_thrust_val, 1) if conn_count > 0 else 0.0,
             "avg_g_per_watt": avg_gw_val,
-            "total_current_a": round(total_curr, 2) if total_curr is not None else None,
-            "total_power_w": round(total_pwr, 2) if total_pwr is not None else None,
-            "avg_rpm": round(avg_rpm_val, 1) if avg_rpm_val is not None else None,
+            "total_current_a": round(total_curr, 2) if total_curr is not None else 0.0,
+            "total_power_w": round(total_pwr, 2) if total_pwr is not None else 0.0,
+            "avg_rpm": round(avg_rpm_val, 1) if avg_rpm_val is not None else 0.0,
             "rpm_imbalance_pct": rpm_imbalance_pct,
             "current_imbalance_pct": curr_imbalance,
             "temp_imbalance_c": temp_imbalance,
             "vibration_imbalance_g": 0.0,
             
-            # Primary Global Sensor Channels
-            "throttle_pct": round(avg_throttle, 1),
-            "rpm": avg_rpm_val if avg_rpm_val is not None else 0.0,
+            # Primary Global Sensor Channels (Strict 0.0 values on ground before takeoff)
+            "throttle_pct": round(avg_throttle, 1) if is_flight_active else 0.0,
+            "rpm": avg_rpm_val if (avg_rpm_val is not None and is_flight_active) else 0.0,
             "voltage_v": round(bus_voltage, 2),
-            "current_a": total_curr if total_curr is not None else 0.0,
-            "power_elec_w": total_pwr if total_pwr is not None else 0.0,
+            "current_a": total_curr if (total_curr is not None and is_flight_active) else 0.0,
+            "power_elec_w": total_pwr if (total_pwr is not None and is_flight_active) else 0.0,
             "torque_nm": 0.0,
-            "power_mech_w": round(total_pwr * 0.85, 2) if total_pwr else 0.0,
-            "efficiency_pct": 85.0 if (avg_rpm_val and avg_rpm_val > 0) else 0.0,
+            "power_mech_w": round(total_pwr * 0.85, 2) if (total_pwr and is_flight_active) else 0.0,
+            "efficiency_pct": 85.0 if (avg_rpm_val and avg_rpm_val > 0 and is_flight_active) else 0.0,
             "temperature_c": max(live_temps) if len(live_temps) > 0 else self.ambient_temp_c,
-            "vibration_rms_g": self.vibration_rms_g,
-            "load_pct": avg_throttle,
+            "vibration_rms_g": self.vibration_rms_g if is_flight_active else 0.012,
+            "load_pct": avg_throttle if is_flight_active else 0.0,
             "ambient_temperature_c": self.ambient_temp_c,
             "altitude_m": self.alt_msl_m,
-            "airspeed_mps": self.groundspeed_mps,
+            "airspeed_mps": self.groundspeed_mps if is_flight_active else 0.0,
             
             # Telemetry Radio Link Metrics
             "radio_rssi": self.radio_rssi,

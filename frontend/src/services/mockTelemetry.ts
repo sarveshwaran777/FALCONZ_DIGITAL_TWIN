@@ -4,7 +4,7 @@ export function createMockSystemState(
   step: number = 0,
   scenario: ScenarioType = 'NORMAL',
   severity: number = 0.0,
-  throttleInput: number = 55,
+  throttleInput: number = 0,
   emergencyStop: boolean = false
 ): FullSystemState {
   const t = step * 0.5; // step increment
@@ -12,13 +12,14 @@ export function createMockSystemState(
 
   // Base throttle and physics calculations
   const effectiveThrottle = emergencyStop ? 0 : Math.max(0, Math.min(100, throttleInput));
-  const baseRpm = (effectiveThrottle / 100) * 9800;
-  const rpmNoise = Math.sin(t * 1.5) * 45 + (Math.random() - 0.5) * 20;
-  const liveRpm = Math.max(0, Math.round(baseRpm + rpmNoise));
+  const isOnGround = effectiveThrottle < 0.5;
+  const baseRpm = isOnGround ? 0 : (effectiveThrottle / 100) * 9800;
+  const rpmNoise = isOnGround ? 0 : Math.sin(t * 1.5) * 45 + (Math.random() - 0.5) * 20;
+  const liveRpm = isOnGround ? 0 : Math.max(0, Math.round(baseRpm + rpmNoise));
 
   // Electrical physics
-  const voltageNominal = 14.8;
-  const currentDraw = emergencyStop ? 0.4 : (liveRpm / 9800) * 24.5 + Math.sin(t * 0.8) * 0.5;
+  const voltageNominal = 12.4;
+  const currentDraw = emergencyStop || isOnGround ? 0.0 : (liveRpm / 9800) * 24.5 + Math.sin(t * 0.8) * 0.5;
   const liveVoltage = Math.max(11.1, +(voltageNominal - currentDraw * 0.035).toFixed(2));
   const liveCurrent = +Math.max(0, currentDraw).toFixed(2);
   const powerElec = +(liveVoltage * liveCurrent).toFixed(1);
@@ -26,26 +27,26 @@ export function createMockSystemState(
   // Mechanical torque & power
   const torqueNm = +(liveRpm > 100 ? (powerElec * 0.78) / ((liveRpm * 2 * Math.PI) / 60) : 0).toFixed(3);
   const powerMech = +(liveRpm > 100 ? (torqueNm * (liveRpm * 2 * Math.PI)) / 60 : 0).toFixed(1);
-  const efficiencyPct = powerElec > 0 ? Math.min(95, +((powerMech / powerElec) * 100).toFixed(1)) : 80;
+  const efficiencyPct = powerElec > 0 ? Math.min(95, +((powerMech / powerElec) * 100).toFixed(1)) : 0;
 
   // Thermal & Vibration
   const ambientTemp = 25.0;
   const tempRise = (liveCurrent / 25) * 24;
-  const liveTemp = +(ambientTemp + tempRise + Math.sin(t * 0.2) * 1.2).toFixed(1);
-  const baseVib = 0.045 + (liveRpm / 10000) * 0.055;
-  const liveVib = +(baseVib + (Math.random() - 0.5) * 0.008).toFixed(3);
+  const liveTemp = +(ambientTemp + tempRise + (isOnGround ? 0 : Math.sin(t * 0.2) * 1.2)).toFixed(1);
+  const baseVib = isOnGround ? 0.012 : (0.045 + (liveRpm / 10000) * 0.055);
+  const liveVib = +(baseVib + (isOnGround ? 0 : (Math.random() - 0.5) * 0.008)).toFixed(3);
 
-  // 3D Quadcopter Dynamics (Subtle realistic hover oscillations)
-  const rollDeg = +(Math.sin(t * 0.7) * 2.2).toFixed(2);
-  const pitchDeg = +(Math.cos(t * 0.6) * 1.8).toFixed(2);
-  const yawDeg = +((t * 3.5) % 360).toFixed(1);
+  // 3D Quadcopter Dynamics (Stationary and level on ground before takeoff)
+  const rollDeg = isOnGround ? 0 : +(Math.sin(t * 0.7) * 2.2).toFixed(2);
+  const pitchDeg = isOnGround ? 0 : +(Math.cos(t * 0.6) * 1.8).toFixed(2);
+  const yawDeg = isOnGround ? 0 : +((t * 3.5) % 360).toFixed(1);
 
   // 4 Motors
   const mRpmNoise = [20, -15, 30, -25];
   const motorsData: Record<string, any> = {};
   ['motor_1', 'motor_2', 'motor_3', 'motor_4'].forEach((key, idx) => {
-    const mRpm = Math.max(0, liveRpm + mRpmNoise[idx] + Math.round((Math.random() - 0.5) * 15));
-    const mCurr = +(liveCurrent / 4 + (Math.random() - 0.5) * 0.1).toFixed(2);
+    const mRpm = isOnGround ? 0 : Math.max(0, liveRpm + mRpmNoise[idx] + Math.round((Math.random() - 0.5) * 15));
+    const mCurr = isOnGround ? 0 : +(liveCurrent / 4 + (Math.random() - 0.5) * 0.1).toFixed(2);
     const mThrust = +(mRpm > 100 ? (mRpm / 9800) * 450 + (Math.random() - 0.5) * 10 : 0).toFixed(0);
     motorsData[key] = {
       motor_id: key,
@@ -64,15 +65,15 @@ export function createMockSystemState(
       current_a: mCurr,
       power_w: +(liveVoltage * mCurr).toFixed(1),
       thrust_g: Number(mThrust),
-      g_per_watt: mCurr > 0 ? +(Number(mThrust) / (liveVoltage * mCurr)).toFixed(2) : 5.2,
+      g_per_watt: mCurr > 0 ? +(Number(mThrust) / (liveVoltage * mCurr)).toFixed(2) : 0,
       efficiency_pct: efficiencyPct,
       temperature_c: +(liveTemp + idx * 0.5).toFixed(1),
       vibration_rms_g: liveVib,
       throttle_pct: effectiveThrottle,
       torque_nm: +(torqueNm / 4).toFixed(3),
       in_cruise_efficiency_zone: effectiveThrottle >= 45 && effectiveThrottle <= 68,
-      status: 'SIMULATION',
-      source_message: 'CLIENT_SIMULATOR'
+      status: isOnGround ? 'READY' : 'SIMULATION',
+      source_message: isOnGround ? 'GROUND_READY' : 'CLIENT_SIMULATOR'
     };
   });
 

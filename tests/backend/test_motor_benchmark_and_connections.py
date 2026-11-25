@@ -24,7 +24,8 @@ def test_motor_benchmark_endpoint():
         assert pt["g_per_watt"] >= 7.0
 
 def test_motor_connection_toggle():
-    # 1. Get initial connections
+    # 1. Get initial connections and set active test operating point
+    telemetry_generator.set_operating_point(55.0, 40.0)
     res = client.get("/api/hardware/motor-connections")
     assert res.status_code == 200
     conns = res.json()["connections"]

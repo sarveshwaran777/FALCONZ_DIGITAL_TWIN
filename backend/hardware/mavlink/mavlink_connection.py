@@ -62,54 +62,85 @@ class MAVLinkConnectionManager:
 
 
     @staticmethod
-    def list_available_ports() -> List[Dict[str, str]]:
+    def list_available_ports() -> List[Dict[str, Any]]:
         """
-        Scans and returns all available serial telemetry ports on the host system.
-        Prioritizes known USB-UART and flight controller devices (FTDI, CP210x, CH340, STM, etc.),
-        while ensuring all serial endpoints (including Bluetooth telemetry bridges) remain selectable.
+        Scans and returns all active serial telemetry ports on the host system.
+        Prioritizes dedicated USB/UART adapters and flight controllers while ensuring
+        standard serial and radio endpoints remain selectable.
         """
-        ports = []
+        usb_ports = []
+        other_ports = []
         try:
             import serial.tools.list_ports
-            detected = list(serial.tools.list_ports.comports())
-            for p in detected:
+            for p in serial.tools.list_ports.comports():
                 desc = p.description or ""
-                hwid = p.hwid or ""
                 desc_lower = desc.lower()
-                hwid_lower = hwid.lower()
+                hwid_lower = (p.hwid or "").lower()
                 
-                # Check for preferred physical USB telemetry / FC hardware
+                # Check for physical USB UART hardware provenance
                 is_usb_telemetry = (
                     p.vid is not None or
-                    any(k in hwid_lower or k in desc_lower for k in [
+                    any(k in hwid_lower or k in desc_lower for k in (
                         "usb", "ftdi", "cp210", "ch34", "prolific", "stm", 
                         "arduino", "ardupilot", "pixhawk", "cube", "uart", 
-                        "telemetry", "radio", "3dr", "sik", "esp32", "ttyusb", "ttyacm"
-                    ])
+                        "ttyusb", "ttyacm", "silicon labs"
+                    ))
                 )
                 
-                ports.append({
+                port_entry = {
                     "port": p.device,
                     "description": desc,
-                    "hwid": hwid,
-                    "preferred": is_usb_telemetry
-                })
-            
-            # Sort so preferred hardware ports appear first, followed by remaining ports
-            ports.sort(key=lambda x: (not x.get("preferred", False), x["port"]))
+                    "hwid": p.hwid,
+                    "is_usb": is_usb_telemetry
+                }
+                
+                if is_usb_telemetry:
+                    usb_ports.append(port_entry)
+                else:
+                    other_ports.append(port_entry)
         except Exception as e:
             logger.warning(f"Error scanning COM ports: {e}")
-        
-        # If no ports detected by scan, offer standard fallback ports so user can still connect
-        if not ports:
-            for fallback_port in ["COM3", "COM4", "COM5", "COM6", "COM7", "COM8"]:
-                ports.append({
-                    "port": fallback_port,
-                    "description": f"Serial Port ({fallback_port})",
-                    "hwid": "GENERIC_FALLBACK",
-                    "preferred": False
-                })
-        return ports
+            
+        # Return prioritized USB ports followed by other system serial ports
+        return usb_ports + other_ports
+
+    def arm(self, armed: bool = True) -> bool:
+        """Sends MAV_CMD_COMPONENT_ARM_DISARM to APM/Pixhawk."""
+        if not self.connection:
+            return False
+        try:
+            from pymavlink import mavutil
+            fc_sys = self.system_id if (self.system_id and self.system_id != 51) else 1
+            self.connection.mav.command_long_send(
+                fc_sys, 0,
+                mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+                0,
+                1.0 if armed else 0.0,
+                0, 0, 0, 0, 0, 0
+            )
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to send MAVLink arm command: {e}")
+            return False
+
+    def takeoff(self, altitude_m: float = 2.5) -> bool:
+        """Sends MAV_CMD_NAV_TAKEOFF to APM/Pixhawk."""
+        if not self.connection:
+            return False
+        try:
+            from pymavlink import mavutil
+            fc_sys = self.system_id if (self.system_id and self.system_id != 51) else 1
+            self.connection.mav.command_long_send(
+                fc_sys, 0,
+                mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+                0,
+                0, 0, 0, 0, 0, 0,
+                float(altitude_m)
+            )
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to send MAVLink takeoff command: {e}")
+            return False
 
     def configure_serial(self, port: str = "COM3", baud: int = 115200):
         self.connection_type = "USB_SERIAL"
@@ -132,7 +163,6 @@ class MAVLinkConnectionManager:
             
         self.disconnect()
         self.connection_status = ConnectionStatus.CONNECTING
-        self.connect_time = time.time()
         
         try:
             from pymavlink import mavutil
@@ -352,12 +382,7 @@ class MAVLinkConnectionManager:
 
     def get_status(self) -> Dict[str, Any]:
         now = time.time()
-        connect_age = (now - getattr(self, "connect_time", 0.0)) if getattr(self, "connect_time", 0.0) > 0 else 999.0
-        if self.last_packet_time > 0:
-            is_stale = (now - self.last_packet_time > 3.0)
-        else:
-            # When newly connected, give 10 seconds grace period to establish stream before declaring stale
-            is_stale = (connect_age > 10.0)
+        is_stale = (now - self.last_packet_time > 3.0) if self.last_packet_time > 0 else True
         
         status = self.connection_status
         if self.connection_status == ConnectionStatus.CONNECTED and is_stale:

@@ -73,6 +73,40 @@ export const api = {
     return res.json();
   },
 
+  async takeoff(throttle_pct: number = 55.0) {
+    const res = await fetch(`${API_BASE}/telemetry/takeoff`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ throttle_pct })
+    });
+    return res.json();
+  },
+
+  async land() {
+    const res = await fetch(`${API_BASE}/telemetry/land`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  async groundReset() {
+    const res = await fetch(`${API_BASE}/telemetry/ground-reset`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  async armMAVLink(armed: boolean = true) {
+    const res = await fetch(`${API_BASE}/hardware/mavlink/arm`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ armed })
+    });
+    return res.json();
+  },
+
   async setScenario(scenario: ScenarioType, severity = 0.5) {
     const res = await fetch(`${API_BASE}/telemetry/scenario`, {
       method: 'POST',

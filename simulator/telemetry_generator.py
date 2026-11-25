@@ -21,9 +21,11 @@ class TelemetryGenerator:
     def __init__(self):
         self.active_scenario: ScenarioType = ScenarioType.NORMAL
         self.scenario_severity: float = 0.5  # 0.0 to 1.0
-        self.throttle_pct: float = 55.0
-        self.load_pct: float = 40.0
-        self.battery_voltage: float = 12.0   # 3S LiPo testbed nominal (11.1V - 12.4V)
+        # Initial values start at 0 before takeoff
+        self.throttle_pct: float = 0.0
+        self.load_pct: float = 0.0
+        self.is_armed: bool = False
+        self.battery_voltage: float = 12.4   # 3S LiPo testbed resting pack nominal (12.4V - 12.6V)
         self.ambient_temp_c: float = settings.DEFAULT_AMBIENT_TEMP_C
         self.internal_temp: float = settings.DEFAULT_AMBIENT_TEMP_C
         self.last_step_time: float = time.time()
@@ -76,10 +78,31 @@ class TelemetryGenerator:
         
     def set_operating_point(self, throttle_pct: float, load_pct: Optional[float] = None, ambient_temp_c: Optional[float] = None):
         self.throttle_pct = max(0.0, min(100.0, throttle_pct))
+        if self.throttle_pct > 2.0:
+            self.is_armed = True
+        else:
+            self.is_armed = False
         if load_pct is not None:
             self.load_pct = max(0.0, min(100.0, load_pct))
         if ambient_temp_c is not None:
             self.ambient_temp_c = ambient_temp_c
+
+    def takeoff(self, target_throttle: float = 55.0):
+        """Initiates simulated takeoff and transitions into hover (55% nominal)."""
+        self.is_armed = True
+        self.set_operating_point(target_throttle, 40.0)
+
+    def land(self):
+        """Initiates simulated landing to ground (0% throttle, disarmed)."""
+        self.is_armed = False
+        self.set_operating_point(0.0, 0.0)
+
+    def reset_to_ground(self):
+        """Resets telemetry generator to ground zero-state before takeoff."""
+        self.is_armed = False
+        self.set_operating_point(0.0, 0.0)
+        self.internal_temp = self.ambient_temp_c
+        self.sim_yaw_deg = 0.0
 
     def generate_packet(self) -> Dict[str, Any]:
         now = time.time()
@@ -271,45 +294,59 @@ class TelemetryGenerator:
         effective_global_temp = (sum(connected_temps) / conn_count) if conn_count > 0 else self.ambient_temp_c
         effective_global_vib = (sum(connected_vibs) / conn_count) if conn_count > 0 else 0.015
 
-        # ——— Realistic attitude synthesis for 3D (was missing → add) ———
+        # ——— Realistic attitude synthesis for 3D (Level and stationary on ground before takeoff) ———
         t = now - self.sim_time_origin
-        # Yaw slow drift + throttle influence
-        yaw_rate = 1.2 + (self.throttle_pct / 100.0) * 2.5
-        self.sim_yaw_deg = (self.sim_yaw_deg + yaw_rate * dt * (0.3 if conn_count==0 else 1.0)) % 360.0
-        # Roll/pitch small oscillations scaled by scenario severity
-        sev_att = sev if self.active_scenario != ScenarioType.NORMAL else 0.15
-        roll_deg = math.sin(t*0.35) * (1.8 + sev_att*4.5) + math.sin(t*1.7)*0.3*sev_att + random.gauss(0,0.08)
-        pitch_deg = math.cos(t*0.42) * (1.2 + sev_att*3.0) + math.sin(t*0.9)*0.25*sev_att + random.gauss(0,0.08)
-        # Add imbalance-induced tilt for degraded scenarios
-        if conn_count >= 2 and rpm_imb > 20:
-            roll_deg += (rpm_imb/60.0) * math.sin(t*0.8)
-        # Clamp
-        roll_deg = max(-22, min(22, roll_deg))
-        pitch_deg = max(-18, min(18, pitch_deg))
-        yaw_deg = self.sim_yaw_deg if conn_count>0 else 0.0
-        # Flight mode & armed synthetic
-        is_armed_sim = conn_count>0 and self.throttle_pct>5.0
-        flight_mode_sim = "LOITER" if 48 < self.throttle_pct < 62 else ("STABILIZE" if self.throttle_pct>5 else "STANDBY")
-        sats_sim = 12 if conn_count>0 else 0
+        is_on_ground = self.throttle_pct < 0.5 or not self.is_armed
+        if is_on_ground:
+            roll_deg = 0.0
+            pitch_deg = 0.0
+            yaw_deg = 0.0
+            roll_speed = 0.0
+            pitch_speed = 0.0
+            yaw_speed = 0.0
+            is_armed_sim = False
+            flight_mode_sim = "STANDBY"
+            sats_sim = 12 if conn_count > 0 else 0
+        else:
+            # Yaw slow drift + throttle influence
+            yaw_rate = 1.2 + (self.throttle_pct / 100.0) * 2.5
+            self.sim_yaw_deg = (self.sim_yaw_deg + yaw_rate * dt * (0.3 if conn_count==0 else 1.0)) % 360.0
+            # Roll/pitch small oscillations scaled by scenario severity
+            sev_att = sev if self.active_scenario != ScenarioType.NORMAL else 0.15
+            roll_deg = math.sin(t*0.35) * (1.8 + sev_att*4.5) + math.sin(t*1.7)*0.3*sev_att + random.gauss(0,0.08)
+            pitch_deg = math.cos(t*0.42) * (1.2 + sev_att*3.0) + math.sin(t*0.9)*0.25*sev_att + random.gauss(0,0.08)
+            # Add imbalance-induced tilt for degraded scenarios
+            if conn_count >= 2 and rpm_imb > 20:
+                roll_deg += (rpm_imb/60.0) * math.sin(t*0.8)
+            # Clamp
+            roll_deg = max(-22, min(22, roll_deg))
+            pitch_deg = max(-18, min(18, pitch_deg))
+            yaw_deg = self.sim_yaw_deg if conn_count>0 else 0.0
+            roll_speed = round(math.cos(t*0.35)*0.7, 2)
+            pitch_speed = round(-math.sin(t*0.42)*0.5, 2)
+            yaw_speed = round(yaw_rate, 2) if conn_count>0 else 0.0
+            is_armed_sim = conn_count > 0 and self.throttle_pct > 2.0
+            flight_mode_sim = "LOITER" if 48 < self.throttle_pct < 62 else "STABILIZE"
+            sats_sim = 12 if conn_count > 0 else 0
         
         return {
             "timestamp": now,
             "source_type": TelemetrySource.SIMULATION.value,
-            "throttle_pct": self.throttle_pct if conn_count > 0 else 0.0,
-            "rpm": effective_global_rpm,
+            "throttle_pct": round(self.throttle_pct, 1) if conn_count > 0 and not is_on_ground else 0.0,
+            "rpm": effective_global_rpm if not is_on_ground else 0.0,
             "voltage_v": round(v_measured, 2) if conn_count > 0 else 12.40,
-            "current_a": effective_global_curr,
+            "current_a": effective_global_curr if not is_on_ground else 0.0,
             "temperature_c": effective_global_temp,
-            "vibration_rms_g": effective_global_vib,
-            "load_pct": effective_load,
+            "vibration_rms_g": effective_global_vib if not is_on_ground else 0.012,
+            "load_pct": effective_load if not is_on_ground else 0.0,
             "ambient_temperature_c": self.ambient_temp_c,
-            "torque_nm": torque_nm if conn_count > 0 else 0.0,
-            "roll_deg": round(roll_deg,2) if conn_count>0 else 0.0,
-            "pitch_deg": round(pitch_deg,2) if conn_count>0 else 0.0,
-            "yaw_deg": round(yaw_deg,2) if conn_count>0 else 0.0,
-            "rollspeed_deg_s": round(math.cos(t*0.35)*0.7,2),
-            "pitchspeed_deg_s": round(-math.sin(t*0.42)*0.5,2),
-            "yawspeed_deg_s": round(yaw_rate,2) if conn_count>0 else 0.0,
+            "torque_nm": torque_nm if (conn_count > 0 and not is_on_ground) else 0.0,
+            "roll_deg": round(roll_deg, 2) if conn_count>0 else 0.0,
+            "pitch_deg": round(pitch_deg, 2) if conn_count>0 else 0.0,
+            "yaw_deg": round(yaw_deg, 2) if conn_count>0 else 0.0,
+            "rollspeed_deg_s": roll_speed,
+            "pitchspeed_deg_s": pitch_speed,
+            "yawspeed_deg_s": yaw_speed,
             "flight_mode": flight_mode_sim,
             "is_armed": is_armed_sim,
             "satellites_visible": sats_sim,
